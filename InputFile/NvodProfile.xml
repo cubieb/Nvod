@@ -1,0 +1,10 @@
+<?xml version='1.0'  encoding='gb2312' ?>
+<Root RxIp="10.0.0.2"  RxUdpPort="5001"
+      TxSrcIp="10.0.0.2"  TxSrcUdpPort="5001" 
+      TxDstIp="10.0.0.10" TxDstUdpPort="5001"
+      PosterInterval="10">
+    <Transportstream TsId="1" OnId="1">
+        <Service ServiceId="1" AudioPid="5001" VideoPid="6001"/>
+        <Service ServiceId="2" AudioPid="5002" VideoPid="6002"/>
+    </Transportstream>
+</Root>
