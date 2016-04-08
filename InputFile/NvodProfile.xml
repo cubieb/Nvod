@@ -1,10 +1,26 @@
 <?xml version='1.0'  encoding='gb2312' ?>
-<Root RxIp="10.0.0.2"  RxUdpPort="5001"
-      TxSrcIp="10.0.0.2"  TxSrcUdpPort="5001" 
-      TxDstIp="10.0.0.10" TxDstUdpPort="5001"
-      PosterInterval="10">
-    <Transportstream TsId="1" OnId="1">
-        <Service ServiceId="1" AudioPid="5001" VideoPid="6001"/>
-        <Service ServiceId="2" AudioPid="5002" VideoPid="6002"/>
-    </Transportstream>
+<Root>
+    <Rx>
+        <Ip>10.0.0.2</Ip>
+        <UdpPort>5001</UdpPort>
+    </Rx>
+    <Tx>
+        <SrcIp>10.0.0.2</SrcIp>     
+        <DstIp>10.0.0.10</DstIp>
+        <DstUdpPort>5001</DstUdpPort>
+    </Tx>
+    <Poster>
+        <Interval>10</Interval>
+    <Poster>
+    <PmtInfo>
+        <Service Id="1" type="Movie">
+            <PmtPid>101</PmtPid>
+            <AudioPid>200</AudioPid>
+            <VideoPid>201</VideoPid>
+        </Service>
+        <Service Id="1" type="Poster">
+            <PmtPid>109</PmtPid>
+            <PosterPid>202</PosterPid>
+        </Service>
+    </PmtInfo>
 </Root>

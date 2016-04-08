@@ -16,7 +16,6 @@
 		<Event EventID="101" StartTime="2017-08-31 01:00:00" Duration="003600" running_status="4" free_CA_mode="1">
 			<Descriptors>
 				<Item01 Tag="0x4D" Data="4D07chi02aa00"/>
-                <Item03 Tag="0x84" Data="840400000001"/>  <!-- Movie Id Descriptor --> 
 			</Descriptors>
 		</Event>
 	</Transportstream>

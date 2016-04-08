@@ -17,6 +17,8 @@
 			<Descriptors>
 				<Item01 Tag="0x48" Data="480A010007Nvod001"/>
 				<Item02 Tag="0x4B" Data="4B0C000100010001000100010002"/>  <!-- NVOD_reference_descriptor --> 
+                <Item03 Tag="0x84" Data="840400000001"/>                  <!-- Movie Id Descriptor --> 
+                <Item03 Tag="0x85" Data="850400000001"/>                  <!-- poster_id_descriptor  --> 
 			</Descriptors>
 		</Service>
 	</Transportstream>
