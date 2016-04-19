@@ -1,26 +1,28 @@
 <?xml version='1.0'  encoding='gb2312' ?>
 <Root>
-    <Rx>
-        <Ip>10.0.0.2</Ip>
-        <UdpPort>5001</UdpPort>
-    </Rx>
     <Tx>
         <SrcIp>10.0.0.2</SrcIp>     
-        <DstIp>10.0.0.10</DstIp>
+        <DstIp>224.1.1.1</DstIp>
         <DstUdpPort>5001</DstUdpPort>
     </Tx>
-    <Poster>
-        <Interval>10</Interval>
-    <Poster>
-    <PmtInfo>
-        <Service Id="1" type="Movie">
+    <TransportStream tsid=”1”>
+        <Service Id="9">
             <PmtPid>101</PmtPid>
-            <AudioPid>200</AudioPid>
-            <VideoPid>201</VideoPid>
+            <PosterPid>102</PosterPid>
         </Service>
-        <Service Id="1" type="Poster">
-            <PmtPid>109</PmtPid>
-            <PosterPid>202</PosterPid>
+    </TransportStream>
+    <TransportStream tsid=”1”>
+        <Service Id="1">
+            <PmtPid>201</PmtPid>
+            <PcrPid>202</PcrPid>
+            <AudioPid>203</AudioPid>
+            <VideoPid>204</VideoPid>
         </Service>
-    </PmtInfo>
+    </TransportStream>
+    <SendingIntervalMilliseconds>
+        <Pat>500</Pat>
+        <Pmt>500</Pmt>
+        <Poster>2000</Poster>
+    </SendingIntervalMilliseconds>
 </Root>
+
