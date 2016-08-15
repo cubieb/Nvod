@@ -52,10 +52,12 @@
       <WarningLevel>Level3</WarningLevel>
       <Optimization>Disabled</Optimization>
       <PreprocessorDefinitions>WIN32;_DEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <AdditionalIncludeDirectories>$(LIBACE_HOME);$(MYSQL_CONNECTOR_HOME)\include;$(LIBODB_HOME);$(LIBODB_MYSQL_HOME);$(GnuWin32_Home)\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
     </ClCompile>
     <Link>
       <SubSystem>Console</SubSystem>
       <GenerateDebugInformation>true</GenerateDebugInformation>
+      <AdditionalLibraryDirectories>$(MYSQL_CONNECTOR_HOME)\lib;$(LIBODB_HOME)\lib;$(LIBODB_MYSQL_HOME)\lib</AdditionalLibraryDirectories>
     </Link>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
@@ -67,6 +69,7 @@
       <FunctionLevelLinking>true</FunctionLevelLinking>
       <IntrinsicFunctions>true</IntrinsicFunctions>
       <PreprocessorDefinitions>WIN32;NDEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <AdditionalIncludeDirectories>$(GnuWin32_Home)\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
     </ClCompile>
     <Link>
       <SubSystem>Console</SubSystem>
@@ -76,13 +79,29 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClCompile Include="..\Codes\LibLinking.cpp" />
     <ClCompile Include="..\Codes\Main.cpp" />
-    <ClCompile Include="..\Codes\NVODServer.cpp" />
+    <ClCompile Include="..\Codes\NvodServer.cpp" />
+    <ClCompile Include="..\Codes\PacketHelper.cpp" />
+    <ClCompile Include="..\Codes\StudyNvod.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="..\Codes\Command.h" />
+    <ClInclude Include="..\Codes\ContainerBase.h" />
+    <ClInclude Include="..\Codes\Controller.h" />
     <ClInclude Include="..\Codes\Main.h" />
-    <ClInclude Include="..\Codes\NVODServer.h" />
+    <ClInclude Include="..\Codes\Module.h" />
+    <ClInclude Include="..\Codes\Movie.h" />
+    <ClInclude Include="..\Codes\NvodServer.h" />
+    <ClInclude Include="..\Codes\PacketHelper.h" />
+    <ClInclude Include="..\Codes\Player.h" />
+    <ClInclude Include="..\Codes\ReferenceService.h" />
+    <ClInclude Include="..\Codes\TsSvcId.h" />
     <ClInclude Include="..\Codes\SystemInclude.h" />
+    <ClInclude Include="..\Codes\TimeShiftedService.h" />
+    <ClInclude Include="..\Codes\TimeShiftedServiceCfg.h" />
+    <ClInclude Include="..\Codes\TxAddrCfg.h" />
+    <ClInclude Include="..\Codes\Type.h" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

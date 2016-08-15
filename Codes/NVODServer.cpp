@@ -1,6 +1,8 @@
-﻿#ifdef StudyNvod
-#include "SystemInclude.h"
-#include "NVODServer.h"
+﻿#include "SystemInclude.h"
+#include "Module.h"
+
+#ifdef StudyNvod
+#include "NvodServer.h"
 
 #define TSSENDPACKSIZE 1316
 #define MAXBUFFERNUM   15000
