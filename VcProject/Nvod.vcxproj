@@ -11,7 +11,7 @@
     </ProjectConfiguration>
   </ItemGroup>
   <PropertyGroup Label="Globals">
-    <ProjectGuid>{C6699ACC-74B6-484F-BE1C-11E960E70223}</ProjectGuid>
+    <ProjectGuid>{D6C81EC5-F633-4D81-83CE-013AB2EE1A1C}</ProjectGuid>
     <Keyword>Win32Proj</Keyword>
     <RootNamespace>Nvod</RootNamespace>
   </PropertyGroup>
@@ -52,12 +52,13 @@
       <WarningLevel>Level3</WarningLevel>
       <Optimization>Disabled</Optimization>
       <PreprocessorDefinitions>WIN32;_DEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
-      <AdditionalIncludeDirectories>$(LIBACE_HOME);$(MYSQL_CONNECTOR_HOME)\include;$(LIBODB_HOME);$(LIBODB_MYSQL_HOME);$(GnuWin32_Home)\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>$(GnuWin32_Home)\include;$(LIBACE_HOME);$(LIBODB_HOME);$(LIBODB_MYSQL_HOME);$(MYSQL_CONNECTOR_HOME)\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <DisableSpecificWarnings>4068</DisableSpecificWarnings>
     </ClCompile>
     <Link>
       <SubSystem>Console</SubSystem>
       <GenerateDebugInformation>true</GenerateDebugInformation>
-      <AdditionalLibraryDirectories>$(MYSQL_CONNECTOR_HOME)\lib;$(LIBODB_HOME)\lib;$(LIBODB_MYSQL_HOME)\lib</AdditionalLibraryDirectories>
+      <AdditionalLibraryDirectories>$(LIBACE_HOME)\lib;$(LIBODB_HOME)\lib;$(LIBODB_MYSQL_HOME)\lib;$(MYSQL_CONNECTOR_HOME)\lib</AdditionalLibraryDirectories>
     </Link>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
@@ -69,39 +70,73 @@
       <FunctionLevelLinking>true</FunctionLevelLinking>
       <IntrinsicFunctions>true</IntrinsicFunctions>
       <PreprocessorDefinitions>WIN32;NDEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
-      <AdditionalIncludeDirectories>$(GnuWin32_Home)\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>$(GnuWin32_Home)\include;$(LIBACE_HOME);$(LIBODB_HOME);$(LIBODB_MYSQL_HOME);$(MYSQL_CONNECTOR_HOME)\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
     </ClCompile>
     <Link>
       <SubSystem>Console</SubSystem>
       <GenerateDebugInformation>true</GenerateDebugInformation>
       <EnableCOMDATFolding>true</EnableCOMDATFolding>
       <OptimizeReferences>true</OptimizeReferences>
+      <AdditionalLibraryDirectories>$(LIBACE_HOME)\lib;$(LIBODB_HOME)\lib;$(LIBODB_MYSQL_HOME)\lib;$(MYSQL_CONNECTOR_HOME)\lib</AdditionalLibraryDirectories>
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClCompile Include="..\Codes\Controller.cpp" />
+    <ClCompile Include="..\Codes\Database.cpp" />
     <ClCompile Include="..\Codes\LibLinking.cpp" />
     <ClCompile Include="..\Codes\Main.cpp" />
-    <ClCompile Include="..\Codes\NvodServer.cpp" />
-    <ClCompile Include="..\Codes\PacketHelper.cpp" />
-    <ClCompile Include="..\Codes\StudyNvod.cpp" />
+    <ClCompile Include="..\Codes\ReferenceService-odb.cpp" />
+    <ClCompile Include="..\Codes\ReferenceService.cpp" />
+    <ClCompile Include="..\Codes\TableIndexHelper.cpp" />
+    <ClCompile Include="..\Codes\TimeShiftedService-odb.cpp" />
+    <ClCompile Include="..\Codes\TimeShiftedService.cpp" />
+    <ClCompile Include="..\Codes\TsSvcId-odb.cpp" />
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="..\Codes\Command.h" />
-    <ClInclude Include="..\Codes\ContainerBase.h" />
     <ClInclude Include="..\Codes\Controller.h" />
+    <ClInclude Include="..\Codes\ControllerInterface.h" />
+    <ClInclude Include="..\Codes\Database.h" />
+    <ClInclude Include="..\Codes\InstanceHelper.h" />
     <ClInclude Include="..\Codes\Main.h" />
-    <ClInclude Include="..\Codes\Module.h" />
-    <ClInclude Include="..\Codes\Movie.h" />
-    <ClInclude Include="..\Codes\NvodServer.h" />
-    <ClInclude Include="..\Codes\PacketHelper.h" />
-    <ClInclude Include="..\Codes\Player.h" />
-    <ClInclude Include="..\Codes\ReferenceService.h" />
-    <ClInclude Include="..\Codes\TsSvcId.h" />
+    <ClInclude Include="..\Codes\ReferenceService.h">
+      <Command Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
+      </Command>
+      <Outputs Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
+      </Outputs>
+      <Command Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">cd $(ProjectDir)..\Codes &amp;&amp; odb.exe --std c++11 --database mysql --generate-query --generate-schema  --generate-session --cxx-suffix .cpp --hxx-suffix .h --sql-suffix -odb.sql ReferenceService.h</Command>
+      <Outputs Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">ReferenceService-odb.h;ReferenceService-odb.ixx;ReferenceService-odb.cpp;%(Outputs)</Outputs>
+    </ClInclude>
+    <ClInclude Include="..\Codes\ReferenceService-odb.h" />
     <ClInclude Include="..\Codes\SystemInclude.h" />
-    <ClInclude Include="..\Codes\TimeShiftedService.h" />
-    <ClInclude Include="..\Codes\TimeShiftedServiceCfg.h" />
-    <ClInclude Include="..\Codes\TxAddrCfg.h" />
+    <ClInclude Include="..\Codes\TableIndexHelper.h" />
+    <ClInclude Include="..\Codes\TableIndexHelperInterface.h" />
+    <ClInclude Include="..\Codes\TimeShiftedService.h">
+      <Command Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
+      </Command>
+      <Outputs Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
+      </Outputs>
+      <Command Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">cd $(ProjectDir)..\Codes &amp;&amp; odb.exe --std c++11 --database mysql --generate-query --generate-schema  --generate-session --cxx-suffix -odb.cpp --hxx-suffix -odb.h --sql-suffix -odb.sql TimeShiftedService.h</Command>
+    </ClInclude>
+    <ClInclude Include="..\Codes\TsSvcId.h">
+      <Command Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
+      </Command>
+      <Outputs Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
+      </Outputs>
+      <Outputs Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">TsSvcId-odb.h;TsSvcId-odb.ixx;TsSvcId-odb.cpp;%(Outputs)</Outputs>
+      <Command Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">cd $(ProjectDir)..\Codes &amp;&amp; odb.exe --std c++11 --database mysql --generate-query --generate-schema --cxx-suffix -odb.cpp --hxx-suffix -odb.h --sql-suffix -odb.sql TsSvcId.h</Command>
+    </ClInclude>
+    <ClInclude Include="..\Codes\TimeShiftedService-odb.h" />
+    <ClInclude Include="..\Codes\TsSvcId-odb.h" />
     <ClInclude Include="..\Codes\Type.h" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="..\Codes\CompileOdbHeader.cmd" />
+    <None Include="..\Codes\ReferenceService-odb.ixx" />
+    <None Include="..\Codes\ReferenceService-odb.sql" />
+    <None Include="..\Codes\TimeShiftedService-odb.ixx" />
+    <None Include="..\Codes\TimeShiftedService-odb.sql" />
+    <None Include="..\Codes\TsSvcId-odb.ixx" />
+    <None Include="..\Codes\TsSvcId-odb.sql" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

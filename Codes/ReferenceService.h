@@ -1,86 +1,172 @@
-#ifndef _ReferenceService_h_
-#define _ReferenceService_h_
+#ifndef _ReferenceServiceService_h_
+#define _ReferenceServiceService_h_
 
 #include "SystemInclude.h"
+#include <odb/core.hxx>
+#include <odb/lazy-ptr.hxx>
+
 #include "Type.h"
-#include "ContainerBase.h"
-#include "Movie.h"
+#include "TsSvcId.h"
 
-class ReferenceServiceEvent: public ContainerBaseTemplate<std::list<Movie*>>
+#pragma db namespace() pointer(std::shared_ptr)
+
+class ReferenceService;
+class ReferenceServiceEvent;
+class Movie;
+
+/**********************class ReferenceService**********************/
+#pragma db object table("ReferenceService")
+class ReferenceService: public std::enable_shared_from_this<ReferenceService>
 {
 public:
-    typedef Iterator<Movie>::MyIter      iterator;
-    typedef ConstIterator<Movie>::MyIter const_iterator;
+    //typedef odb::lazy_weak_ptr<ReferenceServiceEvent> EventPtrType;
+	typedef std::weak_ptr<ReferenceServiceEvent> RefsEventPtrType;
+    typedef std::vector<RefsEventPtrType> EventsType;
+    ReferenceService();
 
-    ReferenceServiceEvent(EventId eventId, TimePoint startTimePoint, Seconds duration);
-    ~ReferenceServiceEvent();
-            
-    virtual iterator Begin() = 0;
-    virtual iterator End() = 0;
-    virtual void Remove(MovieId movieId) = 0;
-    virtual void PushBack(MovieId movieId);
+    /*  
+    Parameter:
+        refsTsId: Time Shifted Service Ts Id
+        refsId  : Time Shifted Service Id
+    */
+    ReferenceService(TsId refsTsId, ServiceId refsId, const char *description);
+    ReferenceService(const ReferenceService &refs) ;
 
-private:
-    EventId     refsEventId;
-    std::list<Movie *> movies;
-    TimePoint  startTimePoint;
-    Seconds    duration;
-};
+    ~ReferenceService();
 
-class ReferenceService: public ContainerBaseTemplate<std::list<ReferenceServiceEvent*>>
-{
-public:    
-    typedef Iterator<ReferenceServiceEvent>::MyIter      iterator;
-    typedef ConstIterator<ReferenceServiceEvent>::MyIter const_iterator;
+    TsSvcId GetRefsId() const {return refsId;}
+    void SetRefsId(TsSvcId refsId) {this->refsId = refsId;}
 
-    ReferenceService(TsId refsTsId, ServiceId refsId)
-        : refsTsId(refsTsId), refsId(refsId)
-    {}
+    std::string GetDescription() const {return description;}
+    void SetDescription(const std::string& description) {this->description = description;}
 
-    std::chrono::milliseconds GetSleepDuration();
+    EventsType GetEvents() const {return events;}
+    void SetEvents(const EventsType& events) {this->events = events;}
+	void BindEvent(RefsEventPtrType evnt);
+
+	/* the following function is provided just for debug */
+    void Put(std::ostream& os) const;
+
+private:    
+    #pragma db id column("RefsId") get(GetRefsId) set(SetRefsId)
+	TsSvcId	   refsId; /* Reference Service Ts Id + Reference Service Id */
+
+    #pragma db column("Description") get(GetDescription) set(SetDescription)
+    std::string description;
     
-    virtual iterator Begin() = 0;
-    virtual iterator End() = 0;
-    virtual iterator Find(EventId refsEventId) = 0;    
-    virtual iterator Remove(EventId refsEventId) = 0;
-    virtual void PushBack(ReferenceServiceEvent *evnt);
-
-private:
-	TsId		refsTsId;
-	ServiceId	refsId;
-
-    std::list<ReferenceServiceEvent> events;
+    #pragma db value_not_null inverse(refs) get(GetEvents) set(SetEvents)
+    EventsType events;
 };
 
-class ReferenceServices: public ContainerBaseTemplate<std::list<ReferenceService*>>
+inline std::ostream& operator << (std::ostream& os, const ReferenceService& value) 
+{ 
+    value.Put(os); 
+    return os; 
+}
+
+/**********************class ReferenceServiceEvent**********************/
+#pragma db object table("ReferenceServiceEvent")
+class ReferenceServiceEvent: public std::enable_shared_from_this<ReferenceServiceEvent>
 {
 public:
-    typedef Iterator<ReferenceService>::MyIter      iterator;
-    typedef ConstIterator<ReferenceService>::MyIter const_iterator;
+    typedef std::shared_ptr<ReferenceService> RefsPtrType;
+	typedef std::weak_ptr<Movie> MoviePtrType;
+	typedef std::vector<MoviePtrType> MoviesType;
 
-    ReferenceServices(TsId refsTsId, ServiceId refsId) {};
-    virtual ~ReferenceServices() {};
+    ReferenceServiceEvent();
+	ReferenceServiceEvent(TableIndex idx, EventId eventId, TimePoint startTimePoint, Seconds duration);
+	~ReferenceServiceEvent();
 
-    virtual iterator Begin() = 0;
-    virtual iterator End() = 0;
-    virtual iterator Find(TsId tmssTsId, ServiceId tmssId) = 0;    
-    virtual iterator Remove(TsId tmssTsId, ServiceId tmssId) = 0;
-    virtual void PushBack(ReferenceService *tmss) = 0;
+	TableIndex GetIndex() const {return idx;}
+	void SetIndex(TableIndex idx) {this->idx = idx;}
 
-    //static function
-    // ContainerBase function.
-    static NodePtr GetNextNodePtr(NodePtr ptr)
-    {   // return reference to successor pointer in node
-        ++ptr.myIter;
-        return ptr;
-    }
-    // ContainerBase function.
-    static reference GetValue(NodePtr ptr)
-    {
-        return ((reference)*ptr.myIter);
-    }
+    EventId GetEventId() const {return eventId;}
+    void SetEventId(EventId eventId) {this->eventId = eventId;}
 
-    static ReferenceServices * CreateInstance();
+    TimePoint GetStartTimePoint() const {return startTimePoint;}
+    void SetStartTimePoint(TimePoint startTimePoint) {this->startTimePoint = startTimePoint;}
+    
+    Seconds GetDuration() const {return duration;}
+    void SetDuration(Seconds duration) {this->duration = duration;}
+
+    RefsPtrType GetReferenceService() const {return refs;}
+    void SetReferenceService(const RefsPtrType& refs) {this->refs = refs;}
+    void BindReferenceService(RefsPtrType refs);
+
+	MoviesType GetMovies() const {return movies;}
+	void SetMovies(const MoviesType& movies) {this->movies = movies;}
+	void BindMovie(MoviePtrType movie);
+    
+	/* the following function is provided just for debug */
+    void Put(std::ostream& os) const;
+
+private:
+	#pragma db id column("Idx") get(GetIndex) set(SetIndex)
+	TableIndex idx;
+
+    #pragma db column("EventId") get(GetEventId) set(SetEventId)
+    EventId eventId; 
+    #pragma db column("StartTimePoint") get(GetStartTimePoint) set(SetStartTimePoint)
+    TimePoint startTimePoint; 
+    #pragma db column("Duration") get(GetDuration) set(SetDuration) 
+    Seconds duration; 
+    
+    #pragma db not_null column("Refs") get(GetReferenceService) set(SetReferenceService) 
+    RefsPtrType refs;
+
+    //Many-to-Many Relationships with "Movie"
+    #pragma db value_not_null inverse(events) get(GetMovies) set(SetMovies)
+    MoviesType movies;
 };
+
+inline std::ostream& operator << (std::ostream& os, const ReferenceServiceEvent& value) 
+{ 
+    value.Put(os); 
+    return os; 
+}
+
+/**********************class Movie**********************/
+#pragma db object table("Movie")
+class Movie: public std::enable_shared_from_this<Movie>
+{
+public:
+    typedef std::shared_ptr<ReferenceServiceEvent> RefsEventPtrType;
+	typedef std::vector<RefsEventPtrType> RefsEventsType;
+
+    Movie();
+    Movie(MovieId movieId, const char *description);
+
+    MovieId GetMovieId() const {return movieId;}
+    void SetMovieId(MovieId movieId) {this->movieId = movieId;}
+
+    std::string GetDescription() const {return description;}
+    void SetDescription(const std::string& description) {this->description = description;}
+    
+	RefsEventsType GetRefsEvents() const {return events;}
+	void SetRefsEvents(const RefsEventsType& events) {this->events = events;}
+    void BindRefsEvent(RefsEventPtrType refsEvent);
+		
+	/* the following function is provided just for debug */
+    void Put(std::ostream& os) const;
+
+private:
+    #pragma db id column("MovieId") get(GetMovieId) set(SetMovieId)
+    MovieId movieId;
+
+    #pragma db column("Description") get(GetDescription) set(SetDescription)
+    std::string description;
+
+    //Many-to-Many Relationships with "ReferenceServiceEvent"
+	#pragma db value_not_null unordered table("Movies_RefEvents") \
+		id_column("MovieId") value_column("RefsEventIdx") \
+		get(GetRefsEvents) set(SetRefsEvents)
+	RefsEventsType events;
+};
+
+inline std::ostream& operator << (std::ostream& os, const Movie& value) 
+{ 
+    value.Put(os); 
+    return os; 
+}
 
 #endif

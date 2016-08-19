@@ -27,7 +27,9 @@
 
     to avoid trouble, we define NOMINMAX.
     */
-#   define NOMINMAX 
+#   ifndef NOMINMAX
+#       define NOMINMAX 
+#   endif
 
 #   define  __LITTLE_ENDIAN 1234
 #   define  __BIG_ENDIAN    4321

@@ -1,7 +1,7 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio 2012
-Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "Nvod", "VcProject\Nvod.vcxproj", "{C6699ACC-74B6-484F-BE1C-11E960E70223}"
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "Nvod", "VcProject\Nvod.vcxproj", "{D6C81EC5-F633-4D81-83CE-013AB2EE1A1C}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -9,10 +9,10 @@ Global
 		Release|Win32 = Release|Win32
 	EndGlobalSection
 	GlobalSection(ProjectConfigurationPlatforms) = postSolution
-		{C6699ACC-74B6-484F-BE1C-11E960E70223}.Debug|Win32.ActiveCfg = Debug|Win32
-		{C6699ACC-74B6-484F-BE1C-11E960E70223}.Debug|Win32.Build.0 = Debug|Win32
-		{C6699ACC-74B6-484F-BE1C-11E960E70223}.Release|Win32.ActiveCfg = Release|Win32
-		{C6699ACC-74B6-484F-BE1C-11E960E70223}.Release|Win32.Build.0 = Release|Win32
+		{D6C81EC5-F633-4D81-83CE-013AB2EE1A1C}.Debug|Win32.ActiveCfg = Debug|Win32
+		{D6C81EC5-F633-4D81-83CE-013AB2EE1A1C}.Debug|Win32.Build.0 = Debug|Win32
+		{D6C81EC5-F633-4D81-83CE-013AB2EE1A1C}.Release|Win32.ActiveCfg = Release|Win32
+		{D6C81EC5-F633-4D81-83CE-013AB2EE1A1C}.Release|Win32.Build.0 = Release|Win32
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
