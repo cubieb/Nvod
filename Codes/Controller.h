@@ -13,10 +13,18 @@
 class Controller: public ControllerInterface
 {
 public:	
-	typedef odb::query<ReferenceService>  RefsQuery;
-	typedef odb::result<ReferenceService> RefsResult;
+    typedef odb::query<Movie>  MovieQuery;
+	typedef odb::result<Movie> MovieResult;
+	typedef odb::query<ReferenceService>    RefsQuery;
+	typedef odb::result<ReferenceService>   RefsResult;
+	typedef odb::query<ReferenceServiceEvent>    RefsEventQuery;
+	typedef odb::result<ReferenceServiceEvent>   RefsEventResult;
+    typedef odb::query<TimeShiftedService>  TmssQuery;
+	typedef odb::result<TimeShiftedService> TmssResult;
+	typedef odb::query<TimeShiftedServiceEvent>    TmssEventQuery;
+	typedef odb::result<TimeShiftedServiceEvent>   TmssEventResult;
+    friend class ACE_Singleton<Controller, ACE_Recursive_Thread_Mutex>;
 
-    Controller();
     ~Controller();
 	
 	/* class ACE_Event_Handler's virtual function. */
@@ -25,25 +33,42 @@ public:
 	
 	/* class ControllerInterface's virtual function. */
 	MovieId AddMovie(MovieId movieId, const char *description);
-	TsSvcId AddReferenceService(TsId tsId, ServiceId refsId, const char *description);	
+	TsSvcId AddReferenceService(TsId refsTsId, ServiceId refsId, const char *description);	
 	TableIndex AddReferenceServiceEvent(TsId refsTsId, ServiceId refsId, EventId eventId, 
 		                                TimePoint startTimePoint, Seconds duration);
 	MovieId BindMovieAndRefsEvent(MovieId movieId, TableIndex eventIdx);
 	bool DeleteMovie(MovieId movieId);
-	bool DeleteReferenceService(TsId tsId, ServiceId refsId);
-	bool DeleteReferenceServiceEvent(TsId refsTsId, ServiceId refsId, EventId eventId);
-	bool DeleteReferenceServiceEventMovie(TsId refsTsId, ServiceId refsId, EventId eventId, 
-	                                      MovieId movieId);
+	bool DeleteReferenceService(TsId refsTsId, ServiceId refsId);
+	bool DeleteReferenceServiceEvent(TableIndex eventIdx);
+	bool UnbindMovieAndRefsEvent(MovieId movieId, TableIndex eventIdx);
+
+    TsSvcId AddTimeShiftedService(TsId tmssTsId, ServiceId tmssId, const char *description);
+	TableIndex AddTimeShiftedServiceEvent(TsId tmssTsId, ServiceId tmssId, EventId eventId, PosterId posterId,
+		                                  TimePoint startTimePoint, Seconds duration);
+	bool DeleteTimeShiftedService(TsId tmssTsId, ServiceId tmssId);
+	bool DeleteTimeShiftedServiceEvent(TableIndex eventIdx);
 
 	void PrintRefsInfo();
+    void PrintTmssInfo();
 	bool Start(const char *user, const char *password, const char *schema);
 
 private:
+    Controller();
 	MovieId InsertMovie(MovieId movieId, const char *description);
-	TsSvcId InsertRefs(TsId tsId, ServiceId refsId, const char *description);
+	TsSvcId InsertRefs(TsId refsTsId, ServiceId refsId, const char *description);
 	TableIndex InsertRefsEvent(TsId refsTsId, ServiceId refsId, EventId eventId, 
 		                       TimePoint startTimePoint, Seconds duration);
 	MovieId InsertMovieRefsEvent(MovieId movieId, TableIndex eventIdx);
+    void DeleteFromMovie(MovieId movieId);
+	void DeleteFromReferenceService(TsId refsTsId, ServiceId refsId);
+	void DeleteFromReferenceServiceEvent(TableIndex eventIdx);
+    void DeleteFromMovieAndRefsEvent(MovieId movieId, TableIndex eventIdx);
+        
+	TsSvcId InsertTmss(TsId tmssTsId, ServiceId tmssId, const char *description);
+	TableIndex InsertTmssEvent(TsId tmssTsId, ServiceId tmssId, EventId eventId, PosterId posterId,
+		                       TimePoint startTimePoint, Seconds duration);
+	void DeleteFromTimeShiftedService(TsId tmssTsId, ServiceId tmssId);
+	void DeleteFromTimeShiftedServiceEvent(TableIndex eventIdx);
 
 private:
 	odb::database *db;

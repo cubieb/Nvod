@@ -302,7 +302,7 @@ namespace odb
     //
     if (sk == statement_insert)
     {
-      // From ReferenceService.h:52:36
+      // From ReferenceService.h:56:36
       ::TsSvcId const& v =
         o.GetRefsId ();
 
@@ -315,7 +315,7 @@ namespace odb
     // description
     //
     {
-      // From ReferenceService.h:55:38
+      // From ReferenceService.h:59:38
       ::std::string const& v =
         o.GetDescription ();
 
@@ -349,7 +349,7 @@ namespace odb
     // refsId
     //
     {
-      // From ReferenceService.h:52:51
+      // From ReferenceService.h:56:51
       ::TsSvcId v;
 
       composite_value_traits< ::TsSvcId, id_mysql >::init (
@@ -357,14 +357,14 @@ namespace odb
         i.refsId_value,
         db);
 
-      // From ReferenceService.h:52:51
+      // From ReferenceService.h:56:51
       o.SetRefsId (v);
     }
 
     // description
     //
     {
-      // From ReferenceService.h:55:58
+      // From ReferenceService.h:59:58
       ::std::string v;
 
       mysql::value_traits<
@@ -375,7 +375,7 @@ namespace odb
         i.description_size,
         i.description_null);
 
-      // From ReferenceService.h:55:58
+      // From ReferenceService.h:59:58
       o.SetDescription (v);
     }
   }
@@ -485,7 +485,7 @@ namespace odb
     statements_type& sts (
       conn.statement_cache ().find_object<object_type> ());
 
-    // From ReferenceService.h:52:36
+    // From ReferenceService.h:56:36
     const id_type& id (
       obj.GetRefsId ());
     id_image_type& idi (sts.id_image ());
@@ -662,7 +662,7 @@ namespace odb
 
     statements_type::auto_lock l (sts);
 
-    // From ReferenceService.h:52:36
+    // From ReferenceService.h:56:36
     const id_type& id  (
       obj.GetRefsId ());
 
@@ -744,14 +744,14 @@ namespace odb
     // events
     //
     {
-      // From ReferenceService.h:58:60
-      ::ReferenceService::EventsType v;
+      // From ReferenceService.h:62:60
+      ::ReferenceService::RefsEventsType v;
 
       events_traits::load (
         v,
         esc.events);
 
-      // From ReferenceService.h:58:60
+      // From ReferenceService.h:62:60
       obj.SetEvents (v);
     }
   }
@@ -1147,7 +1147,7 @@ namespace odb
     //
     if (sk == statement_insert)
     {
-      // From ReferenceService.h:95:30
+      // From ReferenceService.h:115:30
       ::TableIndex const& v =
         o.GetIndex ();
 
@@ -1162,7 +1162,7 @@ namespace odb
     // eventId
     //
     {
-      // From ReferenceService.h:98:34
+      // From ReferenceService.h:118:34
       ::EventId const& v =
         o.GetEventId ();
 
@@ -1177,7 +1177,7 @@ namespace odb
     // startTimePoint
     //
     {
-      // From ReferenceService.h:100:41
+      // From ReferenceService.h:120:41
       ::TimePoint const& v =
         o.GetStartTimePoint ();
 
@@ -1192,7 +1192,7 @@ namespace odb
     // duration
     //
     {
-      // From ReferenceService.h:102:35
+      // From ReferenceService.h:122:35
       ::Seconds const& v =
         o.GetDuration ();
 
@@ -1207,7 +1207,7 @@ namespace odb
     // refs
     //
     {
-      // From ReferenceService.h:105:40
+      // From ReferenceService.h:125:40
       ::ReferenceServiceEvent::RefsPtrType const& v =
         o.GetReferenceService ();
 
@@ -1244,7 +1244,7 @@ namespace odb
     // idx
     //
     {
-      // From ReferenceService.h:95:44
+      // From ReferenceService.h:115:44
       ::TableIndex v;
 
       mysql::value_traits<
@@ -1254,14 +1254,14 @@ namespace odb
         i.idx_value,
         i.idx_null);
 
-      // From ReferenceService.h:95:44
+      // From ReferenceService.h:115:44
       o.SetIndex (v);
     }
 
     // eventId
     //
     {
-      // From ReferenceService.h:98:50
+      // From ReferenceService.h:118:50
       ::EventId v;
 
       mysql::value_traits<
@@ -1271,14 +1271,14 @@ namespace odb
         i.eventId_value,
         i.eventId_null);
 
-      // From ReferenceService.h:98:50
+      // From ReferenceService.h:118:50
       o.SetEventId (v);
     }
 
     // startTimePoint
     //
     {
-      // From ReferenceService.h:100:64
+      // From ReferenceService.h:120:64
       ::TimePoint v;
 
       mysql::value_traits<
@@ -1288,14 +1288,14 @@ namespace odb
         i.startTimePoint_value,
         i.startTimePoint_null);
 
-      // From ReferenceService.h:100:64
+      // From ReferenceService.h:120:64
       o.SetStartTimePoint (v);
     }
 
     // duration
     //
     {
-      // From ReferenceService.h:102:52
+      // From ReferenceService.h:122:52
       ::Seconds v;
 
       mysql::value_traits<
@@ -1305,14 +1305,14 @@ namespace odb
         i.duration_value,
         i.duration_null);
 
-      // From ReferenceService.h:102:52
+      // From ReferenceService.h:122:52
       o.SetDuration (v);
     }
 
     // refs
     //
     {
-      // From ReferenceService.h:105:65
+      // From ReferenceService.h:125:65
       ::ReferenceServiceEvent::RefsPtrType v;
 
       typedef object_traits< ::ReferenceService > obj_traits;
@@ -1338,7 +1338,7 @@ namespace odb
             obj_traits::object_type > (id));
       }
 
-      // From ReferenceService.h:105:65
+      // From ReferenceService.h:125:65
       o.SetReferenceService (v);
     }
   }
@@ -1463,7 +1463,7 @@ namespace odb
     statements_type& sts (
       conn.statement_cache ().find_object<object_type> ());
 
-    // From ReferenceService.h:95:30
+    // From ReferenceService.h:115:30
     const id_type& id (
       obj.GetIndex ());
     id_image_type& idi (sts.id_image ());
@@ -1640,7 +1640,7 @@ namespace odb
 
     statements_type::auto_lock l (sts);
 
-    // From ReferenceService.h:95:30
+    // From ReferenceService.h:115:30
     const id_type& id  (
       obj.GetIndex ());
 
@@ -1708,14 +1708,14 @@ namespace odb
     // movies
     //
     {
-      // From ReferenceService.h:109:62
+      // From ReferenceService.h:129:62
       ::ReferenceServiceEvent::MoviesType v;
 
       movies_traits::load (
         v,
         esc.movies);
 
-      // From ReferenceService.h:109:62
+      // From ReferenceService.h:129:62
       obj.SetMovies (v);
     }
   }
@@ -2166,7 +2166,7 @@ namespace odb
     //
     if (sk == statement_insert)
     {
-      // From ReferenceService.h:137:37
+      // From ReferenceService.h:200:37
       ::MovieId const& v =
         o.GetMovieId ();
 
@@ -2181,7 +2181,7 @@ namespace odb
     // description
     //
     {
-      // From ReferenceService.h:140:38
+      // From ReferenceService.h:203:38
       ::std::string const& v =
         o.GetDescription ();
 
@@ -2215,7 +2215,7 @@ namespace odb
     // movieId
     //
     {
-      // From ReferenceService.h:137:53
+      // From ReferenceService.h:200:53
       ::MovieId v;
 
       mysql::value_traits<
@@ -2225,14 +2225,14 @@ namespace odb
         i.movieId_value,
         i.movieId_null);
 
-      // From ReferenceService.h:137:53
+      // From ReferenceService.h:200:53
       o.SetMovieId (v);
     }
 
     // description
     //
     {
-      // From ReferenceService.h:140:58
+      // From ReferenceService.h:203:58
       ::std::string v;
 
       mysql::value_traits<
@@ -2243,7 +2243,7 @@ namespace odb
         i.description_size,
         i.description_null);
 
-      // From ReferenceService.h:140:58
+      // From ReferenceService.h:203:58
       o.SetDescription (v);
     }
   }
@@ -2332,7 +2332,7 @@ namespace odb
       throw object_already_persistent ();
 
     id_image_type& i (sts.id_image ());
-    // From ReferenceService.h:137:37
+    // From ReferenceService.h:200:37
     init (i, obj.GetMovieId ());
 
     binding& idb (sts.id_image_binding ());
@@ -2348,7 +2348,7 @@ namespace odb
     // events
     //
     {
-      // From ReferenceService.h:146:3
+      // From ReferenceService.h:213:3
       ::Movie::RefsEventsType const& v =
         obj.GetRefsEvents ();
 
@@ -2377,7 +2377,7 @@ namespace odb
     statements_type& sts (
       conn.statement_cache ().find_object<object_type> ());
 
-    // From ReferenceService.h:137:37
+    // From ReferenceService.h:200:37
     const id_type& id (
       obj.GetMovieId ());
     id_image_type& idi (sts.id_image ());
@@ -2425,7 +2425,7 @@ namespace odb
     // events
     //
     {
-      // From ReferenceService.h:146:3
+      // From ReferenceService.h:213:3
       ::Movie::RefsEventsType const& v =
         obj.GetRefsEvents ();
 
@@ -2575,7 +2575,7 @@ namespace odb
 
     statements_type::auto_lock l (sts);
 
-    // From ReferenceService.h:137:37
+    // From ReferenceService.h:200:37
     const id_type& id  (
       obj.GetMovieId ());
 
@@ -2657,14 +2657,14 @@ namespace odb
     // events
     //
     {
-      // From ReferenceService.h:146:22
+      // From ReferenceService.h:213:22
       ::Movie::RefsEventsType v;
 
       events_traits::load (
         v,
         esc.events);
 
-      // From ReferenceService.h:146:22
+      // From ReferenceService.h:213:22
       obj.SetRefsEvents (v);
     }
   }

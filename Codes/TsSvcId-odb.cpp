@@ -92,7 +92,7 @@ namespace odb
     // tsId
     //
     {
-      // From TsSvcId.h:48:31
+      // From TsSvcId.h:58:31
       ::TsId const& v =
         o.GetTsId ();
 
@@ -107,7 +107,7 @@ namespace odb
     // serviceId
     //
     {
-      // From TsSvcId.h:50:32
+      // From TsSvcId.h:60:32
       ::ServiceId const& v =
         o.GetServiceId ();
 
@@ -134,7 +134,7 @@ namespace odb
     // tsId
     //
     {
-      // From TsSvcId.h:48:44
+      // From TsSvcId.h:58:44
       ::TsId v;
 
       mysql::value_traits<
@@ -144,14 +144,14 @@ namespace odb
         i.tsId_value,
         i.tsId_null);
 
-      // From TsSvcId.h:48:44
+      // From TsSvcId.h:58:44
       o.SetTsId (v);
     }
 
     // serviceId
     //
     {
-      // From TsSvcId.h:50:50
+      // From TsSvcId.h:60:50
       ::ServiceId v;
 
       mysql::value_traits<
@@ -161,7 +161,7 @@ namespace odb
         i.serviceId_value,
         i.serviceId_null);
 
-      // From TsSvcId.h:50:50
+      // From TsSvcId.h:60:50
       o.SetServiceId (v);
     }
   }

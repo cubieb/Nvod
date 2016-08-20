@@ -9,26 +9,73 @@
 #include "ReferenceService.h"
 #include "ReferenceService-odb.h"
 
+#include "PlayerInterface.h"
+#include "PlayerInterfaceFactory.h"
 #include "ControllerInterface.h"
 
 #include "Main.h"
 
 using namespace std;
-using namespace odb::core;
 
 int main(int argc, char **argv)
-{ 
-	ControllerInterface &controller = ControllerInterface::GetInstance();
-	controller.Start("odb_test", "", "nvod");
+{
+    PlayerInterfaceFactory& factory = PlayerInterfaceFactory::GetInstance();
+    PlayerInterface *player = factory.Create("TmssPlayer");
+    cout << player->GetWaitingDuration() << endl;
 
-	controller.AddReferenceService(1, 1, "hello reference service 1.");
-	controller.AddReferenceServiceEvent(1, 1, 1, 0, 0);
-	controller.AddMovie(1, "movie 1");
-	controller.AddMovie(2, "movie 2");
-	controller.BindMovieAndRefsEvent(1, 1);
-	controller.BindMovieAndRefsEvent(2, 1);
+    TableIndex eventIdx1, eventIdx2;
+    TsId tsId         = 1;
+    ServiceId svcId   = 1;
+    EventId evntId1   = 1;
+    EventId evntId2   = 2;
+    PosterId posterId = 1;
+    MovieId movieId1  = 1;
+    MovieId movieId2  = 2;
 
-	controller.PrintRefsInfo();
+    ControllerInterface &controller = ControllerInterface::GetInstance();
+    controller.Start("odb_test", "", "nvod");
+
+    eventIdx1 = controller.AddReferenceServiceEvent(tsId, svcId, evntId1, 0, 0);
+    controller.AddReferenceService(tsId, svcId, "hello reference service 1.");
+    controller.AddReferenceService(tsId, svcId, "hello reference service 1.");
+    eventIdx1 = controller.AddReferenceServiceEvent(tsId, svcId, evntId1, 0, 0);
+    controller.AddMovie(movieId1, "movie 1");
+    controller.AddMovie(movieId1, "movie 1");
+    controller.AddMovie(movieId2, "movie 2");
+    controller.BindMovieAndRefsEvent(movieId1, 1);
+    controller.BindMovieAndRefsEvent(movieId1, 1);
+    controller.BindMovieAndRefsEvent(movieId2, 1);
+    controller.PrintRefsInfo();
+
+    controller.UnbindMovieAndRefsEvent(1, 1);
+    controller.UnbindMovieAndRefsEvent(1, 1);
+    controller.UnbindMovieAndRefsEvent(2, 1);
+    //controller.PrintRefsInfo();
+
+    //controller.DeleteMovie(movieId1);
+    //controller.DeleteMovie(movieId2);
+    //controller.PrintRefsInfo();
+
+    controller.DeleteReferenceServiceEvent(eventIdx1);
+    controller.DeleteReferenceServiceEvent(eventIdx1);
+    controller.DeleteReferenceService(tsId, svcId);
+    controller.DeleteReferenceService(tsId, svcId);
+    controller.DeleteMovie(movieId1);
+    controller.DeleteMovie(movieId2);
+    controller.PrintRefsInfo();
+
+    controller.AddTimeShiftedService(tsId, svcId, "hello time shifted service 1.");
+    eventIdx1 = controller.AddTimeShiftedServiceEvent(tsId, svcId, evntId1, posterId, 0, 0);
+    eventIdx1 = controller.AddTimeShiftedServiceEvent(tsId, svcId, evntId1, posterId, 0, 0);
+    eventIdx2 = controller.AddTimeShiftedServiceEvent(tsId, svcId, evntId2, posterId, 0, 0);
+    controller.PrintTmssInfo();
+
+    controller.DeleteTimeShiftedServiceEvent(eventIdx2);
+    controller.DeleteTimeShiftedServiceEvent(eventIdx2);
+    controller.PrintTmssInfo();
+
+    controller.DeleteTimeShiftedService(tsId, svcId);
+    controller.PrintTmssInfo();
 
     return 0; 
 }

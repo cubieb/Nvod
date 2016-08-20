@@ -6,6 +6,8 @@
 
 #include "Type.h"
 
+#define InvalidTsSvcId TsSvcId(InvalidTsId, InvalidServiceId)
+
 #pragma db value
 class TsSvcId
 {

@@ -302,7 +302,7 @@ namespace odb
     //
     if (sk == statement_insert)
     {
-      // From TimeShiftedService.h:51:36
+      // From TimeShiftedService.h:54:36
       ::TsSvcId const& v =
         o.GetTmssId ();
 
@@ -315,7 +315,7 @@ namespace odb
     // description
     //
     {
-      // From TimeShiftedService.h:54:38
+      // From TimeShiftedService.h:57:38
       ::std::string const& v =
         o.GetDescription ();
 
@@ -349,7 +349,7 @@ namespace odb
     // tmssId
     //
     {
-      // From TimeShiftedService.h:51:51
+      // From TimeShiftedService.h:54:51
       ::TsSvcId v;
 
       composite_value_traits< ::TsSvcId, id_mysql >::init (
@@ -357,14 +357,14 @@ namespace odb
         i.tmssId_value,
         db);
 
-      // From TimeShiftedService.h:51:51
+      // From TimeShiftedService.h:54:51
       o.SetTmssId (v);
     }
 
     // description
     //
     {
-      // From TimeShiftedService.h:54:58
+      // From TimeShiftedService.h:57:58
       ::std::string v;
 
       mysql::value_traits<
@@ -375,7 +375,7 @@ namespace odb
         i.description_size,
         i.description_null);
 
-      // From TimeShiftedService.h:54:58
+      // From TimeShiftedService.h:57:58
       o.SetDescription (v);
     }
   }
@@ -485,7 +485,7 @@ namespace odb
     statements_type& sts (
       conn.statement_cache ().find_object<object_type> ());
 
-    // From TimeShiftedService.h:51:36
+    // From TimeShiftedService.h:54:36
     const id_type& id (
       obj.GetTmssId ());
     id_image_type& idi (sts.id_image ());
@@ -662,7 +662,7 @@ namespace odb
 
     statements_type::auto_lock l (sts);
 
-    // From TimeShiftedService.h:51:36
+    // From TimeShiftedService.h:54:36
     const id_type& id  (
       obj.GetTmssId ());
 
@@ -744,14 +744,14 @@ namespace odb
     // events
     //
     {
-      // From TimeShiftedService.h:57:60
-      ::TimeShiftedService::EventsType v;
+      // From TimeShiftedService.h:60:60
+      ::TimeShiftedService::TmssEventsType v;
 
       events_traits::load (
         v,
         esc.events);
 
-      // From TimeShiftedService.h:57:60
+      // From TimeShiftedService.h:60:60
       obj.SetEvents (v);
     }
   }
@@ -997,7 +997,7 @@ namespace odb
     //
     if (sk == statement_insert)
     {
-      // From TimeShiftedService.h:95:30
+      // From TimeShiftedService.h:108:30
       ::TableIndex const& v =
         o.GetIndex ();
 
@@ -1012,7 +1012,7 @@ namespace odb
     // eventId
     //
     {
-      // From TimeShiftedService.h:98:34
+      // From TimeShiftedService.h:111:34
       ::EventId const& v =
         o.GetEventId ();
 
@@ -1027,7 +1027,7 @@ namespace odb
     // posterId
     //
     {
-      // From TimeShiftedService.h:100:35
+      // From TimeShiftedService.h:113:35
       ::PosterId const& v =
         o.GetPosterId ();
 
@@ -1042,7 +1042,7 @@ namespace odb
     // startTimePoint
     //
     {
-      // From TimeShiftedService.h:102:41
+      // From TimeShiftedService.h:115:41
       ::TimePoint const& v =
         o.GetStartTimePoint ();
 
@@ -1057,7 +1057,7 @@ namespace odb
     // duration
     //
     {
-      // From TimeShiftedService.h:104:35
+      // From TimeShiftedService.h:117:35
       ::Seconds const& v =
         o.GetDuration ();
 
@@ -1072,7 +1072,7 @@ namespace odb
     // tmss
     //
     {
-      // From TimeShiftedService.h:107:40
+      // From TimeShiftedService.h:120:40
       ::TimeShiftedServiceEvent::TmssPtrType const& v =
         o.GetTimeShiftedService ();
 
@@ -1109,7 +1109,7 @@ namespace odb
     // idx
     //
     {
-      // From TimeShiftedService.h:95:44
+      // From TimeShiftedService.h:108:44
       ::TableIndex v;
 
       mysql::value_traits<
@@ -1119,14 +1119,14 @@ namespace odb
         i.idx_value,
         i.idx_null);
 
-      // From TimeShiftedService.h:95:44
+      // From TimeShiftedService.h:108:44
       o.SetIndex (v);
     }
 
     // eventId
     //
     {
-      // From TimeShiftedService.h:98:50
+      // From TimeShiftedService.h:111:50
       ::EventId v;
 
       mysql::value_traits<
@@ -1136,14 +1136,14 @@ namespace odb
         i.eventId_value,
         i.eventId_null);
 
-      // From TimeShiftedService.h:98:50
+      // From TimeShiftedService.h:111:50
       o.SetEventId (v);
     }
 
     // posterId
     //
     {
-      // From TimeShiftedService.h:100:52
+      // From TimeShiftedService.h:113:52
       ::PosterId v;
 
       mysql::value_traits<
@@ -1153,14 +1153,14 @@ namespace odb
         i.posterId_value,
         i.posterId_null);
 
-      // From TimeShiftedService.h:100:52
+      // From TimeShiftedService.h:113:52
       o.SetPosterId (v);
     }
 
     // startTimePoint
     //
     {
-      // From TimeShiftedService.h:102:64
+      // From TimeShiftedService.h:115:64
       ::TimePoint v;
 
       mysql::value_traits<
@@ -1170,14 +1170,14 @@ namespace odb
         i.startTimePoint_value,
         i.startTimePoint_null);
 
-      // From TimeShiftedService.h:102:64
+      // From TimeShiftedService.h:115:64
       o.SetStartTimePoint (v);
     }
 
     // duration
     //
     {
-      // From TimeShiftedService.h:104:52
+      // From TimeShiftedService.h:117:52
       ::Seconds v;
 
       mysql::value_traits<
@@ -1187,14 +1187,14 @@ namespace odb
         i.duration_value,
         i.duration_null);
 
-      // From TimeShiftedService.h:104:52
+      // From TimeShiftedService.h:117:52
       o.SetDuration (v);
     }
 
     // tmss
     //
     {
-      // From TimeShiftedService.h:107:67
+      // From TimeShiftedService.h:120:67
       ::TimeShiftedServiceEvent::TmssPtrType v;
 
       typedef object_traits< ::TimeShiftedService > obj_traits;
@@ -1220,7 +1220,7 @@ namespace odb
             obj_traits::object_type > (id));
       }
 
-      // From TimeShiftedService.h:107:67
+      // From TimeShiftedService.h:120:67
       o.SetTimeShiftedService (v);
     }
   }
@@ -1349,7 +1349,7 @@ namespace odb
     statements_type& sts (
       conn.statement_cache ().find_object<object_type> ());
 
-    // From TimeShiftedService.h:95:30
+    // From TimeShiftedService.h:108:30
     const id_type& id (
       obj.GetIndex ());
     id_image_type& idi (sts.id_image ());
@@ -1526,7 +1526,7 @@ namespace odb
 
     statements_type::auto_lock l (sts);
 
-    // From TimeShiftedService.h:95:30
+    // From TimeShiftedService.h:108:30
     const id_type& id  (
       obj.GetIndex ());
 

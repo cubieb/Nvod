@@ -11,7 +11,7 @@
 #include "TableIndexHelper.h"
 using namespace std;
 
-/**********************class TableIndexHelper**********************/
+/**********************class RefsEventTableIndexHelper**********************/
 RefsEventTableIndexHelper::RefsEventTableIndexHelper()
 {
 	index = 1;
@@ -22,6 +22,21 @@ RefsEventTableIndexHelper::~RefsEventTableIndexHelper()
 }
 
 TableIndex RefsEventTableIndexHelper::GetUseableTableIndex()
+{
+	return index++;
+}
+
+/**********************class TmssEventTableIndexHelper**********************/
+TmssEventTableIndexHelper::TmssEventTableIndexHelper()
+{
+	index = 1;
+}
+
+TmssEventTableIndexHelper::~TmssEventTableIndexHelper()
+{
+}
+
+TableIndex TmssEventTableIndexHelper::GetUseableTableIndex()
 {
 	return index++;
 }

@@ -306,7 +306,7 @@ namespace odb
       static const char select_statement[];
       static const char delete_statement[];
 
-      typedef ::ReferenceService::EventsType container_type;
+      typedef ::ReferenceService::RefsEventsType container_type;
       typedef
       odb::access::container_traits<container_type>
       container_traits_type;

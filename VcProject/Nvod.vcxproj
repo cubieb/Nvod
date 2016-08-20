@@ -85,6 +85,8 @@
     <ClCompile Include="..\Codes\Database.cpp" />
     <ClCompile Include="..\Codes\LibLinking.cpp" />
     <ClCompile Include="..\Codes\Main.cpp" />
+    <ClCompile Include="..\Codes\TmssPlayer.cpp" />
+    <ClCompile Include="..\Codes\PlayerInterfaceFactory.cpp" />
     <ClCompile Include="..\Codes\ReferenceService-odb.cpp" />
     <ClCompile Include="..\Codes\ReferenceService.cpp" />
     <ClCompile Include="..\Codes\TableIndexHelper.cpp" />
@@ -96,8 +98,11 @@
     <ClInclude Include="..\Codes\Controller.h" />
     <ClInclude Include="..\Codes\ControllerInterface.h" />
     <ClInclude Include="..\Codes\Database.h" />
-    <ClInclude Include="..\Codes\InstanceHelper.h" />
+    <ClInclude Include="..\Codes\TmssPlayer.h" />
+    <ClInclude Include="..\Codes\PlayerInterfaceFactory.h" />
+    <ClInclude Include="..\Codes\PrototypeCache.h" />
     <ClInclude Include="..\Codes\Main.h" />
+    <ClInclude Include="..\Codes\PlayerInterface.h" />
     <ClInclude Include="..\Codes\ReferenceService.h">
       <Command Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
       </Command>

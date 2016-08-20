@@ -128,7 +128,4 @@
 #   endif
 #endif  //#if defined(__cplusplus)
 
-typedef unsigned char uchar_t;
-typedef unsigned int uint_t;
-
 #endif /* _STDAFX_H_ */

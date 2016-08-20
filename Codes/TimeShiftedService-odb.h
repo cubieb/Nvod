@@ -260,7 +260,7 @@ namespace odb
       static const char select_statement[];
       static const char delete_statement[];
 
-      typedef ::TimeShiftedService::EventsType container_type;
+      typedef ::TimeShiftedService::TmssEventsType container_type;
       typedef
       odb::access::container_traits<container_type>
       container_traits_type;

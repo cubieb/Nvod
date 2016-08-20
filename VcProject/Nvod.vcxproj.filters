@@ -43,6 +43,12 @@
     <Filter Include="源文件\Controller">
       <UniqueIdentifier>{730671fa-7d65-4e82-b070-d9e46a15ab23}</UniqueIdentifier>
     </Filter>
+    <Filter Include="头文件\Player">
+      <UniqueIdentifier>{a176dc27-4049-439b-be8b-2b28d5c840b6}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="源文件\Player">
+      <UniqueIdentifier>{d23937a4-7855-4b2b-bace-e0238a0c56ed}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\Codes\Main.cpp">
@@ -74,6 +80,12 @@
     </ClCompile>
     <ClCompile Include="..\Codes\TableIndexHelper.cpp">
       <Filter>源文件\Controller</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Codes\PlayerInterfaceFactory.cpp">
+      <Filter>源文件\Player</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Codes\TmssPlayer.cpp">
+      <Filter>源文件\Player</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -119,8 +131,17 @@
     <ClInclude Include="..\Codes\TableIndexHelperInterface.h">
       <Filter>头文件\Controller</Filter>
     </ClInclude>
-    <ClInclude Include="..\Codes\InstanceHelper.h">
+    <ClInclude Include="..\Codes\PlayerInterface.h">
+      <Filter>头文件\Player</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Codes\PrototypeCache.h">
       <Filter>头文件\Foundation</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Codes\PlayerInterfaceFactory.h">
+      <Filter>头文件\Player</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Codes\TmssPlayer.h">
+      <Filter>源文件\Player</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
