@@ -12,24 +12,49 @@
 using namespace std;
 
 /**********************class PlayerInterfaceFactory**********************/
+class PlayerInterfaceFactory
+{
+public:
+    typedef std::string I;
+    typedef std::function<PlayerInterface*()> F;
+
+    typedef CreatorRepository<I, F>         CreatorRepositoryType;
+    typedef CreatorRepositoryRegistor<I, F> RegistorType;
+    friend class ACE_Singleton<PlayerInterfaceFactory, ACE_Recursive_Thread_Mutex>;
+
+    ~PlayerInterfaceFactory();
+    F GetCreator(const char *name);
+    static PlayerInterfaceFactory& GetInstance();
+
+private:
+    PlayerInterfaceFactory();
+};
+
+/**********************class PlayerInterfaceFactory**********************/
+static PlayerInterfaceFactory::RegistorType p0001("TmssPlayer", TmssPlayer::CreateInstance);
 PlayerInterfaceFactory::PlayerInterfaceFactory() 
 {}
 
 PlayerInterfaceFactory::~PlayerInterfaceFactory() 
 {}
 
-PlayerInterface* PlayerInterfaceFactory::Create(const char *name)
+PlayerInterfaceFactory::F PlayerInterfaceFactory::GetCreator(const char *name)
 {
-    PlayerPrototypeCache& instance = PlayerPrototypeCache::GetInstance();
-    return instance.CreateInstance(name);
+    CreatorRepositoryType& instance = CreatorRepositoryType::GetInstance();
+    return instance.GetCreator(name);
 }
 
 PlayerInterfaceFactory& PlayerInterfaceFactory::GetInstance()
 {
-    static PlayerPrototypeCacheRegisterSuite playerReg0001("TmssPlayer", TmssPlayer::CreateInstance);
-
     typedef ACE_Singleton<PlayerInterfaceFactory, ACE_Recursive_Thread_Mutex> TheSingleton;
     return *TheSingleton::instance();
+}
+
+/**********************Global Function**********************/
+PlayerInterface* CreatePlayerInterface(const char *name)
+{
+    PlayerInterfaceFactory::F Create = PlayerInterfaceFactory::GetInstance().GetCreator("TmssPlayer");
+    return Create();
 }
 
 #pragma warning(pop)

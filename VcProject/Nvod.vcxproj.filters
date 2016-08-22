@@ -134,14 +134,14 @@
     <ClInclude Include="..\Codes\PlayerInterface.h">
       <Filter>头文件\Player</Filter>
     </ClInclude>
-    <ClInclude Include="..\Codes\PrototypeCache.h">
-      <Filter>头文件\Foundation</Filter>
-    </ClInclude>
     <ClInclude Include="..\Codes\PlayerInterfaceFactory.h">
       <Filter>头文件\Player</Filter>
     </ClInclude>
     <ClInclude Include="..\Codes\TmssPlayer.h">
       <Filter>源文件\Player</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Codes\CreatorRepository.h">
+      <Filter>头文件\Foundation</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

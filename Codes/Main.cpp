@@ -17,12 +17,8 @@
 
 using namespace std;
 
-int main(int argc, char **argv)
+void DebugNvodService()
 {
-    PlayerInterfaceFactory& factory = PlayerInterfaceFactory::GetInstance();
-    PlayerInterface *player = factory.Create("TmssPlayer");
-    cout << player->GetWaitingDuration() << endl;
-
     TableIndex eventIdx1, eventIdx2;
     TsId tsId         = 1;
     ServiceId svcId   = 1;
@@ -50,12 +46,8 @@ int main(int argc, char **argv)
     controller.UnbindMovieAndRefsEvent(1, 1);
     controller.UnbindMovieAndRefsEvent(1, 1);
     controller.UnbindMovieAndRefsEvent(2, 1);
-    //controller.PrintRefsInfo();
-
-    //controller.DeleteMovie(movieId1);
-    //controller.DeleteMovie(movieId2);
-    //controller.PrintRefsInfo();
-
+    controller.PrintRefsInfo();
+    
     controller.DeleteReferenceServiceEvent(eventIdx1);
     controller.DeleteReferenceServiceEvent(eventIdx1);
     controller.DeleteReferenceService(tsId, svcId);
@@ -76,6 +68,12 @@ int main(int argc, char **argv)
 
     controller.DeleteTimeShiftedService(tsId, svcId);
     controller.PrintTmssInfo();
+}
 
+int main(int argc, char **argv)
+{
+    PlayerInterface *player = CreatePlayerInterface("TmssPlayer");
+    cout << player->GetWaitingDuration() << endl;
+        
     return 0; 
 }

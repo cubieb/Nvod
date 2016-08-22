@@ -100,7 +100,7 @@
     <ClInclude Include="..\Codes\Database.h" />
     <ClInclude Include="..\Codes\TmssPlayer.h" />
     <ClInclude Include="..\Codes\PlayerInterfaceFactory.h" />
-    <ClInclude Include="..\Codes\PrototypeCache.h" />
+    <ClInclude Include="..\Codes\CreatorRepository.h" />
     <ClInclude Include="..\Codes\Main.h" />
     <ClInclude Include="..\Codes\PlayerInterface.h" />
     <ClInclude Include="..\Codes\ReferenceService.h">
