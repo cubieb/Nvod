@@ -8,16 +8,14 @@
 class RefsEventTableIndexHelper: public TableIndexHelperInterface
 {
 public:
-    friend class ACE_Singleton<RefsEventTableIndexHelper, ACE_Recursive_Thread_Mutex>;
+    typedef ACE_Singleton<RefsEventTableIndexHelper, ACE_Recursive_Thread_Mutex> TheSingleton;
+    friend class TheSingleton;
 
     ~RefsEventTableIndexHelper();
-    TableIndex GetUseableTableIndex();
 
-    static TableIndexHelperInterface& GetInstance()
-    {
-        typedef ACE_Singleton<RefsEventTableIndexHelper, ACE_Recursive_Thread_Mutex> TheHelper;
-        return *TheHelper::instance();
-    }
+    TableIndex GetUseableTableIndex();
+    /* return the pointer of singleton instance */
+    static TableIndexHelperInterface* CreateSingletonInstance();
 
 private:
     RefsEventTableIndexHelper();
@@ -30,17 +28,17 @@ private:
 class TmssEventTableIndexHelper: public TableIndexHelperInterface
 {
 public:
-    TmssEventTableIndexHelper();
+    typedef ACE_Singleton<TmssEventTableIndexHelper, ACE_Recursive_Thread_Mutex> TheSingleton;
+    friend class TheSingleton;
+        
     ~TmssEventTableIndexHelper();
-    TableIndex GetUseableTableIndex();
 
-    static TableIndexHelperInterface& GetInstance()
-    {
-        typedef ACE_Singleton<TmssEventTableIndexHelper, ACE_Recursive_Thread_Mutex> TheHelper;
-        return *TheHelper::instance();
-    }
+    TableIndex GetUseableTableIndex();
+    /* return the pointer of singleton instance */
+    static TableIndexHelperInterface* CreateSingletonInstance();
 
 private:
+    TmssEventTableIndexHelper();
     TableIndex index;
 };
 

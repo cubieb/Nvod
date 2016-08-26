@@ -23,6 +23,8 @@ public:
 	typedef odb::result<TimeShiftedService> TmssResult;
 	typedef odb::query<TimeShiftedServiceEvent>    TmssEventQuery;
 	typedef odb::result<TimeShiftedServiceEvent>   TmssEventResult;
+    typedef std::list<std::shared_ptr<PlayerInterface>> PlayersType;
+
     friend class ACE_Singleton<Controller, ACE_Recursive_Thread_Mutex>;
 
     ~Controller();
@@ -44,7 +46,7 @@ public:
 
     TsSvcId AddTimeShiftedService(TsId tmssTsId, ServiceId tmssId, const char *description);
 	TableIndex AddTimeShiftedServiceEvent(TsId tmssTsId, ServiceId tmssId, EventId eventId, PosterId posterId,
-		                                  TimePoint startTimePoint, Seconds duration);
+        TimePoint startTimePoint, Seconds duration, TableIndex refsEventIdx);
 	bool DeleteTimeShiftedService(TsId tmssTsId, ServiceId tmssId);
 	bool DeleteTimeShiftedServiceEvent(TableIndex eventIdx);
 
@@ -66,13 +68,14 @@ private:
         
 	TsSvcId InsertTmss(TsId tmssTsId, ServiceId tmssId, const char *description);
 	TableIndex InsertTmssEvent(TsId tmssTsId, ServiceId tmssId, EventId eventId, PosterId posterId,
-		                       TimePoint startTimePoint, Seconds duration);
+        TimePoint startTimePoint, Seconds duration, TableIndex refsEventIdx);
 	void DeleteFromTimeShiftedService(TsId tmssTsId, ServiceId tmssId);
 	void DeleteFromTimeShiftedServiceEvent(TableIndex eventIdx);
 
 private:
-	odb::database *db;
-	odb::session  *session;
+    std::shared_ptr<odb::database> db;
+    std::shared_ptr<odb::session> session;
+    PlayersType players;
 };
 
 #endif

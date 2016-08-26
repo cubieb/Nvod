@@ -11,6 +11,12 @@
 #include "TableIndexHelper.h"
 using namespace std;
 
+typedef ClassFactoriesRegistor<TableIndexHelperInterface, std::string> RefsEventRegistor;
+static RefsEventRegistor refse01("ReferenceServiceEvent", RefsEventTableIndexHelper::CreateSingletonInstance);
+
+typedef ClassFactoriesRegistor<TableIndexHelperInterface, std::string> TmssEventRegistor;
+static TmssEventRegistor tmsse01("TimeShiftedServiceEvent", TmssEventTableIndexHelper::CreateSingletonInstance);
+
 /**********************class RefsEventTableIndexHelper**********************/
 RefsEventTableIndexHelper::RefsEventTableIndexHelper()
 {
@@ -26,6 +32,11 @@ TableIndex RefsEventTableIndexHelper::GetUseableTableIndex()
 	return index++;
 }
 
+TableIndexHelperInterface* RefsEventTableIndexHelper::CreateSingletonInstance()
+{
+    return TheSingleton::instance();
+}
+
 /**********************class TmssEventTableIndexHelper**********************/
 TmssEventTableIndexHelper::TmssEventTableIndexHelper()
 {
@@ -39,6 +50,11 @@ TmssEventTableIndexHelper::~TmssEventTableIndexHelper()
 TableIndex TmssEventTableIndexHelper::GetUseableTableIndex()
 {
 	return index++;
+}
+
+TableIndexHelperInterface* TmssEventTableIndexHelper::CreateSingletonInstance()
+{
+    return TheSingleton::instance();
 }
 
 #pragma warning(pop)

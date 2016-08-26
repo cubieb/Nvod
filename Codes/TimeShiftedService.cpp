@@ -1,6 +1,6 @@
 ﻿#include "SystemInclude.h"
 
-#include "TimeShiftedService.h"
+#include "NvodService.h"
 using namespace std;
 
 /**********************class TimeShiftedService**********************/
@@ -13,11 +13,11 @@ tmssTsId: Time Shifted Service Ts Id
 tmssId  : Time Shifted Service Id
 */
 TimeShiftedService::TimeShiftedService(TsId tmssTsId, ServiceId tmssId, const char *description)
-	: tmssId(tmssTsId, tmssId), description(description)
+: tmssId(tmssTsId, tmssId), description(description)
 {}
 
-TimeShiftedService::TimeShiftedService(const TimeShiftedService &tmss)        
-	: tmssId(tmss.tmssId), description(tmss.description)
+TimeShiftedService::TimeShiftedService(const TimeShiftedService &tmss)
+: tmssId(tmss.tmssId), description(tmss.description)
 {}
 
 TimeShiftedService::~TimeShiftedService()
@@ -56,10 +56,10 @@ void TimeShiftedService::Put(std::ostream& os) const
 TimeShiftedServiceEvent::TimeShiftedServiceEvent()
 {}
 
-TimeShiftedServiceEvent::TimeShiftedServiceEvent(TableIndex idx, EventId eventId, PosterId posterId, 
-												 TimePoint startTimePoint, Seconds duration)
-	: idx(idx), eventId(eventId), posterId(posterId), 
-	  startTimePoint(startTimePoint), duration(duration)
+TimeShiftedServiceEvent::TimeShiftedServiceEvent(TableIndex idx, EventId eventId, PosterId posterId,
+    time_t startTimePoint, time_t duration)
+    : idx(idx), eventId(eventId), posterId(posterId),
+    startTimePoint(startTimePoint), duration(duration)
 {}
 
 TimeShiftedServiceEvent::~TimeShiftedServiceEvent()
@@ -73,9 +73,8 @@ void TimeShiftedServiceEvent::SetTimeShiftedService(TmssPtrType tmss)
     tmssPtr = GetSharedPtr(this->tmss);
     if (tmssPtr != nullptr)
     {
-        TimeShiftedService::TmssEventsType events = tmssPtr->GetEvents();
+        TimeShiftedService::TmssEventsType& events = tmssPtr->GetEvents();
         events.remove_if(CompareTmssEventIndex(idx));
-        tmssPtr->SetEvents(events);
     }
 
     /* step 2.1: add event into tmss */
@@ -83,9 +82,8 @@ void TimeShiftedServiceEvent::SetTimeShiftedService(TmssPtrType tmss)
     //refs could be null, when user delete the event.
     if (tmssPtr != nullptr) 
     {
-        TimeShiftedService::TmssEventsType events = tmssPtr->GetEvents();
+        TimeShiftedService::TmssEventsType& events = tmssPtr->GetEvents();
         events.push_back(shared_from_this());
-        tmssPtr->SetEvents(events);
     }
 
     /* step 2.2: set tmss member variable. */

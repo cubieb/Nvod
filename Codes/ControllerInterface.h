@@ -22,7 +22,7 @@ public:
     
 	virtual TsSvcId AddTimeShiftedService(TsId tmssTsId, ServiceId tmssId, const char *description) = 0;
 	virtual TableIndex AddTimeShiftedServiceEvent(TsId tmssTsId, ServiceId tmssId, EventId eventId, PosterId posterId,
-		                                          TimePoint startTimePoint, Seconds duration) = 0;
+        TimePoint startTimePoint, Seconds duration, TableIndex refsEventIdx) = 0;
 	virtual bool DeleteTimeShiftedService(TsId tmssTsId, ServiceId tmssId) = 0;
 	virtual bool DeleteTimeShiftedServiceEvent(TableIndex eventIdx) = 0;
 

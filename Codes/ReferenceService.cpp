@@ -1,6 +1,6 @@
 ﻿#include "SystemInclude.h"
 
-#include "ReferenceService.h"
+#include "NvodService.h"
 using namespace std;
 
 /**********************class ReferenceService**********************/
@@ -50,7 +50,7 @@ ReferenceServiceEvent::ReferenceServiceEvent()
 {}
 
 ReferenceServiceEvent::ReferenceServiceEvent(TableIndex idx, EventId eventId, 
-											 TimePoint startTimePoint, Seconds duration)
+											 time_t startTimePoint, time_t duration)
 	: idx(idx), eventId(eventId), startTimePoint(startTimePoint), duration(duration)
 {}
 
@@ -110,7 +110,10 @@ void ReferenceServiceEvent::Put(ostream& os) const
 
 /**********************class Movie**********************/
 Movie::Movie()
-{}
+{
+    clips.push_back(make_shared<Clip>(10));
+    clips.push_back(make_shared<Clip>(10));
+}
 
 Movie::Movie(MovieId movieId, const char *description)
     : movieId(movieId), description(description)

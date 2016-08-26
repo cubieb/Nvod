@@ -1,0 +1,110 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project DefaultTargets="Build" ToolsVersion="12.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup Label="ProjectConfigurations">
+    <ProjectConfiguration Include="Debug|Win32">
+      <Configuration>Debug</Configuration>
+      <Platform>Win32</Platform>
+    </ProjectConfiguration>
+    <ProjectConfiguration Include="Release|Win32">
+      <Configuration>Release</Configuration>
+      <Platform>Win32</Platform>
+    </ProjectConfiguration>
+  </ItemGroup>
+  <PropertyGroup Label="Globals">
+    <ProjectGuid>{B4180680-61C2-4B67-A31C-BE75E082C8E4}</ProjectGuid>
+    <RootNamespace>VcProject</RootNamespace>
+  </PropertyGroup>
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.Default.props" />
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'" Label="Configuration">
+    <ConfigurationType>Application</ConfigurationType>
+    <UseDebugLibraries>true</UseDebugLibraries>
+    <PlatformToolset>v120</PlatformToolset>
+    <CharacterSet>MultiByte</CharacterSet>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'" Label="Configuration">
+    <ConfigurationType>Application</ConfigurationType>
+    <UseDebugLibraries>false</UseDebugLibraries>
+    <PlatformToolset>v120</PlatformToolset>
+    <WholeProgramOptimization>true</WholeProgramOptimization>
+    <CharacterSet>MultiByte</CharacterSet>
+  </PropertyGroup>
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.props" />
+  <ImportGroup Label="ExtensionSettings">
+  </ImportGroup>
+  <ImportGroup Label="PropertySheets" Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
+    <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
+  </ImportGroup>
+  <ImportGroup Label="PropertySheets" Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
+    <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
+  </ImportGroup>
+  <PropertyGroup Label="UserMacros" />
+  <PropertyGroup />
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
+    <ClCompile>
+      <WarningLevel>Level3</WarningLevel>
+      <Optimization>Disabled</Optimization>
+      <SDLCheck>true</SDLCheck>
+      <AdditionalIncludeDirectories>$(GnuWin32_Home)\include;$(LIBACE_HOME);$(LIBODB_HOME);$(LIBODB_MYSQL_HOME);$(MYSQL_CONNECTOR_HOME)\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <DisableSpecificWarnings>4068</DisableSpecificWarnings>
+    </ClCompile>
+    <Link>
+      <GenerateDebugInformation>true</GenerateDebugInformation>
+      <AdditionalLibraryDirectories>$(LIBACE_HOME)\lib;$(LIBODB_HOME)\lib;$(LIBODB_MYSQL_HOME)\lib;$(MYSQL_CONNECTOR_HOME)\lib</AdditionalLibraryDirectories>
+    </Link>
+  </ItemDefinitionGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
+    <ClCompile>
+      <WarningLevel>Level3</WarningLevel>
+      <Optimization>MaxSpeed</Optimization>
+      <FunctionLevelLinking>true</FunctionLevelLinking>
+      <IntrinsicFunctions>true</IntrinsicFunctions>
+      <SDLCheck>true</SDLCheck>
+      <AdditionalIncludeDirectories>$(GnuWin32_Home)\include;$(LIBACE_HOME);$(LIBODB_HOME);$(LIBODB_MYSQL_HOME);$(MYSQL_CONNECTOR_HOME)\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <DisableSpecificWarnings>4068</DisableSpecificWarnings>
+    </ClCompile>
+    <Link>
+      <GenerateDebugInformation>true</GenerateDebugInformation>
+      <EnableCOMDATFolding>true</EnableCOMDATFolding>
+      <OptimizeReferences>true</OptimizeReferences>
+      <AdditionalLibraryDirectories>$(LIBACE_HOME)\lib;$(LIBODB_HOME)\lib;$(LIBODB_MYSQL_HOME)\lib;$(MYSQL_CONNECTOR_HOME)\lib</AdditionalLibraryDirectories>
+    </Link>
+  </ItemDefinitionGroup>
+  <ItemGroup>
+    <ClInclude Include="..\Codes\Controller.h" />
+    <ClInclude Include="..\Codes\ControllerInterface.h" />
+    <ClInclude Include="..\Codes\ClassFactories.h" />
+    <ClInclude Include="..\Codes\Database.h" />
+    <ClInclude Include="..\Codes\Main.h" />
+    <ClInclude Include="..\Codes\NvodService-odb.h" />
+    <ClInclude Include="..\Codes\PlayerInterface.h" />
+    <ClInclude Include="..\Codes\NvodService.h" />
+    <ClInclude Include="..\Codes\SystemInclude.h" />
+    <ClInclude Include="..\Codes\TableIndexHelper.h" />
+    <ClInclude Include="..\Codes\TableIndexHelperInterface.h" />
+    <ClInclude Include="..\Codes\TmssPlayer.h" />
+    <ClInclude Include="..\Codes\TsSvcId-odb.h" />
+    <ClInclude Include="..\Codes\TsSvcId.h" />
+    <ClInclude Include="..\Codes\Type.h" />
+  </ItemGroup>
+  <ItemGroup>
+    <ClCompile Include="..\Codes\Controller.cpp" />
+    <ClCompile Include="..\Codes\Database.cpp" />
+    <ClCompile Include="..\Codes\LibLinking.cpp" />
+    <ClCompile Include="..\Codes\Main.cpp" />
+    <ClCompile Include="..\Codes\NvodService-odb.cpp" />
+    <ClCompile Include="..\Codes\ReferenceService.cpp" />
+    <ClCompile Include="..\Codes\TableIndexHelper.cpp" />
+    <ClCompile Include="..\Codes\TimeShiftedService.cpp" />
+    <ClCompile Include="..\Codes\TmssPlayer.cpp" />
+    <ClCompile Include="..\Codes\TsSvcId-odb.cpp" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="..\Codes\NvodService-odb.ixx" />
+    <None Include="..\Codes\NvodService-odb.sql" />
+    <None Include="..\Codes\TsSvcId-odb.ixx" />
+    <None Include="..\Codes\TsSvcId-odb.sql" />
+  </ItemGroup>
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
+  <ImportGroup Label="ExtensionTargets">
+  </ImportGroup>
+</Project>

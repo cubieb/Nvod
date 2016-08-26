@@ -12,13 +12,11 @@
 #include "PlayerInterface.h"
 
 /* NvodServiceEntity */
-#include "TimeShiftedService.h"
-#include "TimeShiftedService-odb.h"
-#include "ReferenceService.h"
-#include "ReferenceService-odb.h"
+#include "NvodService.h"
+#include "NvodService-odb.h"
 
 /* Controller */
-#include "TableIndexHelper.h"
+#include "TableIndexHelperInterface.h"
 #include "Controller.h"
 using namespace std;
 
@@ -33,12 +31,7 @@ ControllerInterface &ControllerInterface::GetInstance()
 /**********************class Controller**********************/
 /* public function */
 Controller::~Controller()
-{
-    if (session != nullptr)
-        delete session;
-    if (db != nullptr)
-        delete db;
-}
+{}
 
 int Controller::handle_signal(int signum, siginfo_t *, ucontext_t *)
 {
@@ -259,14 +252,19 @@ TsSvcId Controller::AddTimeShiftedService(TsId tmssTsId, ServiceId tmssId, const
     
     /* step 2: update database */
     TsSvcId ret = InsertTmss(tmssTsId, tmssId, description);
+    
+    /* step 3: create player */
+    shared_ptr<TimeShiftedService> tmss = db->load<TimeShiftedService>(ret);
+    players.push_back(shared_ptr<PlayerInterface>(CreatePlayerInterface("TmssPlayer", db, tmss)));
 
-    /* step 3: commit. */
+    /* step 4: commit. */
     t.commit(); 
+
     return ret;
 }
 
 TableIndex Controller::AddTimeShiftedServiceEvent(TsId tmssTsId, ServiceId tmssId, EventId eventId, PosterId posterId,
-                                                  TimePoint startTimePoint, Seconds duration)
+    TimePoint startTimePoint, Seconds duration, TableIndex refsEventIdx)
 {
     odb::transaction t (db->begin()); 
     /* step 1: check reference service */
@@ -287,10 +285,17 @@ TableIndex Controller::AddTimeShiftedServiceEvent(TsId tmssTsId, ServiceId tmssI
     }
     
     /* step 2: update database */
-    TableIndex ret = InsertTmssEvent(tmssTsId, tmssId, eventId, posterId, startTimePoint, duration);
+    TableIndex ret = InsertTmssEvent(tmssTsId, tmssId, eventId, posterId, startTimePoint, duration, refsEventIdx);
 
-    /* step 3: commit. */
-    t.commit(); 
+    /* step 3: update player */
+    PlayerId playerId = MakePlayerId(tmssTsId, tmssId);
+    auto player = find_if(players.begin(), players.end(), ComparePlayerId(playerId));
+    duration = (*player)->GetWaitingDuration();
+    cout << "waiting :" << duration << endl;
+
+    /* step 4: commit. */
+    t.commit();
+
     return ret;
 }
 
@@ -304,12 +309,21 @@ bool Controller::DeleteTimeShiftedService(TsId tmssTsId, ServiceId tmssId)
     {
         t.rollback();
         return false;
-    }     
-    
-    /* step 2: update database */
+    }
+
+    /* step 2: delete player */
+    PlayersType::iterator player = find_if(players.begin(), players.end(),
+                                           ComparePlayerId(MakePlayerId(tmssTsId, tmssId)));
+    //cancel timer
+    //if ()
+    //{
+    //}
+    players.erase(player);
+
+    /* step 3: update database */
     DeleteFromTimeShiftedService(tmssTsId, tmssId);
 
-    /* step 3: commit. */
+    /* step 4: commit. */
     t.commit(); 
     return true;
 }
@@ -323,7 +337,7 @@ bool Controller::DeleteTimeShiftedServiceEvent(TableIndex eventIdx)
     {
         t.rollback();
         return false;
-    }    
+    }
     
     /* step 2: update database */
     DeleteFromTimeShiftedServiceEvent(eventIdx);
@@ -361,8 +375,8 @@ void Controller::PrintTmssInfo()
 
 bool Controller::Start(const char *user, const char *password, const char *schema)
 {
-    db = CreateDatabase(user, password, schema);
-    session = new odb::session();
+    db = shared_ptr<odb::database>(CreateDatabase(user, password, schema));
+    session = make_shared<odb::session>();
 
     return true;
 }
@@ -390,7 +404,7 @@ TableIndex Controller::InsertRefsEvent(TsId refsTsId, ServiceId refsId, EventId 
                                        TimePoint startTimePoint, Seconds duration)
 {	
     /* get table index */
-    TableIndexHelperInterface& helper = RefsEventTableIndexHelper::GetInstance();
+    TableIndexHelperInterface& helper = GetTableIndexHelperInterface("ReferenceServiceEvent");
     TableIndex idx = helper.GetUseableTableIndex();
 
     /* create event instance. */
@@ -483,10 +497,10 @@ TsSvcId Controller::InsertTmss(TsId tmssTsId, ServiceId tmssId, const char *desc
 }
 
 TableIndex Controller::InsertTmssEvent(TsId tmssTsId, ServiceId tmssId, EventId eventId, PosterId posterId,
-                                       TimePoint startTimePoint, Seconds duration)
+    TimePoint startTimePoint, Seconds duration, TableIndex refsEventIdx)
 {
     /* get table index */
-    TableIndexHelperInterface& helper = TmssEventTableIndexHelper::GetInstance();
+    TableIndexHelperInterface& helper = GetTableIndexHelperInterface("TimeShiftedServiceEvent");
     TableIndex idx = helper.GetUseableTableIndex();
 
     /* create event instance. */
@@ -495,6 +509,12 @@ TableIndex Controller::InsertTmssEvent(TsId tmssTsId, ServiceId tmssId, EventId 
     shared_ptr<TimeShiftedService> tmss = db->load<TimeShiftedService>(TsSvcId(tmssTsId, tmssId));
     assert (tmss != nullptr);
     tmssEvent->SetTimeShiftedService(tmss);
+    
+    if (refsEventIdx != InvalidTableIndex)
+    {
+        shared_ptr<ReferenceServiceEvent> refsEvent = db->load<ReferenceServiceEvent>(refsEventIdx);
+        tmssEvent->SetRefsEvent(refsEvent);
+    }
     db->persist(tmssEvent);
 
     return idx;
