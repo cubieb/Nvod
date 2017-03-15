@@ -1,0 +1,51 @@
+1 Nvod 播发配置信息.  
+  Nvod 播发需要做如下配置:
+<Root>
+    <Tx>
+        <ReferenceTransportStreamList>
+            <ReferenceTransportStream tsid ="1">
+                <!--当DstIp为组播时,通过SrcIp来决定通过那张网卡发送数据。-->
+                <SrcIp>10.0.0.2</SrcIp>                //源IP地址
+                <DstIp>224.1.1.1</DstIp>               //目的IP地址
+                <DstUdpPort>5001</DstUdpPort>          //目的UDP端口
+            </ReferenceTransportStream>
+        <ReferenceTransportStreamList>
+    </Tx>
+
+/****************************************************
+    <DataPipeTransportStreamList>                 // --> DataPipeTsEntity  {}
+	<DataPipeTransportStream TsId=”1”>      //海报传输数据管道 TSID
+            <ServiceId>1</ServiceId>
+            <PmtPid>101</PmtPid>                   //PMT PID
+	    <DataPipePid>500</DataPipePid>         //数据管道PID
+        </DataPipeTransportStream>
+    </DataPipeTransportStreamList>
+---------------------------------------------------------------------
+    <ReferenceTransportStreamList>                 // --> DataPipeTsEntity  {}
+	<ReferenceTransportStream TsId=”1”>      //海报传输数据管道 TSID
+            <Service Id="1">
+                <PmtPid>101</PmtPid>               //PMT PID
+	        <DataPipePid>500</DataPipePid>     //数据管道PID
+            </Service>
+        </ReferenceTransportStream>
+    </ReferenceTransportStreamList>
+****************************************************/    
+    <TimeShiftedTransportStreamList>
+        <TimeShiftedTransportStream tsid=”1”>  //时移业务TSID
+            <Service Id="1">                     //时移业务Service ID
+                <PmtPid>201</PmtPid>             //PMT PID
+                <PcrPid>202</PcrPid>             //PCR PID
+                <AudioPid>203</AudioPid>         //Audio PID
+                <VideoPid>204</VideoPid>         //Video PID
+            </Service>
+        </TimeShiftedTransportStream>
+    </TimeShiftedTransportStreamList>
+    
+    <SendingIntervalMilliseconds>                // --> DataPipeGlobalEntity
+        <Pat>500</Pat>                           //PAT
+        <Pmt>500</Pmt>                           //PMT
+        <Poster>2000</Poster>                    //POSTER
+    </SendingIntervalMilliseconds>
+</Root>
+
+   以上配置,  可以由WEB保存到xml 文件里面, Nvod 播发服务器来读取.  最好的方式是WEB将其保存在你们的数据库中提供API, 通过json的方式来获取这些信息.

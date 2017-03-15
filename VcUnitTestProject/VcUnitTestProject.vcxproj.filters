@@ -1,0 +1,246 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup>
+    <Filter Include="源文件">
+      <UniqueIdentifier>{4FC737F1-C7A5-4376-A066-2A32D752A2FF}</UniqueIdentifier>
+      <Extensions>cpp;c;cc;cxx;def;odl;idl;hpj;bat;asm;asmx</Extensions>
+    </Filter>
+    <Filter Include="头文件">
+      <UniqueIdentifier>{93995380-89BD-4b04-88EB-625FBE52EBFB}</UniqueIdentifier>
+      <Extensions>h;hh;hpp;hxx;hm;inl;inc;xsd</Extensions>
+    </Filter>
+    <Filter Include="资源文件">
+      <UniqueIdentifier>{67DA6AB6-F800-4c08-8B7A-83BB121AAD01}</UniqueIdentifier>
+      <Extensions>rc;ico;cur;bmp;dlg;rc2;rct;bin;rgs;gif;jpg;jpeg;jpe;resx;tiff;tif;png;wav;mfcribbon-ms</Extensions>
+    </Filter>
+    <Filter Include="CommonCodes">
+      <UniqueIdentifier>{6d599a37-606d-42f9-922f-4c8f184acf29}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="CommonCodes\头文件">
+      <UniqueIdentifier>{a2d58335-ce7a-44d2-b906-7dad0f9e3531}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="CommonCodes\头文件\Foundation">
+      <UniqueIdentifier>{851114d5-ea3f-4d35-b42f-8ff458ad66c2}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="CommonCodes\源文件">
+      <UniqueIdentifier>{aa60ce8d-ca40-429f-a098-b5e5f19502cd}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="CommonCodes\源文件\Foundation">
+      <UniqueIdentifier>{9a6d070f-8e45-4726-b485-d3b4b5933398}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="CommonCodes\头文件\Functions-L1">
+      <UniqueIdentifier>{c7ea2f07-ecd3-4262-9e20-35475dff717f}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="CommonCodes\头文件\Functions-L2">
+      <UniqueIdentifier>{79184b38-1109-4a25-b13a-152aa0ab82ed}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="CommonCodes\头文件\Functions-L3">
+      <UniqueIdentifier>{0489401f-3edd-45aa-8ef4-fcae314baab0}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="CommonCodes\头文件\Entity">
+      <UniqueIdentifier>{04697149-0a57-4f55-9477-941b86234672}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="CommonCodes\源文件\Entity">
+      <UniqueIdentifier>{9aeeac99-0f9b-4472-8f8f-51db31b23304}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="CommonCodes\源文件\Functions-L1">
+      <UniqueIdentifier>{66733ad6-18bc-411b-8e76-d2137c9b01b3}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="CommonCodes\源文件\Functions-L1\Miscellaneous">
+      <UniqueIdentifier>{92d5464e-0d37-4ce6-8b2a-adaf5fab0c68}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="CommonCodes\源文件\Functions-L2">
+      <UniqueIdentifier>{d66adb83-acda-4922-896e-fc3ec3476c9b}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="CommonCodes\源文件\Functions-L3">
+      <UniqueIdentifier>{a5f7ec89-7871-44cc-921f-34d97f4bdc7b}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="CommonCodes\源文件\Functions-L2\TmssPlayer">
+      <UniqueIdentifier>{9cdf293d-25e9-417f-8a8b-8b13dcd88c02}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="CommonCodes\源文件\Functions-L1\Downloader">
+      <UniqueIdentifier>{15ac353d-d09e-4edd-adc9-19cd68dd4dbf}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="CommonCodes\源文件\Functions-L1\TransportPacket">
+      <UniqueIdentifier>{09e5f4a2-4f16-40f9-950a-08db6bafecea}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="CommonCodes\源文件\Functions-L2\PatPlayer">
+      <UniqueIdentifier>{0d58d31e-5b40-4a66-989d-1ce1a0184334}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="CommonCodes\源文件\Functions-L2\RefsPlayer">
+      <UniqueIdentifier>{e9a19004-b244-446f-bb21-e6f2fd4ba695}</UniqueIdentifier>
+    </Filter>
+  </ItemGroup>
+  <ItemGroup>
+    <ClCompile Include="..\Codes\LibLinking.cpp">
+      <Filter>CommonCodes\源文件\Foundation</Filter>
+    </ClCompile>
+    <ClCompile Include="Codes\Main.cpp">
+      <Filter>源文件</Filter>
+    </ClCompile>
+    <ClCompile Include="Codes\UnitTestLibLinking.cpp">
+      <Filter>源文件</Filter>
+    </ClCompile>
+    <ClCompile Include="Codes\UtController.cpp">
+      <Filter>源文件</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Codes\Command.cpp">
+      <Filter>CommonCodes\源文件\Functions-L1\Miscellaneous</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Codes\Controller.cpp">
+      <Filter>CommonCodes\源文件\Functions-L3</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Codes\Entities.cpp">
+      <Filter>CommonCodes\源文件\Entity</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Codes\TmssPlayer.cpp">
+      <Filter>CommonCodes\源文件\Functions-L2\TmssPlayer</Filter>
+    </ClCompile>
+    <ClCompile Include="Codes\UtTmssPlayer.cpp">
+      <Filter>源文件</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Codes\TableIndexHelper.cpp">
+      <Filter>CommonCodes\源文件\Functions-L1\Miscellaneous</Filter>
+    </ClCompile>
+    <ClCompile Include="Codes\EntityHelper.cpp">
+      <Filter>源文件</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Codes\DownloaderFtp.cpp">
+      <Filter>CommonCodes\源文件\Functions-L1\Downloader</Filter>
+    </ClCompile>
+    <ClCompile Include="Codes\UtDownloaderFtp.cpp">
+      <Filter>源文件</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Codes\TransportPacket.cpp">
+      <Filter>CommonCodes\源文件\Functions-L1\TransportPacket</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Codes\Crc32.cpp">
+      <Filter>CommonCodes\源文件\Foundation</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Codes\TmssPlayerCookie.cpp">
+      <Filter>CommonCodes\源文件\Functions-L2\TmssPlayer</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Codes\PatPlayerCookie.cpp">
+      <Filter>CommonCodes\源文件\Functions-L2\PatPlayer</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Codes\PatPlayer.cpp">
+      <Filter>CommonCodes\源文件\Functions-L2\PatPlayer</Filter>
+    </ClCompile>
+    <ClCompile Include="Codes\UtPatPlayer.cpp">
+      <Filter>源文件</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Codes\RefsPlayer.cpp">
+      <Filter>CommonCodes\源文件\Functions-L2\RefsPlayer</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Codes\RefsPlayerCookie.cpp">
+      <Filter>CommonCodes\源文件\Functions-L2\RefsPlayer</Filter>
+    </ClCompile>
+    <ClCompile Include="Codes\UtRefsPlayer.cpp">
+      <Filter>源文件</Filter>
+    </ClCompile>
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="..\Codes\ClassFactories.h">
+      <Filter>CommonCodes\头文件\Foundation</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Codes\SystemInclude.h">
+      <Filter>CommonCodes\头文件\Foundation</Filter>
+    </ClInclude>
+    <ClInclude Include="Codes\UtController.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Codes\Database.h">
+      <Filter>CommonCodes\头文件\Foundation</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Codes\ControllerInterface.h">
+      <Filter>CommonCodes\头文件\Functions-L3</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Codes\PlayerInterface.h">
+      <Filter>CommonCodes\头文件\Functions-L2</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Codes\Entities.h">
+      <Filter>CommonCodes\头文件\Entity</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Codes\Command.h">
+      <Filter>CommonCodes\源文件\Functions-L1\Miscellaneous</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Codes\Controller.h">
+      <Filter>CommonCodes\源文件\Functions-L3</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Codes\MovieRepositoryInterface.h">
+      <Filter>CommonCodes\头文件\Functions-L1</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Codes\EpgServerInterface.h">
+      <Filter>CommonCodes\头文件\Functions-L1</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Codes\TmssPlayer.h">
+      <Filter>CommonCodes\源文件\Functions-L2\TmssPlayer</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Codes\BaseType.h">
+      <Filter>CommonCodes\头文件\Foundation</Filter>
+    </ClInclude>
+    <ClInclude Include="Codes\UtTmssPlayer.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Codes\Debug.h">
+      <Filter>CommonCodes\头文件\Foundation</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Codes\TableIndexHelper.h">
+      <Filter>CommonCodes\源文件\Functions-L1\Miscellaneous</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Codes\TableIndexHelperInterface.h">
+      <Filter>CommonCodes\头文件\Functions-L1</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Codes\DownloaderInterface.h">
+      <Filter>CommonCodes\头文件\Functions-L1</Filter>
+    </ClInclude>
+    <ClInclude Include="Codes\EntityHelper.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Codes\DownloaderFtp.h">
+      <Filter>CommonCodes\源文件\Functions-L1\Downloader</Filter>
+    </ClInclude>
+    <ClInclude Include="Codes\UtDownloaderFtp.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Codes\PacketHelper.h">
+      <Filter>CommonCodes\头文件\Foundation</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Codes\TransportPacket.h">
+      <Filter>CommonCodes\源文件\Functions-L1\TransportPacket</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Codes\TransportPacketInterface.h">
+      <Filter>CommonCodes\头文件\Functions-L1</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Codes\MemberHelper.h">
+      <Filter>CommonCodes\头文件\Entity</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Codes\Crc32.h">
+      <Filter>CommonCodes\头文件\Foundation</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Codes\TmssPlayerCookie.h">
+      <Filter>CommonCodes\源文件\Functions-L2\TmssPlayer</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Codes\PatPlayer.h">
+      <Filter>CommonCodes\源文件\Functions-L2\PatPlayer</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Codes\NvodConfigWrapperInterface.h">
+      <Filter>CommonCodes\头文件\Functions-L1</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Codes\PatPlayerCookie.h">
+      <Filter>CommonCodes\源文件\Functions-L2\PatPlayer</Filter>
+    </ClInclude>
+    <ClInclude Include="Codes\UtPatPlayer.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Codes\RefsPlayer.h">
+      <Filter>CommonCodes\源文件\Functions-L2\RefsPlayer</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Codes\RefsPlayerCookie.h">
+      <Filter>CommonCodes\源文件\Functions-L2\RefsPlayer</Filter>
+    </ClInclude>
+    <ClInclude Include="Codes\UtRefsPlayer.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
+  </ItemGroup>
+</Project>

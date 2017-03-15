@@ -1,60 +1,54 @@
-#include "SystemInclude.h"
-
-#pragma warning(push)
-#pragma warning(disable:702)   //disable warning caused by ACE library.
-#pragma warning(disable:4251)  //disable warning caused by ACE library.
-#pragma warning(disable:4996)  //disable warning caused by ACE library.
-#include "ace/OS.h"
-#include "ace/Singleton.h"
-
-/* Controller */
 #include "TableIndexHelper.h"
+
+/* ODB */
+#include <odb/database.hxx>    //odb::database
+#include <odb/session.hxx>
+#include <odb/transaction.hxx>
+
+/* Entity */
+#include "Entities.h"
+
 using namespace std;
 
-typedef ClassFactoriesRegistor<TableIndexHelperInterface, std::string> RefsEventRegistor;
-static RefsEventRegistor refse01("ReferenceServiceEvent", RefsEventTableIndexHelper::CreateSingletonInstance);
-
-typedef ClassFactoriesRegistor<TableIndexHelperInterface, std::string> TmssEventRegistor;
-static TmssEventRegistor tmsse01("TimeShiftedServiceEvent", TmssEventTableIndexHelper::CreateSingletonInstance);
-
-/**********************class RefsEventTableIndexHelper**********************/
-RefsEventTableIndexHelper::RefsEventTableIndexHelper()
+/**********************class TableIndexHelperInterface**********************/
+TableIndexHelperInterface& TableIndexHelperInterface::GetInstance()
 {
-	index = 1;
+    /* In C++11, the following is guaranteed to perform thread-safe initialisation: */
+    static TableIndexHelper instance;
+    return instance;
 }
 
-RefsEventTableIndexHelper::~RefsEventTableIndexHelper()
+/**********************class TableIndexHelper**********************/
+TableIndexHelper::TableIndexHelper()
 {
+    tableIds = std::initializer_list<map<std::string, TableId>::value_type>
+    {
+        { "Refs", 1 }, { "RefsEvent", 1 }, 
+        { "Tmss", 1 }, { "TmssEvent", 1 },
+		{ "Movie", 1 }, { "Poster", 1 },
+        { "GlobalCfg", 1 }, {"Ts", 1}
+    };
 }
 
-TableIndex RefsEventTableIndexHelper::GetUseableTableIndex()
-{
-	return index++;
-}
+TableIndexHelper::~TableIndexHelper()
+{}
 
-TableIndexHelperInterface* RefsEventTableIndexHelper::CreateSingletonInstance()
+TableId TableIndexHelper::GetUseableTableIndex(const char *tableName)
 {
-    return TheSingleton::instance();
-}
+    TableId tableId;
+    lock_guard<std::mutex> lock(mtx);
 
-/**********************class TmssEventTableIndexHelper**********************/
-TmssEventTableIndexHelper::TmssEventTableIndexHelper()
-{
-	index = 1;
-}
+    map<string, TableId>::iterator iter = tableIds.find(tableName);
+    if (iter == tableIds.end())
+    {
+        assert(false);
+        tableId = InvalidTableId;
+    }
+    else
+    {
+        tableId = iter->second;
+        ++iter->second;
+    }
 
-TmssEventTableIndexHelper::~TmssEventTableIndexHelper()
-{
+    return tableId;
 }
-
-TableIndex TmssEventTableIndexHelper::GetUseableTableIndex()
-{
-	return index++;
-}
-
-TableIndexHelperInterface* TmssEventTableIndexHelper::CreateSingletonInstance()
-{
-    return TheSingleton::instance();
-}
-
-#pragma warning(pop)

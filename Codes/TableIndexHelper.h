@@ -1,45 +1,24 @@
 #ifndef _TableIndexHelper_h_
 #define _TableIndexHelper_h_
 
-#include "Type.h"
+/* Foundation */
+#include "SystemInclude.h"
+
+/* Functions */
 #include "TableIndexHelperInterface.h"
 
-/**********************class RefsEventTableIndexHelper**********************/
-class RefsEventTableIndexHelper: public TableIndexHelperInterface
+/**********************class OrderEntityIndexHelper**********************/
+class TableIndexHelper : public TableIndexHelperInterface
 {
 public:
-    typedef ACE_Singleton<RefsEventTableIndexHelper, ACE_Recursive_Thread_Mutex> TheSingleton;
-    friend class TheSingleton;
+    TableIndexHelper();
+    ~TableIndexHelper();
 
-    ~RefsEventTableIndexHelper();
-
-    TableIndex GetUseableTableIndex();
-    /* return the pointer of singleton instance */
-    static TableIndexHelperInterface* CreateSingletonInstance();
+    TableId GetUseableTableIndex(const char *tableName);
 
 private:
-    RefsEventTableIndexHelper();
-
-private:
-    TableIndex index;
-};
-
-/**********************class TmssEventTableIndexHelper**********************/
-class TmssEventTableIndexHelper: public TableIndexHelperInterface
-{
-public:
-    typedef ACE_Singleton<TmssEventTableIndexHelper, ACE_Recursive_Thread_Mutex> TheSingleton;
-    friend class TheSingleton;
-        
-    ~TmssEventTableIndexHelper();
-
-    TableIndex GetUseableTableIndex();
-    /* return the pointer of singleton instance */
-    static TableIndexHelperInterface* CreateSingletonInstance();
-
-private:
-    TmssEventTableIndexHelper();
-    TableIndex index;
+    std::map<std::string, TableId> tableIds;
+    std::mutex mtx;
 };
 
 #endif

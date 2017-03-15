@@ -23,17 +23,35 @@ TimeShiftedService::TimeShiftedService(const TimeShiftedService &tmss)
 TimeShiftedService::~TimeShiftedService()
 {}
 
-
-void TimeShiftedService::BindEvent(TmssEventPtrType evnt)
+const std::list<std::shared_ptr<TimeShiftedServiceEvent>>& TimeShiftedService::GetEvents() const
 {
-    TmssEventSharedPtrType eventPtr = GetSharedPtr(evnt);
-    eventPtr->SetTimeShiftedService(shared_from_this());
+    return events;
 }
 
-void TimeShiftedService::UnbindEvent(TmssEventPtrType evnt)
+std::list<std::shared_ptr<TimeShiftedServiceEvent>>& TimeShiftedService::GetEvents()
 {
-    TmssEventSharedPtrType eventPtr = GetSharedPtr(evnt);
-    eventPtr->SetTimeShiftedService(nullptr);
+    return events;
+}
+
+void TimeShiftedService::SetEvents(const std::list<std::shared_ptr<TimeShiftedServiceEvent>>& events)
+{
+    this->events = events;
+}
+
+void TimeShiftedService::BindEvent(std::shared_ptr<TimeShiftedServiceEvent> evnt)
+{
+    evnt->BindTimeShiftedService(shared_from_this());
+    events.push_back(evnt);
+}
+
+void TimeShiftedService::UnbindEvent(std::shared_ptr<TimeShiftedServiceEvent> evnt)
+{
+    evnt->UnbindTimeShiftedService();
+    auto cmp = [evnt](shared_ptr<TimeShiftedServiceEvent> i)->bool
+    {
+        return (i->GetIndex() == evnt->GetIndex());
+    };
+    events.remove_if(cmp);
 }
 
 void TimeShiftedService::Put(std::ostream& os) const
@@ -45,9 +63,9 @@ void TimeShiftedService::Put(std::ostream& os) const
 		<< "description = " << description << endl
 		<< "events      = " << endl;
     os.width(width + 4);
-	for (TmssEventsType::const_iterator i = events.cbegin(); i != events.cend(); ++i)
+	for (auto i = events.cbegin(); i != events.cend(); ++i)
 	{
-		os << *(i->lock());
+		os << *i;
 	}
     os.width(width);
 }
@@ -57,7 +75,7 @@ TimeShiftedServiceEvent::TimeShiftedServiceEvent()
 {}
 
 TimeShiftedServiceEvent::TimeShiftedServiceEvent(TableIndex idx, EventId eventId, PosterId posterId,
-    time_t startTimePoint, time_t duration)
+    TimePoint startTimePoint, Seconds duration)
     : idx(idx), eventId(eventId), posterId(posterId),
     startTimePoint(startTimePoint), duration(duration)
 {}
@@ -65,29 +83,40 @@ TimeShiftedServiceEvent::TimeShiftedServiceEvent(TableIndex idx, EventId eventId
 TimeShiftedServiceEvent::~TimeShiftedServiceEvent()
 {}
 
-void TimeShiftedServiceEvent::SetTimeShiftedService(TmssPtrType tmss)
+std::weak_ptr<TimeShiftedService> TimeShiftedServiceEvent::GetTimeShiftedService() const
 {
-    TmssSharedPtrType tmssPtr;
+    return tmss;
+}
 
-    /* step 1: unbind event and current tmss */
-    tmssPtr = GetSharedPtr(this->tmss);
-    if (tmssPtr != nullptr)
+void TimeShiftedServiceEvent::SetTimeShiftedService(std::weak_ptr<TimeShiftedService> tmss)
+{
+    if (!this->tmss.expired())
     {
-        TimeShiftedService::TmssEventsType& events = tmssPtr->GetEvents();
-        events.remove_if(CompareTmssEventIndex(idx));
+        this->tmss.lock()->UnbindEvent(shared_from_this());
     }
 
-    /* step 2.1: add event into tmss */
-    tmssPtr = GetSharedPtr(tmss);
-    //refs could be null, when user delete the event.
-    if (tmssPtr != nullptr) 
+    if (!tmss.expired())
     {
-        TimeShiftedService::TmssEventsType& events = tmssPtr->GetEvents();
-        events.push_back(shared_from_this());
+        tmss.lock()->BindEvent(shared_from_this());
+    }
+}
+
+std::shared_ptr<ReferenceServiceEvent> TimeShiftedServiceEvent::GetRefsEvent() const
+{
+    return refsEvent;
+}
+
+void TimeShiftedServiceEvent::SetRefsEvent(std::shared_ptr<ReferenceServiceEvent> refsEvent)
+{
+    if (this->refsEvent != nullptr)
+    {
+        this->refsEvent->UnbindTmssEvent(shared_from_this());
     }
 
-    /* step 2.2: set tmss member variable. */
-    this->tmss = tmssPtr;
+    if (refsEvent != nullptr)
+    {
+        refsEvent->BindTmssEvent(shared_from_this());
+    }
 }
 
 void TimeShiftedServiceEvent::Put(std::ostream& os) const
@@ -99,4 +128,25 @@ void TimeShiftedServiceEvent::Put(std::ostream& os) const
         << ", posterId = " << posterId
         << "}" << endl;
     os.width(width);
+}
+
+/* private functions */
+void TimeShiftedServiceEvent::BindTimeShiftedService(std::shared_ptr<TimeShiftedService> tmss)
+{
+    this->tmss = tmss;
+}
+
+void TimeShiftedServiceEvent::UnbindTimeShiftedService()
+{
+    tmss.reset();
+}
+
+void TimeShiftedServiceEvent::BindRefsEvent(std::shared_ptr<ReferenceServiceEvent> refsEvent)
+{
+    this->refsEvent = refsEvent;
+}
+
+void TimeShiftedServiceEvent::UnbindRefsEvent()
+{
+    refsEvent.reset();
 }

@@ -3,12 +3,6 @@
 #include <map>
 #include <functional>
 
-#pragma warning(push)
-#pragma warning(disable:702)   //disable warning caused by ACE library.
-#pragma warning(disable:4251)  //disable warning caused by ACE library.
-#pragma warning(disable:4996)  //disable warning caused by ACE library.
-#include "ace/Singleton.h"
-
 /**********************class ClassFactories**********************/
 /*
 Template Para: 
@@ -38,9 +32,13 @@ public:
 
     static MyType& GetInstance()
     {
-        typedef ACE_Singleton<MyType, ACE_Recursive_Thread_Mutex> TheSingleton;
-        return *TheSingleton::instance();
+        /* In C++11, the following is guaranteed to perform thread-safe initialisation: */
+        static MyType instance;
+        return instance;
     }
+
+private:
+    ClassFactories() {}
 
 private:
     FactoryMap factories;
@@ -60,5 +58,19 @@ public:
     }
 };
 
-#pragma warning(pop)
+/*
+* From boost documentation:
+* The following piece of macro magic joins the two
+* arguments together, even when one of the arguments is
+* itself a macro (see 16.3.1 in C++ standard).  The key
+* is that macro expansion of macro arguments does not
+* occur in JoinName2 but does in JoinName.
+*/
+#define JoinName(symbol1, symbol2)  JoinName1(symbol1, symbol2)
+#define JoinName1(symbol1, symbol2) JoinName2(symbol1, symbol2)
+#define JoinName2(symbol1, symbol2) symbol1##symbol2
+
+#define RegisterClassFactory(registor, var, index, factory)      \
+	static registor JoinName(var, __LINE__)(index, factory)
+
 #endif

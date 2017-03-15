@@ -1,10 +1,9 @@
 #ifndef _PlayerInterface_h_
 #define _PlayerInterface_h_
 
-#include <utility>    //std::pair
+#include <memory>     //shared_ptr
 
 /* Foundation */
-#include "Type.h"
 #include "ClassFactories.h"
 
 /**********************class PlayerInterface**********************/
@@ -14,40 +13,9 @@ public:
     PlayerInterface() {};
     virtual ~PlayerInterface() {};    
 
-    virtual PlayerId GetPlayerId() const = 0;
-    virtual Milliseconds GetWaitingDuration() = 0;
-    virtual std::pair<uchar_t *, size_t> GetCurrentClip() = 0;
-};
-
-class ComparePlayerId : public std::unary_function<PlayerInterface, bool>
-{
-public:
-    ComparePlayerId(PlayerId playerId)
-        : playerId(playerId)
-    {}
-
-    result_type operator()(const argument_type &player)
-    {
-        return (result_type)(player.GetPlayerId() == playerId);
-    }
-
-    result_type operator()(const argument_type *player)
-    {
-        return this->operator()(*player);
-    }
-
-    result_type operator()(const std::shared_ptr<argument_type> player)
-    {
-        return this->operator()(*player);
-    }
-
-    result_type operator()(const std::weak_ptr<argument_type> player)
-    {
-        return this->operator()(player.lock());
-    }
-
-private:
-    PlayerId playerId;
+    virtual void Start() = 0;
+    virtual void Stop() = 0;
+    virtual bool IsRunning() = 0;
 };
 
 /**********************class PlayerInterface Factory**********************/

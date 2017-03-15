@@ -1,0 +1,147 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project DefaultTargets="Build" ToolsVersion="12.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup Label="ProjectConfigurations">
+    <ProjectConfiguration Include="Debug|Win32">
+      <Configuration>Debug</Configuration>
+      <Platform>Win32</Platform>
+    </ProjectConfiguration>
+    <ProjectConfiguration Include="Release|Win32">
+      <Configuration>Release</Configuration>
+      <Platform>Win32</Platform>
+    </ProjectConfiguration>
+  </ItemGroup>
+  <PropertyGroup Label="Globals">
+    <ProjectGuid>{7E4AE99E-3342-46A9-B241-967039124567}</ProjectGuid>
+    <Keyword>Win32Proj</Keyword>
+    <RootNamespace>VcUnitTestProject</RootNamespace>
+  </PropertyGroup>
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.Default.props" />
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'" Label="Configuration">
+    <ConfigurationType>Application</ConfigurationType>
+    <UseDebugLibraries>true</UseDebugLibraries>
+    <PlatformToolset>v120</PlatformToolset>
+    <CharacterSet>Unicode</CharacterSet>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'" Label="Configuration">
+    <ConfigurationType>Application</ConfigurationType>
+    <UseDebugLibraries>false</UseDebugLibraries>
+    <PlatformToolset>v120</PlatformToolset>
+    <WholeProgramOptimization>true</WholeProgramOptimization>
+    <CharacterSet>Unicode</CharacterSet>
+  </PropertyGroup>
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.props" />
+  <ImportGroup Label="ExtensionSettings">
+  </ImportGroup>
+  <ImportGroup Label="PropertySheets" Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
+    <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
+  </ImportGroup>
+  <ImportGroup Label="PropertySheets" Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
+    <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
+  </ImportGroup>
+  <PropertyGroup Label="UserMacros" />
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
+    <LinkIncremental>true</LinkIncremental>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
+    <LinkIncremental>false</LinkIncremental>
+  </PropertyGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
+    <ClCompile>
+      <PrecompiledHeader>
+      </PrecompiledHeader>
+      <WarningLevel>Level3</WarningLevel>
+      <Optimization>Disabled</Optimization>
+      <PreprocessorDefinitions>WIN32;_DEBUG;_CONSOLE;_LIB;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <AdditionalIncludeDirectories>..\Codes;..\UnitTestCodes;$(GnuWin32_Home)\include;$(LIBACE_HOME);$(LIBCPPUNIT_HOME)\include;$(LIBCURL_HOME)\include;$(LIBODB_HOME);$(LIBODB_MYSQL_HOME);$(MYSQL_CONNECTOR_HOME)\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <DisableSpecificWarnings>4068; 4996</DisableSpecificWarnings>
+    </ClCompile>
+    <Link>
+      <SubSystem>Console</SubSystem>
+      <GenerateDebugInformation>true</GenerateDebugInformation>
+      <AdditionalLibraryDirectories>$(LIBACE_HOME)\lib;$(LIBCPPUNIT_HOME)\lib;$(LIBCURL_HOME);$(LIBJSONCPP_HOME)\lib;$(LIBODB_HOME)\lib;$(LIBODB_MYSQL_HOME)\lib;$(MYSQL_CONNECTOR_HOME)\lib</AdditionalLibraryDirectories>
+    </Link>
+  </ItemDefinitionGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
+    <ClCompile>
+      <WarningLevel>Level3</WarningLevel>
+      <PrecompiledHeader>
+      </PrecompiledHeader>
+      <Optimization>MaxSpeed</Optimization>
+      <FunctionLevelLinking>true</FunctionLevelLinking>
+      <IntrinsicFunctions>true</IntrinsicFunctions>
+      <PreprocessorDefinitions>WIN32;NDEBUG;_CONSOLE;_LIB;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <AdditionalIncludeDirectories>..\Codes;..\UnitTestCodes;$(GnuWin32_Home)\include;$(LIBACE_HOME);$(LIBCPPUNIT_HOME)\include;$(LIBODB_HOME);$(LIBODB_MYSQL_HOME);$(MYSQL_CONNECTOR_HOME)\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <DisableSpecificWarnings>4068</DisableSpecificWarnings>
+    </ClCompile>
+    <Link>
+      <SubSystem>Console</SubSystem>
+      <GenerateDebugInformation>true</GenerateDebugInformation>
+      <EnableCOMDATFolding>true</EnableCOMDATFolding>
+      <OptimizeReferences>true</OptimizeReferences>
+      <AdditionalLibraryDirectories>$(LIBACE_HOME)\lib;$(LIBCPPUNIT_HOME)\lib;$(LIBJSONCPP_HOME)\lib;$(LIBODB_HOME)\lib;$(LIBODB_MYSQL_HOME)\lib;$(MYSQL_CONNECTOR_HOME)\lib</AdditionalLibraryDirectories>
+    </Link>
+  </ItemDefinitionGroup>
+  <ItemGroup>
+    <ClCompile Include="..\Codes\Controller.cpp" />
+    <ClCompile Include="..\Codes\Crc32.cpp" />
+    <ClCompile Include="..\Codes\RefsPlayerCookie.cpp" />
+    <ClCompile Include="..\Codes\DownloaderFtp.cpp" />
+    <ClCompile Include="..\Codes\PatPlayer.cpp" />
+    <ClCompile Include="..\Codes\PatPlayerCookie.cpp" />
+    <ClCompile Include="..\Codes\TmssPlayerCookie.cpp" />
+    <ClCompile Include="..\Codes\LibLinking.cpp" />
+    <ClCompile Include="..\Codes\Entities.cpp" />
+    <ClCompile Include="..\Codes\Command.cpp" />
+    <ClCompile Include="..\Codes\RefsPlayer.cpp" />
+    <ClCompile Include="..\Codes\TableIndexHelper.cpp" />
+    <ClCompile Include="..\Codes\TmssPlayer.cpp" />
+    <ClCompile Include="..\Codes\TransportPacket.cpp" />
+    <ClCompile Include="Codes\EntityHelper.cpp" />
+    <ClCompile Include="Codes\Main.cpp" />
+    <ClCompile Include="Codes\UnitTestLibLinking.cpp" />
+    <ClCompile Include="Codes\UtController.cpp" />
+    <ClCompile Include="Codes\UtRefsPlayer.cpp" />
+    <ClCompile Include="Codes\UtDownloaderFtp.cpp" />
+    <ClCompile Include="Codes\UtPatPlayer.cpp" />
+    <ClCompile Include="Codes\UtTmssPlayer.cpp" />
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="..\Codes\ClassFactories.h" />
+    <ClInclude Include="..\Codes\Controller.h" />
+    <ClInclude Include="..\Codes\ControllerInterface.h" />
+    <ClInclude Include="..\Codes\Crc32.h" />
+    <ClInclude Include="..\Codes\Database.h" />
+    <ClInclude Include="..\Codes\RefsPlayerCookie.h" />
+    <ClInclude Include="..\Codes\Debug.h" />
+    <ClInclude Include="..\Codes\DownloaderFtp.h" />
+    <ClInclude Include="..\Codes\DownloaderInterface.h" />
+    <ClInclude Include="..\Codes\Entities.h" />
+    <ClInclude Include="..\Codes\NvodConfigWrapperInterface.h" />
+    <ClInclude Include="..\Codes\PatPlayer.h" />
+    <ClInclude Include="..\Codes\PatPlayerCookie.h" />
+    <ClInclude Include="..\Codes\TmssPlayerCookie.h" />
+    <ClInclude Include="..\Codes\MemberHelper.h" />
+    <ClInclude Include="..\Codes\MovieRepositoryInterface.h" />
+    <ClInclude Include="..\Codes\PacketHelper.h" />
+    <ClInclude Include="..\Codes\PlayerInterface.h" />
+    <ClInclude Include="..\Codes\EpgServerInterface.h" />
+    <ClInclude Include="..\Codes\RefsPlayer.h" />
+    <ClInclude Include="..\Codes\SystemInclude.h" />
+    <ClInclude Include="..\Codes\Command.h" />
+    <ClInclude Include="..\Codes\TableIndexHelper.h" />
+    <ClInclude Include="..\Codes\TableIndexHelperInterface.h" />
+    <ClInclude Include="..\Codes\TmssPlayer.h" />
+    <ClInclude Include="..\Codes\BaseType.h" />
+    <ClInclude Include="..\Codes\TransportPacket.h" />
+    <ClInclude Include="..\Codes\TransportPacketInterface.h" />
+    <ClInclude Include="Codes\EntityHelper.h" />
+    <ClInclude Include="Codes\UtController.h" />
+    <ClInclude Include="Codes\UtRefsPlayer.h" />
+    <ClInclude Include="Codes\UtDownloaderFtp.h" />
+    <ClInclude Include="Codes\UtPatPlayer.h" />
+    <ClInclude Include="Codes\UtTmssPlayer.h" />
+  </ItemGroup>
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
+  <ImportGroup Label="ExtensionTargets">
+  </ImportGroup>
+</Project>

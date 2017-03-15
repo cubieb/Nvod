@@ -1,149 +1,179 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
   <ItemGroup>
-    <Filter Include="源文件">
-      <UniqueIdentifier>{4FC737F1-C7A5-4376-A066-2A32D752A2FF}</UniqueIdentifier>
-      <Extensions>cpp;c;cc;cxx;def;odl;idl;hpj;bat;asm;asmx</Extensions>
-    </Filter>
-    <Filter Include="头文件">
-      <UniqueIdentifier>{93995380-89BD-4b04-88EB-625FBE52EBFB}</UniqueIdentifier>
-      <Extensions>h;hh;hpp;hxx;hm;inl;inc;xsd</Extensions>
-    </Filter>
     <Filter Include="资源文件">
       <UniqueIdentifier>{67DA6AB6-F800-4c08-8B7A-83BB121AAD01}</UniqueIdentifier>
       <Extensions>rc;ico;cur;bmp;dlg;rc2;rct;bin;rgs;gif;jpg;jpeg;jpe;resx;tiff;tif;png;wav;mfcribbon-ms</Extensions>
     </Filter>
-    <Filter Include="头文件\Controller">
+    <Filter Include="CommonCodes">
+      <UniqueIdentifier>{7c51dd09-b79d-4127-93b2-4ec7b3cdfab3}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="CommonCodes\头文件">
+      <UniqueIdentifier>{93995380-89BD-4b04-88EB-625FBE52EBFB}</UniqueIdentifier>
+      <Extensions>h;hh;hpp;hxx;hm;inl;inc;xsd</Extensions>
+    </Filter>
+    <Filter Include="CommonCodes\头文件\Controller">
       <UniqueIdentifier>{116e85bb-440c-4ff6-a40d-44762c2a9d6d}</UniqueIdentifier>
     </Filter>
-    <Filter Include="Main">
-      <UniqueIdentifier>{4f9331b2-2a82-4641-af17-f60b55f80824}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="头文件\Foundation">
+    <Filter Include="CommonCodes\头文件\Foundation">
       <UniqueIdentifier>{60951ba0-d722-4960-914e-4815b9e5a89e}</UniqueIdentifier>
     </Filter>
-    <Filter Include="头文件\NvodServiceEntity">
+    <Filter Include="CommonCodes\头文件\NvodServiceEntity">
       <UniqueIdentifier>{2d57759f-d7ba-4c55-8df0-30f0a685d3c0}</UniqueIdentifier>
     </Filter>
-    <Filter Include="头文件\NvodServiceEntity\TsSvcId">
+    <Filter Include="CommonCodes\头文件\NvodServiceEntity\TsSvcId">
       <UniqueIdentifier>{8d866455-ec18-4278-8af3-43a6439c549e}</UniqueIdentifier>
     </Filter>
-    <Filter Include="头文件\Player">
+    <Filter Include="CommonCodes\头文件\NvodServiceEntity\NvodService">
+      <UniqueIdentifier>{1f94382c-5954-4ce8-acdc-81f1c849d649}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="CommonCodes\头文件\Player">
       <UniqueIdentifier>{95a9750d-80cf-404e-a3d2-f28f92abd660}</UniqueIdentifier>
     </Filter>
-    <Filter Include="源文件\Controller">
-      <UniqueIdentifier>{279483de-d58f-47e3-8460-8ca56083ed6c}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="源文件\Foundation">
-      <UniqueIdentifier>{a5263473-767a-4b54-ac4f-bf1a236ad857}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="源文件\NvodServiceEntity">
-      <UniqueIdentifier>{c260fe28-b0c1-467f-9af6-f1ae867440b1}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="源文件\Player">
-      <UniqueIdentifier>{99623099-f91a-47f4-826f-ec91f200c2c4}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="头文件\TableIndexHelper">
+    <Filter Include="CommonCodes\头文件\TableIndexHelper">
       <UniqueIdentifier>{faefbef9-236d-40e2-ba71-fd41a39dcdd3}</UniqueIdentifier>
     </Filter>
-    <Filter Include="源文件\TableIndexHelper">
+    <Filter Include="CommonCodes\头文件\Database">
+      <UniqueIdentifier>{1d9d4023-173c-48df-af85-a115f916175b}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="CommonCodes\源文件">
+      <UniqueIdentifier>{4FC737F1-C7A5-4376-A066-2A32D752A2FF}</UniqueIdentifier>
+      <Extensions>cpp;c;cc;cxx;def;odl;idl;hpj;bat;asm;asmx</Extensions>
+    </Filter>
+    <Filter Include="CommonCodes\源文件\Controller">
+      <UniqueIdentifier>{279483de-d58f-47e3-8460-8ca56083ed6c}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="CommonCodes\源文件\Foundation">
+      <UniqueIdentifier>{a5263473-767a-4b54-ac4f-bf1a236ad857}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="CommonCodes\源文件\NvodServiceEntity">
+      <UniqueIdentifier>{c260fe28-b0c1-467f-9af6-f1ae867440b1}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="CommonCodes\源文件\Player">
+      <UniqueIdentifier>{99623099-f91a-47f4-826f-ec91f200c2c4}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="CommonCodes\源文件\TableIndexHelper">
       <UniqueIdentifier>{d5c9c062-105b-42c4-b347-602d68cf0639}</UniqueIdentifier>
     </Filter>
-    <Filter Include="头文件\NvodServiceEntity\NvodService">
-      <UniqueIdentifier>{1f94382c-5954-4ce8-acdc-81f1c849d649}</UniqueIdentifier>
+    <Filter Include="CommonCodes\源文件\Command">
+      <UniqueIdentifier>{3440921a-0714-4cd6-932f-c15a2404b55f}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="CommonCodes\源文件\Database">
+      <UniqueIdentifier>{71d25653-0df9-4bd1-a760-04e11a4c5b4e}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="头文件">
+      <UniqueIdentifier>{443fb417-1240-4739-a5e1-32f701cbc761}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="源文件">
+      <UniqueIdentifier>{ebee3f4d-b52f-4aa0-b2ea-c25fb55053f0}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\Codes\ControllerInterface.h">
-      <Filter>头文件\Controller</Filter>
-    </ClInclude>
-    <ClInclude Include="..\Codes\Database.h">
-      <Filter>头文件\Foundation</Filter>
+      <Filter>CommonCodes\头文件\Controller</Filter>
     </ClInclude>
     <ClInclude Include="..\Codes\SystemInclude.h">
-      <Filter>头文件\Foundation</Filter>
+      <Filter>CommonCodes\头文件\Foundation</Filter>
     </ClInclude>
     <ClInclude Include="..\Codes\Type.h">
-      <Filter>头文件\Foundation</Filter>
+      <Filter>CommonCodes\头文件\Foundation</Filter>
     </ClInclude>
     <ClInclude Include="..\Codes\TsSvcId.h">
-      <Filter>头文件\NvodServiceEntity</Filter>
+      <Filter>CommonCodes\头文件\NvodServiceEntity</Filter>
     </ClInclude>
     <ClInclude Include="..\Codes\PlayerInterface.h">
-      <Filter>头文件\Player</Filter>
+      <Filter>CommonCodes\头文件\Player</Filter>
     </ClInclude>
     <ClInclude Include="..\Codes\Controller.h">
-      <Filter>源文件\Controller</Filter>
+      <Filter>CommonCodes\源文件\Controller</Filter>
     </ClInclude>
     <ClInclude Include="..\Codes\TmssPlayer.h">
-      <Filter>源文件\Player</Filter>
+      <Filter>CommonCodes\源文件\Player</Filter>
     </ClInclude>
     <ClInclude Include="..\Codes\TsSvcId-odb.h">
-      <Filter>头文件\NvodServiceEntity\TsSvcId</Filter>
-    </ClInclude>
-    <ClInclude Include="..\Codes\Main.h">
-      <Filter>Main</Filter>
+      <Filter>CommonCodes\头文件\NvodServiceEntity\TsSvcId</Filter>
     </ClInclude>
     <ClInclude Include="..\Codes\ClassFactories.h">
-      <Filter>头文件\Foundation</Filter>
+      <Filter>CommonCodes\头文件\Foundation</Filter>
     </ClInclude>
     <ClInclude Include="..\Codes\TableIndexHelperInterface.h">
-      <Filter>头文件\TableIndexHelper</Filter>
+      <Filter>CommonCodes\头文件\TableIndexHelper</Filter>
     </ClInclude>
     <ClInclude Include="..\Codes\TableIndexHelper.h">
-      <Filter>源文件\TableIndexHelper</Filter>
+      <Filter>CommonCodes\源文件\TableIndexHelper</Filter>
     </ClInclude>
     <ClInclude Include="..\Codes\NvodService.h">
-      <Filter>头文件\NvodServiceEntity</Filter>
+      <Filter>CommonCodes\头文件\NvodServiceEntity</Filter>
     </ClInclude>
     <ClInclude Include="..\Codes\NvodService-odb.h">
-      <Filter>头文件\NvodServiceEntity\NvodService</Filter>
+      <Filter>CommonCodes\头文件\NvodServiceEntity\NvodService</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Codes\TmssCommand.h">
+      <Filter>CommonCodes\源文件\Command</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Codes\DatabaseInterface.h">
+      <Filter>CommonCodes\头文件\Database</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Codes\Database.h">
+      <Filter>CommonCodes\源文件\Database</Filter>
+    </ClInclude>
+    <ClInclude Include="Codes\Main.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Codes\Debug.h">
+      <Filter>CommonCodes\头文件\Foundation</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\Codes\Controller.cpp">
-      <Filter>源文件\Controller</Filter>
-    </ClCompile>
-    <ClCompile Include="..\Codes\Database.cpp">
-      <Filter>源文件\Foundation</Filter>
+      <Filter>CommonCodes\源文件\Controller</Filter>
     </ClCompile>
     <ClCompile Include="..\Codes\LibLinking.cpp">
-      <Filter>源文件\Foundation</Filter>
+      <Filter>CommonCodes\源文件\Foundation</Filter>
     </ClCompile>
     <ClCompile Include="..\Codes\ReferenceService.cpp">
-      <Filter>源文件\NvodServiceEntity</Filter>
+      <Filter>CommonCodes\源文件\NvodServiceEntity</Filter>
     </ClCompile>
     <ClCompile Include="..\Codes\TimeShiftedService.cpp">
-      <Filter>源文件\NvodServiceEntity</Filter>
+      <Filter>CommonCodes\源文件\NvodServiceEntity</Filter>
     </ClCompile>
     <ClCompile Include="..\Codes\TmssPlayer.cpp">
-      <Filter>源文件\Player</Filter>
+      <Filter>CommonCodes\源文件\Player</Filter>
     </ClCompile>
     <ClCompile Include="..\Codes\TsSvcId-odb.cpp">
-      <Filter>头文件\NvodServiceEntity\TsSvcId</Filter>
-    </ClCompile>
-    <ClCompile Include="..\Codes\Main.cpp">
-      <Filter>Main</Filter>
+      <Filter>CommonCodes\头文件\NvodServiceEntity\TsSvcId</Filter>
     </ClCompile>
     <ClCompile Include="..\Codes\TableIndexHelper.cpp">
-      <Filter>源文件\TableIndexHelper</Filter>
+      <Filter>CommonCodes\源文件\TableIndexHelper</Filter>
     </ClCompile>
     <ClCompile Include="..\Codes\NvodService-odb.cpp">
-      <Filter>头文件\NvodServiceEntity\NvodService</Filter>
+      <Filter>CommonCodes\头文件\NvodServiceEntity\NvodService</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Codes\TmssCommand.cpp">
+      <Filter>CommonCodes\源文件\Command</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Codes\Database.cpp">
+      <Filter>CommonCodes\源文件\Database</Filter>
+    </ClCompile>
+    <ClCompile Include="Codes\Main.cpp">
+      <Filter>源文件</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Codes\Debug.cpp">
+      <Filter>CommonCodes\源文件\Foundation</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <None Include="..\Codes\TsSvcId-odb.ixx">
-      <Filter>头文件\NvodServiceEntity\TsSvcId</Filter>
+      <Filter>CommonCodes\头文件\NvodServiceEntity\TsSvcId</Filter>
     </None>
     <None Include="..\Codes\TsSvcId-odb.sql">
-      <Filter>头文件\NvodServiceEntity\TsSvcId</Filter>
+      <Filter>CommonCodes\头文件\NvodServiceEntity\TsSvcId</Filter>
     </None>
     <None Include="..\Codes\NvodService-odb.ixx">
-      <Filter>头文件\NvodServiceEntity\NvodService</Filter>
+      <Filter>CommonCodes\头文件\NvodServiceEntity\NvodService</Filter>
     </None>
     <None Include="..\Codes\NvodService-odb.sql">
-      <Filter>头文件\NvodServiceEntity\NvodService</Filter>
+      <Filter>CommonCodes\头文件\NvodServiceEntity\NvodService</Filter>
     </None>
   </ItemGroup>
 </Project>

@@ -12,7 +12,15 @@
      * The _CRT_SECURE_NO_WARNINGS must be defined before including any system 
      * header files which may cause the security warning.
      */
-#   define _CRT_SECURE_NO_WARNINGS 
+#   ifndef _CRT_SECURE_NO_WARNINGS
+#       define _CRT_SECURE_NO_WARNINGS 
+#   endif
+
+	// 包括 SDKDDKVer.h 将定义可用的最高版本的 Windows 平台。
+	// 如果要为以前的 Windows 平台生成应用程序，请包括 WinSDKVer.h，并将
+	// WIN32_WINNT 宏设置为要支持的平台，然后再包括 SDKDDKVer.h。
+#	include <SDKDDKVer.h>
+
     /* there are two macro "min, max" definition in minwindef.h,
     they will cause troulbe when we call std::min() or std::max() template.
     #ifndef NOMINMAX
@@ -44,7 +52,10 @@
 #   else
 #       define DEBUG_CLIENTBLOCK
 #   endif // _DEBUG
-#endif
+
+#   include <io.h>      /* int _access(const char *path,  int mode);*/
+#   define access(x, y) _access(x, y)
+#endif //#ifdef _WIN32
 
 #ifdef __linux
 #   include <endian.h>
