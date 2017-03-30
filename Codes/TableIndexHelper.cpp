@@ -1,10 +1,5 @@
 #include "TableIndexHelper.h"
 
-/* ODB */
-#include <odb/database.hxx>    //odb::database
-#include <odb/session.hxx>
-#include <odb/transaction.hxx>
-
 /* Entity */
 #include "Entities.h"
 

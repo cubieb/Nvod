@@ -73,7 +73,8 @@ void TmssPlayer::TheMovieThreadMain()
 	Duration duration = Duration::zero();
     while (true)
     {
-		cout << duration_cast<Milliseconds>(duration).count() << endl;
+        cout << *cookie.GetTmss()->GetServiceId() << ", "
+            << duration_cast<Milliseconds>(duration).count() << endl;
         std::unique_lock<std::mutex> lock(mtx);
 		if (cv.wait_for(lock, duration, [this]{return !isOnGoing; }))
             break;

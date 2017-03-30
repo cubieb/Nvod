@@ -20,7 +20,10 @@ PatPlayerCookie::PatPlayerCookie(shared_ptr<GlobalCfgEntity> globalCfg, shared_p
     list<shared_ptr<RefsEntity>>& refses = ts->GetRefses();
     for (auto iter = refses.begin(); iter != refses.end(); ++iter)
 	{
-		this->ts->Bind(make_shared<RefsEntity>(**iter));
+		shared_ptr<RefsEntity> refs = make_shared<RefsEntity>(**iter);
+
+		refs->SetPsts(make_shared<PstsEntity>(*(*iter)->GetPsts()));
+		this->ts->Bind(refs);
 	}
 
     list<shared_ptr<TmssEntity>>& tmsses  = ts->GetTmsses();

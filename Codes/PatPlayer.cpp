@@ -91,7 +91,7 @@ void PatPlayer::HandlePatTimer()
     
     auto FillPat = [this, buffer, bufSize, &bptr, &tsHelper, &patHelper](ServiceId serviceId, Pid pmtPid) ->void
     {
-        if (tsHelper->GetSize() + patHelper->GetSize() + PatElementaryInterface::GetMinSize() > TsPacketSize)
+        if (tsHelper->GetSize() + patHelper->GetSize() + 4 > TsPacketSize)
         {
             bptr = bptr + TsPacketSize;
             assert(bptr < buffer + bufSize);
@@ -126,7 +126,8 @@ void PatPlayer::HandlePatTimer()
     list<shared_ptr<TmssEntity>>& tmsses = cookie.GetTs()->GetTmsses();
     for (auto iter = refses.begin(); iter != refses.end(); ++iter)
     {
-        FillPat(*(*iter)->GetServiceId(), *(*iter)->GetPmtPid());
+		shared_ptr<PstsEntity> psts = (*iter)->GetPsts();
+		FillPat(*psts->GetServiceId(), *psts->GetPmtPid());
     }
 
     for (auto iter = tmsses.begin(); iter != tmsses.end(); ++iter)

@@ -289,7 +289,6 @@ public:
     EsInfoLength GetEsInfoLength() const;
     void SetEsInfoLength(EsInfoLength esInfoLength);
 
-    uchar_t* GetEsInfoes() const;
     size_t GetSize() const;
 
 private:
@@ -318,6 +317,18 @@ struct ts_packet_poster_dit_data
     DitSectionNumber  section_number;
     DitSectionNumber  last_section_number;
 };
+
+struct ts_packet_poster_file_info
+{
+    uint16_t      file_id;
+    uint16_t      event_loop_length;
+    /*
+    for(i=0;i<N1;i++){
+        event_id;
+    }
+    */
+};
+
 #pragma pack(pop)
 
 /**********************class DitHelper**********************/
@@ -351,6 +362,25 @@ public:
 
 private:
     ts_packet_poster_dit_data* ditHeader;
+};
+
+class DitElementary : public DitElementaryInterface
+{
+public:
+	DitElementary(uchar_t *ditElementary);
+	~DitElementary();
+
+    uint16_t GetFileId() const;
+    void SetFileId(uint16_t fileId);
+
+	uint16_t GetEventLoopLength() const;
+	void SetEventLoopLength(uint16_t eventLoopLength);
+	
+    uchar_t* GetHeader() const;
+	size_t GetSize() const;
+
+private:
+    ts_packet_poster_file_info *ditElementary;
 };
 
 /* DDT: Download Data Table */

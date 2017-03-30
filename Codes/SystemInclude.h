@@ -53,6 +53,7 @@
 #       define DEBUG_CLIENTBLOCK
 #   endif // _DEBUG
 
+#   define __func__ __FUNCTION__
 #   include <io.h>      /* int _access(const char *path,  int mode);*/
 #   define access(x, y) _access(x, y)
 #endif //#ifdef _WIN32

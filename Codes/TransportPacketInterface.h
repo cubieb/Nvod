@@ -103,10 +103,10 @@ public:
     virtual Pid GetPmtPid() const = 0;
     virtual void SetPmtPid(Pid pmtPid) = 0;
 
-    static size_t GetMinSize()
-    {
-        return 4;
-    }
+    //static size_t GetMinSize()
+    //{
+    //    return 4;
+    //}
     virtual size_t GetSize() const = 0;
 };
 
@@ -171,7 +171,6 @@ public:
     virtual EsInfoLength GetEsInfoLength() const = 0;
     virtual void SetEsInfoLength(EsInfoLength esInfoLength) = 0;
 
-    virtual uchar_t* GetEsInfoes() const = 0;
     virtual size_t GetSize() const = 0;
 };
 
@@ -205,6 +204,23 @@ public:
     virtual size_t GetSize() const = 0;
 
     virtual void UpdateCrcCode() = 0;
+};
+
+class DitElementaryInterface
+{
+public: 
+	DitElementaryInterface() {}
+	virtual ~DitElementaryInterface() {}
+    static DitElementaryInterface* CreateInstance(uchar_t *ditElementary);
+
+    virtual uint16_t GetFileId() const = 0;
+    virtual void SetFileId(uint16_t fileId) = 0;
+
+	virtual uint16_t GetEventLoopLength() const = 0;
+	virtual void SetEventLoopLength(uint16_t eventLoopLength) = 0;
+
+    virtual uchar_t* GetHeader() const = 0;
+	virtual size_t GetSize() const = 0;
 };
 
 /**********************class DdtHelperInterface**********************/

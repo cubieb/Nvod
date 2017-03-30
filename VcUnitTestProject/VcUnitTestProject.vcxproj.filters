@@ -70,6 +70,9 @@
     <Filter Include="CommonCodes\源文件\Functions-L2\RefsPlayer">
       <UniqueIdentifier>{e9a19004-b244-446f-bb21-e6f2fd4ba695}</UniqueIdentifier>
     </Filter>
+    <Filter Include="CommonCodes\源文件\Functions-L1\XmlWrapper">
+      <UniqueIdentifier>{65e90fb6-220d-4025-b662-c39948fadd40}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\Codes\LibLinking.cpp">
@@ -137,6 +140,18 @@
     </ClCompile>
     <ClCompile Include="Codes\UtRefsPlayer.cpp">
       <Filter>源文件</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Codes\StaticConfigWrapper.cpp">
+      <Filter>CommonCodes\源文件\Functions-L1\XmlWrapper</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Codes\Debug.cpp">
+      <Filter>CommonCodes\源文件\Foundation</Filter>
+    </ClCompile>
+    <ClCompile Include="Codes\UtXmlWrapper.cpp">
+      <Filter>源文件</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Codes\DynamicConfigWrapper.cpp">
+      <Filter>CommonCodes\源文件\Functions-L1\XmlWrapper</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -224,9 +239,6 @@
     <ClInclude Include="..\Codes\PatPlayer.h">
       <Filter>CommonCodes\源文件\Functions-L2\PatPlayer</Filter>
     </ClInclude>
-    <ClInclude Include="..\Codes\NvodConfigWrapperInterface.h">
-      <Filter>CommonCodes\头文件\Functions-L1</Filter>
-    </ClInclude>
     <ClInclude Include="..\Codes\PatPlayerCookie.h">
       <Filter>CommonCodes\源文件\Functions-L2\PatPlayer</Filter>
     </ClInclude>
@@ -241,6 +253,21 @@
     </ClInclude>
     <ClInclude Include="Codes\UtRefsPlayer.h">
       <Filter>头文件</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Codes\StaticConfigWrapper.h">
+      <Filter>CommonCodes\源文件\Functions-L1\XmlWrapper</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Codes\XmlHelper.h">
+      <Filter>CommonCodes\头文件\Functions-L1</Filter>
+    </ClInclude>
+    <ClInclude Include="Codes\UtXmlWrapper.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Codes\XmlWrapperInterface.h">
+      <Filter>CommonCodes\头文件\Functions-L1</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Codes\DynamicConfigWrapper.h">
+      <Filter>CommonCodes\源文件\Functions-L1\XmlWrapper</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>

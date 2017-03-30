@@ -1,0 +1,53 @@
+<?xml version="1.0" encoding="utf-8"?>
+<root>
+  <Tx>
+    <TransportStreamList>
+      <TransportStream TsId="1">
+        <SrcIp>127.0.0.1</SrcIp>
+        <DstIp>127.0.0.1</DstIp>
+        <DstUdpPort>1234</DstUdpPort>
+      </TransportStream>
+    </TransportStreamList>
+  </Tx>
+  
+  <ReferenceTransportStreamList>
+    <ReferenceTransportStream TsId="1">
+      <ReferenceService Id="1">
+        <PosterService>
+          <ServiceId>100</ServiceId>
+          <PmtPid>1001</PmtPid>
+          <DataPipePid>1002</DataPipePid>
+        </PosterService>
+      </ReferenceService>
+    </ReferenceTransportStream>
+  </ReferenceTransportStreamList>
+  
+  <TimeShiftedTransportStreamList>
+    <TimeShiftedTransportStream TsId="1">
+      <Service Id="2">
+        <PmtPid>2001</PmtPid>
+        <PcrPid>2002</PcrPid>
+        <AudioPid>2003</AudioPid>
+        <VideoPid>2004</VideoPid>
+      </Service>
+      <Service Id="3">
+        <PmtPid>3001</PmtPid>
+        <PcrPid>3002</PcrPid>
+        <AudioPid>3003</AudioPid>
+        <VideoPid>3004</VideoPid>
+      </Service>
+      <Service Id="4">
+        <PmtPid>4001</PmtPid>
+        <PcrPid>4002</PcrPid>
+        <AudioPid>4003</AudioPid>
+        <VideoPid>4004</VideoPid>
+      </Service>
+    </TimeShiftedTransportStream>
+  </TimeShiftedTransportStreamList>
+  
+  <SendingIntervalMilliseconds>
+    <Pat>500</Pat>
+    <Pmt>500</Pmt>
+    <Poster>2000</Poster>
+  </SendingIntervalMilliseconds>    
+</root>

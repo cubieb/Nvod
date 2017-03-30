@@ -4,6 +4,7 @@
 #include <cppunit/extensions/HelperMacros.h>
 
 /* Foundation */
+#include "BaseType.h"
 #include "SystemInclude.h"
 
 class GlobalCfgEntity;
@@ -22,13 +23,11 @@ public:
     std::shared_ptr<GlobalCfgEntity> GetGlobalCfgEntity();
     std::shared_ptr<TsEntity> GetTsEntity();
     std::shared_ptr<RefsEntity> GetRefsEntity();
-    std::shared_ptr<TmssEntity> GetTmssEntity();
 
 private:
     std::shared_ptr<GlobalCfgEntity> globalCfgEntity;
     std::shared_ptr<TsEntity> tsEntity;
     std::shared_ptr<RefsEntity> refsEntity;
-    std::shared_ptr<TmssEntity> tmssEntity;
 };
 
 #endif

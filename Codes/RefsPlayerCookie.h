@@ -12,8 +12,8 @@ using std::string;
 
 class GlobalCfgEntity;
 class TsEntity;
-class PosterViewEntity;
 class RefsEntity;
+struct PosterViewEntity;
 
 class RefsRuntimeInfoEntity;
 
@@ -36,6 +36,17 @@ private:
     shared_ptr<RefsEntity> refs;
     list<shared_ptr<PosterViewEntity>> posterViews;
     shared_ptr<RefsRuntimeInfoEntity> dataPipeRuntimeInfo;
+};
+
+/**********************class RefsViewEntity**********************/
+struct PosterViewEntity
+{
+	TableId id;                    /* not null */
+	PosterId posterId;
+	string remotePath;
+	string localPath;  /* tansient, not null */
+
+	list<EventId> refsEventIds;
 };
 
 /**********************class RefsRuntimeInfoEntity**********************/

@@ -25,16 +25,6 @@ PatElementaryInterface* PatElementaryInterface::CreateInstance(uchar_t *patEleme
     return new PatElementary(patElementary);
 }
 
-DitHelperInterface* DitHelperInterface::CreateInstance(uchar_t *ditHeader)
-{
-    return new DitHelper(ditHeader);
-}
-
-DdtHelperInterface* DdtHelperInterface::CreateInstance(uchar_t *ddtHeader)
-{
-    return new DdtHelper(ddtHeader);
-}
-
 /**********************class PmtHelperInterface**********************/
 PmtHelperInterface* PmtHelperInterface::CreateInstance(uchar_t *pmtHeader)
 {
@@ -45,6 +35,24 @@ PmtElementaryInterface* PmtElementaryInterface::CreateInstance(uchar_t *pmtEleme
 {
     return new PmtElementary(pmtElementary);
 }
+
+/**********************class DitHelperInterface**********************/
+DitHelperInterface* DitHelperInterface::CreateInstance(uchar_t *ditHeader)
+{
+    return new DitHelper(ditHeader);
+}
+
+DitElementaryInterface* DitElementaryInterface::CreateInstance(uchar_t *ditElementary)
+{
+    return new DitElementary(ditElementary);
+}
+
+/**********************class DdtHelperInterface**********************/
+DdtHelperInterface* DdtHelperInterface::CreateInstance(uchar_t *ddtHeader)
+{
+    return new DdtHelper(ddtHeader);
+}
+
 
 /**********************class TransportPacketHelper**********************/
 TransportPacketHelper::TransportPacketHelper(uchar_t *tsPacketHeader)
@@ -569,11 +577,6 @@ void PmtElementary::SetEsInfoLength(EsInfoLength esInfoLength)
     WriteBuffer(&pmtElementary->pseudo_member2, esInfoLength, 0, 12);
 }
 
-uchar_t* PmtElementary::GetEsInfoes() const
-{
-    return reinterpret_cast<uchar_t*>(pmtElementary + 1);
-}
-
 size_t PmtElementary::GetSize() const
 {
     return 5 + GetEsInfoLength();
@@ -678,6 +681,43 @@ void DitHelper::UpdateCrcCode()
 {
     uchar_t *crc = (uchar_t*)ditHeader + GetSize() - GetCrcCodeSize();
     WriteBuffer((uint32_t*)crc, Crc32::CalculateCrc((uchar_t*)ditHeader, GetSize() - GetCrcCodeSize()));
+}
+
+DitElementary::DitElementary(uchar_t *ditElementary)
+    : ditElementary(reinterpret_cast<ts_packet_poster_file_info*>(ditElementary))
+{}
+
+DitElementary::~DitElementary()
+{}
+
+uint16_t DitElementary::GetFileId() const
+{
+    return ReadBuffer(&ditElementary->file_id, 0, sizeof(uint16_t) * 8);
+}
+
+void DitElementary::SetFileId(uint16_t fileId)
+{
+    WriteBuffer(&ditElementary->file_id, fileId, 0, sizeof(uint16_t) * 8);
+}
+
+uint16_t DitElementary::GetEventLoopLength() const
+{   
+    return ReadBuffer(&ditElementary->event_loop_length, 0, sizeof(uint16_t) * 8);
+}
+
+void DitElementary::SetEventLoopLength(uint16_t eventLoopLength)
+{
+    WriteBuffer(&ditElementary->event_loop_length, eventLoopLength, 0, sizeof(uint16_t) * 8);
+}
+
+uchar_t* DitElementary::GetHeader() const
+{
+    return reinterpret_cast<uchar_t*>(ditElementary);
+}
+
+size_t DitElementary::GetSize() const
+{
+    return 4 + GetEventLoopLength();
 }
 
 /**********************class DdtHelperInterface**********************/

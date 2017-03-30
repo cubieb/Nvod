@@ -160,22 +160,16 @@ void TsEntity::Unbind(weak_ptr<TmssEntity> tmss)
 }
 
 /**********************class RefsEntity**********************/
-RefsEntity::RefsEntity(TableId id, shared_ptr<TsId> tsId, shared_ptr<ServiceId> serviceId,
-	shared_ptr<Pid> pmtPid, shared_ptr<StreamType> streamType,
-	shared_ptr<Pid> posterPid, shared_ptr<string> description)
-    : id(id), tsId(tsId), serviceId(serviceId), 
-	pmtPid(pmtPid), streamType(streamType), 
-	posterPid(posterPid), description(description)
+RefsEntity::RefsEntity(TableId id, shared_ptr<ServiceId> serviceId, shared_ptr<string> description)
+    : id(id), serviceId(serviceId), description(description)
 {}
 
 RefsEntity::RefsEntity()
-: RefsEntity(InvalidTableId, nullptr, nullptr, nullptr, nullptr, nullptr, nullptr)
+: RefsEntity(InvalidTableId, nullptr, nullptr)
 {}
 
 RefsEntity::RefsEntity(const RefsEntity& right)
-    : RefsEntity(right.id, make_shared<TsId>(*right.tsId), make_shared<ServiceId>(*right.serviceId),
-	make_shared<Pid>(*right.pmtPid), make_shared<StreamType>(*right.streamType),
-	make_shared<Pid>(*right.posterPid), nullptr)
+    : RefsEntity(right.id, make_shared<ServiceId>(*right.serviceId), nullptr)
 {
     if (right.description != nullptr)
     {
@@ -183,10 +177,8 @@ RefsEntity::RefsEntity(const RefsEntity& right)
     }
 }
 
-RefsEntity::RefsEntity(TableId id, TsId tsId, ServiceId serviceId,
-	Pid pmtPid, StreamType streamType, Pid posterPid)
-	: RefsEntity(id, make_shared<TsId>(tsId), make_shared<ServiceId>(serviceId),
-	make_shared<Pid>(pmtPid), make_shared<StreamType>(streamType), make_shared<Pid>(posterPid), nullptr)
+RefsEntity::RefsEntity(TableId id, ServiceId serviceId)
+	: RefsEntity(id, make_shared<ServiceId>(serviceId), nullptr)
 {}
 
 RefsEntity::~RefsEntity()
@@ -202,21 +194,6 @@ void RefsEntity::SetId(TableId id)
     this->id = id;
 }
 
-shared_ptr<TsId> RefsEntity::GetTsId() const
-{
-    return tsId;
-}
-
-void RefsEntity::SetTsId(shared_ptr<TsId> tsId)
-{
-    this->tsId = tsId;
-}
-
-void RefsEntity::SetTsId(TsId tsId)
-{
-    MemberHelper::SetMember(this->tsId, tsId, nullptr);
-}
-
 shared_ptr<ServiceId> RefsEntity::GetServiceId() const
 {
     return serviceId;
@@ -230,51 +207,6 @@ void RefsEntity::SetServiceId(shared_ptr<ServiceId> serviceId)
 void RefsEntity::SetServiceId(ServiceId serviceId)
 {
     MemberHelper::SetMember(this->serviceId, serviceId, nullptr);
-}
-
-shared_ptr<Pid> RefsEntity::GetPmtPid() const
-{
-    return pmtPid;
-}
-
-void RefsEntity::SetPmtPid(shared_ptr<Pid> pmtPid)
-{
-    this->pmtPid = pmtPid;
-}
-
-void RefsEntity::SetPmtPid(Pid pmtPid)
-{
-    MemberHelper::SetMember(this->pmtPid, pmtPid, nullptr);
-}
-
-shared_ptr<StreamType> RefsEntity::GetStreamType() const
-{
-    return streamType;
-}
-
-void RefsEntity::SetStreamType(shared_ptr<StreamType> streamType)
-{
-    this->streamType = streamType;
-}
-
-void RefsEntity::SetStreamType(StreamType streamType)
-{
-    MemberHelper::SetMember(this->streamType, streamType, nullptr);
-}
-
-shared_ptr<Pid> RefsEntity::GetPosterPid() const
-{
-    return posterPid;
-}
-
-void RefsEntity::SetPosterPid(shared_ptr<Pid> posterPid)
-{
-    this->posterPid = posterPid;
-}
-
-void RefsEntity::SetPosterPid(Pid posterPid)
-{
-    MemberHelper::SetMember(this->posterPid, posterPid, nullptr);
 }
 
 shared_ptr<string> RefsEntity::GetDescription() const
@@ -300,6 +232,16 @@ weak_ptr<TsEntity> RefsEntity::GetTs() const
 void RefsEntity::SetTs(weak_ptr<TsEntity> ts)
 {
 	MemberHelper::SetMember(this->ts, ts, shared_from_this());
+}
+
+shared_ptr<PstsEntity> RefsEntity::GetPsts() const
+{
+	return psts;
+}
+
+void RefsEntity::SetPsts(shared_ptr<PstsEntity> psts)
+{
+	MemberHelper::SetMember(this->psts, psts, shared_from_this());
 }
 
 const list<shared_ptr<RefsEventEntity>>& RefsEntity::GetRefsEvents() const
@@ -334,9 +276,29 @@ string RefsEntity::ToString() const
 }
 
 /* private functions */
+void RefsEntity::Bind(shared_ptr<PstsEntity> psts)
+{
+	MemberHelper::BindMember(this->psts, psts, shared_from_this());
+}
+
+void RefsEntity::Unbind(shared_ptr<PstsEntity>)
+{
+	MemberHelper::UnbindMember(this->psts, NullSharedPtr(PstsEntity), shared_from_this());
+}
+
+void RefsEntity::Bind(weak_ptr<PstsEntity> psts)
+{
+	MemberHelper::BindMember(this->psts, psts, shared_from_this());
+}
+
+void RefsEntity::Unbind(weak_ptr<PstsEntity>)
+{
+	MemberHelper::UnbindMember(this->psts, NullWeakPtr(PstsEntity), shared_from_this());
+}
+
 void RefsEntity::Bind(shared_ptr<TsEntity> ts)
 {
-	MemberHelper::BindMember(this->ts, ts, shared_from_this());
+	MemberHelper::BindMember(this->psts, psts, shared_from_this());
 }
 
 void RefsEntity::Unbind(shared_ptr<TsEntity>)
@@ -834,21 +796,22 @@ void PosterEntity::Unbind(weak_ptr<RefsEventEntity> refsEvent)
 
 /**********************class TmssEntity**********************/
 /* public functions */
-TmssEntity::TmssEntity(TableId id, shared_ptr<TsId> tsId, shared_ptr<ServiceId> serviceId,
+TmssEntity::TmssEntity(TableId id, shared_ptr<ServiceId> serviceId,
 	shared_ptr<Pid> pmtPid, shared_ptr<Pid> pcrPid, shared_ptr<Pid> audioPid, shared_ptr<Pid> videoPid,
 	shared_ptr<string> description)
-    : id(id), tsId(tsId), serviceId(serviceId), 
+    : id(id), serviceId(serviceId), 
 	pmtPid(pmtPid), pcrPid(pcrPid), audioPid(audioPid), videoPid(videoPid),
 	description(description)
 {}
 
 TmssEntity::TmssEntity()
-	: TmssEntity(InvalidTableId, nullptr, nullptr, nullptr, nullptr, nullptr, nullptr, nullptr)
+	: TmssEntity(InvalidTableId, nullptr, nullptr, nullptr, nullptr, nullptr, nullptr)
 {}
 
 TmssEntity::TmssEntity(const TmssEntity& right)
-	: TmssEntity(right.id, make_shared<TsId>(*right.tsId), make_shared<ServiceId>(*right.serviceId),
-	make_shared<Pid>(*right.pmtPid), make_shared<Pid>(*right.pcrPid), make_shared<Pid>(*right.audioPid), make_shared<Pid>(*right.videoPid),
+	: TmssEntity(right.id, make_shared<ServiceId>(*right.serviceId),
+	make_shared<Pid>(*right.pmtPid), make_shared<Pid>(*right.pcrPid), 
+	make_shared<Pid>(*right.audioPid), make_shared<Pid>(*right.videoPid),
     nullptr)
 {
     if (right.description != nullptr)
@@ -857,8 +820,8 @@ TmssEntity::TmssEntity(const TmssEntity& right)
     }
 }
 
-TmssEntity::TmssEntity(TableId id, TsId tsId, ServiceId serviceId, Pid pmtPid, Pid pcrPid, Pid audioPid, Pid videoPid)
-: TmssEntity(id, make_shared<TsId>(tsId), make_shared<ServiceId>(serviceId), 
+TmssEntity::TmssEntity(TableId id, ServiceId serviceId, Pid pmtPid, Pid pcrPid, Pid audioPid, Pid videoPid)
+: TmssEntity(id, make_shared<ServiceId>(serviceId), 
 make_shared<Pid>(pmtPid), make_shared<Pid>(pcrPid), make_shared<Pid>(audioPid), make_shared<Pid>(videoPid), 
 nullptr)
 {}
@@ -874,21 +837,6 @@ TableId TmssEntity::GetId() const
 void TmssEntity::SetId(TableId id)
 {
     this->id = id;
-}
-
-shared_ptr<TsId> TmssEntity::GetTsId() const
-{
-    return tsId;
-}
-
-void TmssEntity::SetTsId(shared_ptr<TsId> tsId)
-{
-    this->tsId = tsId;
-}
-
-void TmssEntity::SetTsId(TsId tsId)
-{
-    MemberHelper::SetMember(this->tsId, tsId, nullptr);
 }
 
 shared_ptr<ServiceId> TmssEntity::GetServiceId() const
@@ -1198,6 +1146,131 @@ void TmssEventEntity::Unbind(weak_ptr<RefsEventEntity>)
     MemberHelper::UnbindMember(refsEvent, NullWeakPtr(RefsEventEntity), shared_from_this());
 }
 
+/**********************class PstsEntity**********************/
+PstsEntity::PstsEntity(TableId id, shared_ptr<ServiceId> serviceId,
+	shared_ptr<Pid> pmtPid, shared_ptr<StreamType> streamType, shared_ptr<Pid> posterPid)
+	: id(id), serviceId(serviceId), pmtPid(pmtPid), streamType(streamType), posterPid(posterPid)
+{}
+
+PstsEntity::PstsEntity()
+	: PstsEntity(InvalidTableId, nullptr, nullptr, nullptr, nullptr)
+{}
+
+PstsEntity::PstsEntity(const PstsEntity& right)
+	: PstsEntity(right.id, make_shared<ServiceId>(*right.serviceId),
+	make_shared<Pid>(right.pmtPid), make_shared<StreamType>(*right.streamType), make_shared<Pid>(*right.posterPid))
+{}
+
+PstsEntity::PstsEntity(TableId id, ServiceId serviceId,
+	Pid pmtPid, StreamType streamType, Pid posterPid)
+	: PstsEntity(id, make_shared<ServiceId>(serviceId),
+	make_shared<Pid>(pmtPid), make_shared<StreamType>(streamType), make_shared<Pid>(posterPid))
+{}
+
+PstsEntity::~PstsEntity()
+{}
+
+TableId PstsEntity::GetId() const
+{
+	return id;
+}
+
+void PstsEntity::SetId(TableId id)
+{
+	this->id = id;
+}
+
+shared_ptr<ServiceId> PstsEntity::GetServiceId() const
+{
+	return serviceId;
+}
+
+void PstsEntity::SetServiceId(shared_ptr<ServiceId> serviceId)
+{
+	this->serviceId = serviceId;
+}
+
+void PstsEntity::SetServiceId(ServiceId serviceId)
+{
+	MemberHelper::SetMember(this->serviceId, serviceId, nullptr);
+}
+
+shared_ptr<Pid> PstsEntity::GetPmtPid() const
+{
+	return pmtPid;
+}
+
+void PstsEntity::SetPmtPid(shared_ptr<Pid> pmtPid)
+{
+	this->pmtPid = pmtPid;
+}
+
+void PstsEntity::SetPmtPid(Pid pmtPid)
+{
+	MemberHelper::SetMember(this->pmtPid, pmtPid, nullptr);
+}
+
+shared_ptr<StreamType> PstsEntity::GetStreamType() const
+{
+	return streamType;
+}
+
+void PstsEntity::SetStreamType(shared_ptr<StreamType> streamType)
+{
+	this->streamType = streamType;
+}
+
+void PstsEntity::SetStreamType(StreamType streamType)
+{
+	MemberHelper::SetMember(this->streamType, streamType, nullptr);
+}
+
+shared_ptr<Pid> PstsEntity::GetPosterPid() const
+{
+	return posterPid;
+}
+
+void PstsEntity::SetPosterPid(shared_ptr<Pid> posterPid)
+{
+	this->posterPid = posterPid;
+}
+
+void PstsEntity::SetPosterPid(Pid posterPid)
+{
+	MemberHelper::SetMember(this->posterPid, posterPid, nullptr);
+}
+
+weak_ptr<RefsEntity> PstsEntity::GetRefs() const
+{
+    return refs;
+}
+
+void PstsEntity::SetRefs(weak_ptr<RefsEntity> refs)
+{
+    MemberHelper::SetMember(this->refs, refs, shared_from_this());
+}
+
+/* private functions */
+void PstsEntity::Bind(shared_ptr<RefsEntity> refs)
+{
+	MemberHelper::BindMember(this->refs, refs, shared_from_this());
+}
+
+void PstsEntity::Unbind(shared_ptr<RefsEntity>)
+{
+	MemberHelper::UnbindMember(this->refs, NullSharedPtr(RefsEntity), shared_from_this());
+}
+
+void PstsEntity::Bind(weak_ptr<RefsEntity> refs)
+{
+	MemberHelper::BindMember(this->refs, refs, shared_from_this());
+}
+
+void PstsEntity::Unbind(weak_ptr<RefsEntity>)
+{
+	MemberHelper::UnbindMember(this->refs, NullWeakPtr(RefsEntity), shared_from_this());
+}
+
 /**********************class GlobalCfgEntity**********************/
 GlobalCfgEntity::GlobalCfgEntity(TableId id, shared_ptr<Duration> patInterval,
     shared_ptr<Duration> pmtInterval, shared_ptr<Duration> posterInterval)
@@ -1277,122 +1350,3 @@ void GlobalCfgEntity::SetPosterInterval(Duration posterInterval)
     MemberHelper::SetMember(this->posterInterval, posterInterval, nullptr);
 }
 
-/**********************class RefsViewEntity**********************/
-PosterViewEntity::PosterViewEntity(TableId id, shared_ptr<PosterId> posterId, 
-    shared_ptr<string> remotePath, shared_ptr<string> localPath)
-	: id(id), posterId(posterId), remotePath(remotePath), localPath(localPath)
-{}
-
-PosterViewEntity::PosterViewEntity()
-	: PosterViewEntity(InvalidTableId, nullptr, nullptr, nullptr)
-{}
-
-PosterViewEntity::PosterViewEntity(const PosterViewEntity& right)
-    : PosterViewEntity(right.id, make_shared<PosterId>(*right.posterId), 
-    make_shared<string>(*right.remotePath), nullptr)
-{
-    if (right.localPath != nullptr)
-    {
-        localPath = make_shared<string>(*right.localPath);
-    }
-}
-
-PosterViewEntity::PosterViewEntity(TableId id, PosterId posterId, 
-    const char *remotePath, const char *localPath)
-    : PosterViewEntity(id, make_shared<PosterId>(posterId),
-    make_shared<string>(remotePath), nullptr)
-{
-    if (localPath != nullptr)
-    {
-        this->localPath = make_shared<string>(localPath);
-    }
-}
-
-PosterViewEntity::~PosterViewEntity()
-{}
-
-TableId PosterViewEntity::GetId() const
-{
-    return id;
-}
-
-void PosterViewEntity::SetId(TableId id)
-{
-    this->id = id;
-}
-
-shared_ptr<PosterId> PosterViewEntity::GetPosterId() const
-{
-    return posterId;
-}
-
-void PosterViewEntity::SetPosterId(shared_ptr<PosterId> posterId)
-{
-    this->posterId = posterId;
-}
-
-void PosterViewEntity::SetPosterId(PosterId posterId)
-{
-    MemberHelper::SetMember(this->posterId, posterId, nullptr);
-}
-
-shared_ptr<string> PosterViewEntity::GetRemotePath() const
-{
-    return remotePath;
-}
-
-void PosterViewEntity::SetRemotePath(shared_ptr<string> remotePath)
-{
-    this->remotePath = remotePath;
-}
-
-void PosterViewEntity::SetRemotePath(const string& remotePath)
-{
-    MemberHelper::SetMember(this->remotePath, remotePath, nullptr);
-}
-
-shared_ptr<string> PosterViewEntity::GetLocalPath() const
-{
-    return localPath;
-}
-
-void PosterViewEntity::SetLocalPath(shared_ptr<string> localPath)
-{
-    this->localPath = localPath;
-}
-
-void PosterViewEntity::SetLocalPath(const string& localPath)
-{
-    MemberHelper::SetMember(this->localPath, localPath, nullptr);
-}
-
-const list<shared_ptr<RefsEntity>>& PosterViewEntity::GetRefses() const
-{
-    return refses;
-}
-
-list<shared_ptr<RefsEntity>>& PosterViewEntity::GetRefses()
-{
-    return refses;
-}
-
-void PosterViewEntity::SetRefses(const list<shared_ptr<RefsEntity>>& refses)
-{
-    this->refses.clear();
-    copy(refses.begin(), refses.end(), this->refses.begin());
-}
-
-void PosterViewEntity::Bind(shared_ptr<RefsEntity> refs)
-{
-    refses.push_back(refs);
-}
-
-void PosterViewEntity::Unbind(shared_ptr<RefsEntity> refs)
-{
-    auto cmp = [refs](shared_ptr<RefsEntity> right)->bool
-    {
-        return refs->GetId() == right->GetId();
-    };
-
-    remove_if(refses.begin(), refses.end(), cmp);
-}

@@ -43,5 +43,7 @@ int main(int argc, char **argv)
 
     curl_global_cleanup();
     WSACleanup();
+
+    system("pause");
     return 0; 
 }

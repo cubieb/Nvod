@@ -1,11 +1,12 @@
 #include "RefsPlayer.h"
 
+/* Entity */
+#include "Entities.h"
+
 /* Functions */
 #include "TransportPacketInterface.h"
 #include "PacketHelper.h"
 
-/* Entity */
-#include "Entities.h"
 
 #include "RefsPlayerCookie.h"
 
@@ -95,14 +96,14 @@ void RefsPlayer::HandlePmtTimer()
     tsHelper->SetTransportErrorIndicator(0);
     tsHelper->SetPayloadUnitStartIndicator(1);
     tsHelper->SetTransportPriority(0);
-    tsHelper->SetPid(*refs->GetPmtPid());
+    tsHelper->SetPid(*refs->GetPsts()->GetPmtPid());
     tsHelper->SetTransportScramblingControl(0);
     tsHelper->SetAdaptationFieldControl(1);
     tsHelper->SetContinuityCounter(cookie.GetDataPipeRuntimeInfo()->GetNewPmtContinuityCounter());
 
     shared_ptr<PmtHelperInterface> pmtHelper(PmtHelperInterface::CreateInstance(tsHelper->GetPayLoadHeader()));
     pmtHelper->SetSectionLength(pmtHelper->GetMinSectionLength());
-    pmtHelper->SetProgramNumber(1);
+	pmtHelper->SetProgramNumber(*refs->GetPsts()->GetServiceId());
     pmtHelper->SetVersionNumber(0);
     pmtHelper->SetCurrentNextIndicator(1);
     pmtHelper->SetSectionMumber(0);
@@ -112,8 +113,8 @@ void RefsPlayer::HandlePmtTimer()
 
     uchar_t *ptr = pmtHelper->GetHeader() + pmtHelper->GetSize() - pmtHelper->GetCrcCodeSize();
     shared_ptr<PmtElementaryInterface> pmtElementary(PmtElementaryInterface::CreateInstance(ptr));
-    pmtElementary->SetStreamType(*refs->GetStreamType());
-    pmtElementary->SetElementaryPid(*refs->GetPosterPid());
+	pmtElementary->SetStreamType(*refs->GetPsts()->GetStreamType());
+	pmtElementary->SetElementaryPid(*refs->GetPsts()->GetPosterPid());
     pmtElementary->SetEsInfoLength(0);
 
     pmtHelper->SetSectionLength(pmtHelper->GetSectionLength() + pmtElementary->GetSize());
@@ -141,7 +142,7 @@ void RefsPlayer::HandlePosterDitTimer()
         tsHelper->SetTransportErrorIndicator(0);
         tsHelper->SetPayloadUnitStartIndicator(payloadUnitStartIndicator);
         tsHelper->SetTransportPriority(0);
-        tsHelper->SetPid(*refs->GetPosterPid());
+		tsHelper->SetPid(*refs->GetPsts()->GetPosterPid());
         tsHelper->SetTransportScramblingControl(0);
         tsHelper->SetAdaptationFieldControl(1);
         tsHelper->SetContinuityCounter(rtInfo->GetNewPosterContinuityCounter());
@@ -165,8 +166,7 @@ void RefsPlayer::HandlePosterDitTimer()
     WriteDit(ditHelper);
 
     shared_ptr<list<shared_ptr<PosterViewEntity>>::iterator> posterIter;
-    shared_ptr<list<shared_ptr<RefsEntity>>::iterator> refsIter;
-    shared_ptr<list<shared_ptr<RefsEventEntity>>::iterator> refsEventIter;
+	shared_ptr<list<EventId>::iterator> refsEventIdIter;
 
     list<shared_ptr<PosterViewEntity>>& posters = cookie.GetPosterViews();
     for (auto iter1 = posters.begin(); iter1 != posters.end(); ++iter1)
@@ -176,7 +176,7 @@ void RefsPlayer::HandlePosterDitTimer()
             iter1 = *posterIter;
             posterIter.reset();
         }
-        if (tsHelper->GetSize() + ditHelper->GetSize() + 10 > TsPacketSize)
+        if (tsHelper->GetSize() + ditHelper->GetSize() + 6 > TsPacketSize)
         {
             bptr = bptr + TsPacketSize;
             assert(bptr < buffer + bufSize);
@@ -185,61 +185,31 @@ void RefsPlayer::HandlePosterDitTimer()
             ditHelper.reset(DitHelperInterface::CreateInstance(tsHelper->GetPayLoadHeader()));
             WriteDit(ditHelper);
         }
-
+		
         uchar_t *ptr = ditHelper->GetHeader() + ditHelper->GetSize() - ditHelper->GetCrcCodeSize();
-        ditHelper->SetSectionLength(ditHelper->GetSectionLength() + 4);
-        WriteBuffer((PosterId*)(ptr + 0), *(*iter1)->GetPosterId()); //file_id
-        WriteBuffer((uint16_t*)(ptr + 2), (uint16_t)0); //service_loop_length
+        shared_ptr<DitElementaryInterface> ditElementary(DitElementaryInterface::CreateInstance(ptr));
+        ditElementary->SetFileId((*iter1)->posterId);
+        ditElementary->SetEventLoopLength(0);        
 
-        list<shared_ptr<RefsEntity>>& refses = (*iter1)->GetRefses();
-        for (auto iter2 = refses.begin(); iter2 != refses.end(); ++iter2)
+		list<EventId>& refsEventIds = (*iter1)->refsEventIds;
+		for (auto iter2 = refsEventIds.begin(); iter2 != refsEventIds.end(); ++iter2)
         {
-            if (tsHelper->GetSize() + ditHelper->GetSize() + 6 > TsPacketSize)
+            if (tsHelper->GetSize() + ditHelper->GetSize() + ditElementary->GetSize() + 2 > TsPacketSize)
             {
                 posterIter = make_shared<list<shared_ptr<PosterViewEntity>>::iterator>(iter1);
-                refsIter = make_shared<list<shared_ptr<RefsEntity>>::iterator>(iter2);
+				refsEventIdIter = make_shared<list<EventId>::iterator>(iter2);
                 break;
             }
 
-            if (refsIter != nullptr)
+			if (refsEventIdIter != nullptr)
             {
-                iter2 = *refsIter;
-                refsIter.reset();
+				iter2 = *refsEventIdIter;
+				refsEventIdIter.reset();
             }
-
-            uchar_t *ptr = ditHelper->GetHeader() + ditHelper->GetSize() - ditHelper->GetCrcCodeSize();
-            ditHelper->SetSectionLength(ditHelper->GetSectionLength() + 4);
-            WriteBuffer((ServiceId*)(ptr + 0), *(*iter2)->GetServiceId()); //service_id
-            WriteBuffer((uint16_t*)(ptr + 2), (uint16_t)0); //event_loop_length
-
-            list<shared_ptr<RefsEventEntity>>& refsEvents = (*iter2)->GetRefsEvents();
-            for (auto iter3 = refsEvents.begin(); iter3 != refsEvents.end(); ++iter3)
-            {
-                if (tsHelper->GetSize() + ditHelper->GetSize() + 2 > TsPacketSize)
-                {
-                    posterIter = make_shared<list<shared_ptr<PosterViewEntity>>::iterator>(iter1);
-                    refsIter = make_shared<list<shared_ptr<RefsEntity>>::iterator>(iter2);
-                    refsEventIter = make_shared<list<shared_ptr<RefsEventEntity>>::iterator>(iter3);
-                    break;
-                }
-
-                if (refsIter != nullptr)
-                {
-                    iter3 = *refsEventIter;
-                    refsEventIter.reset();
-                }
-
-                uchar_t *ptr = ditHelper->GetHeader() + ditHelper->GetSize() - ditHelper->GetCrcCodeSize();
-                ditHelper->SetSectionLength(ditHelper->GetSectionLength() + sizeof(EventId));
-                WriteBuffer((uint16_t*)ptr, *(*iter3)->GetEventId());
-            }
-            //event_loop_length
-            WriteBuffer((uint16_t*)(ptr + 2), 
-                (uint16_t)(ditHelper->GetHeader() + ditHelper->GetSize() - ditHelper->GetCrcCodeSize() - ptr - 4));
+            WriteBuffer((uint16_t*)(ditElementary->GetHeader() + ditElementary->GetSize()), *iter2);
+            ditElementary->SetEventLoopLength(ditElementary->GetEventLoopLength() + sizeof(EventId));
         }
-        //service_loop_length
-        WriteBuffer((uint16_t*)(ptr + 2), 
-            (uint16_t)(ditHelper->GetHeader() + ditHelper->GetSize() - ditHelper->GetCrcCodeSize() - ptr - 4));
+        ditHelper->SetSectionLength(ditHelper->GetSectionLength() + ditElementary->GetSize());
     }
     
     DitSectionNumber cur = 0;
@@ -271,7 +241,7 @@ void RefsPlayer::HandlePosterDdtTimer()
         tsHelper->SetTransportErrorIndicator(0);
         tsHelper->SetPayloadUnitStartIndicator(payloadUnitStartIndicator);
         tsHelper->SetTransportPriority(0);
-        tsHelper->SetPid(*refs->GetPosterPid());
+        tsHelper->SetPid(*refs->GetPsts()->GetPosterPid());
         tsHelper->SetTransportScramblingControl(0);
         tsHelper->SetAdaptationFieldControl(1);
         tsHelper->SetContinuityCounter(rtInfo->GetNewPosterContinuityCounter());
@@ -294,7 +264,7 @@ void RefsPlayer::HandlePosterDdtTimer()
     {
         uchar_t *bptr = buffer;
 
-        ifstream ifstrm((*iter)->GetLocalPath()->c_str(), ios::binary);
+        ifstream ifstrm((*iter)->localPath.c_str(), ios::binary);
 		assert(ifstrm.good());
 		while (!ifstrm.eof() && bptr < buffer + bufSize)
         {
@@ -302,7 +272,7 @@ void RefsPlayer::HandlePosterDdtTimer()
             WriteTs(tsHelper, bptr == buffer ? 1 : 0);
 
             shared_ptr<DdtHelperInterface> ddtHelper(DdtHelperInterface::CreateInstance(tsHelper->GetPayLoadHeader()));            
-            WriteDdt(ddtHelper, *(*iter)->GetPosterId());
+            WriteDdt(ddtHelper, (*iter)->posterId);
 
             size_t readSize = TsPacketSize - tsHelper->GetSize() - ddtHelper->GetSize();
             ifstrm.read((char*)ddtHelper->GetHeader() + ddtHelper->GetSize() - ddtHelper->GetCrcCodeSize(), readSize);

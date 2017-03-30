@@ -14,7 +14,7 @@
 using std::shared_ptr;
 
 class GlobalCfgEntity;
-class PosterViewEntity;
+struct PosterViewEntity;
 class RefsEntity;
 class RefsEventEntity;
 

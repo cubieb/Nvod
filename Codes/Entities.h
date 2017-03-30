@@ -20,11 +20,9 @@ class MovieEntity;
 class PosterEntity;
 class TmssEntity;
 class TmssEventEntity;
+class PstsEntity;
 class GlobalCfgEntity; 
 class DataPipeTsEntity;
-
-class PosterViewEntity;
-class RefsViewEntity;
 
 /**********************class TsEntity**********************/
 class TsEntity : public std::enable_shared_from_this<TsEntity>
@@ -67,6 +65,12 @@ public:
     void Bind(shared_ptr<TmssEntity> tmss);
     void Unbind(shared_ptr<TmssEntity> tmss);
 
+	const list<shared_ptr<PstsEntity>>& GetPstses() const;
+	list<shared_ptr<PstsEntity>>& GetPstses();
+	void SetPstses(list<shared_ptr<PstsEntity>>& pstses);
+	void Bind(shared_ptr<PstsEntity> psts);
+	void Unbind(shared_ptr<PstsEntity> psts);
+
 private:
     void Bind(weak_ptr<RefsEntity> refs);
     void Unbind(weak_ptr<RefsEntity> refs);
@@ -82,6 +86,7 @@ private:
 
     list<shared_ptr<RefsEntity>>  refses;
     list<shared_ptr<TmssEntity>>  tmsses;
+	list<shared_ptr<PstsEntity>>  pstses;
 };
 
 /**********************class RefsEntity**********************/
@@ -90,39 +95,18 @@ class RefsEntity : public std::enable_shared_from_this<RefsEntity>
 public:
     friend class MemberHelper;
 
-    RefsEntity(TableId id, shared_ptr<TsId> tsId, shared_ptr<ServiceId> serviceId,
-		shared_ptr<Pid> pmtPid, shared_ptr<StreamType> streamType, 
-		shared_ptr<Pid> posterPid, shared_ptr<string> description);
+    RefsEntity(TableId id, shared_ptr<ServiceId> serviceId, shared_ptr<string> description);
 	RefsEntity();
     RefsEntity(const RefsEntity& right);
-	RefsEntity(TableId id, TsId tsId, ServiceId serviceId, 
-		Pid pmtPid, StreamType streamType, Pid posterPid);
+	RefsEntity(TableId id, ServiceId serviceId);
     virtual ~RefsEntity();
 
     TableId GetId() const;
     void SetId(TableId id);
 
-    shared_ptr<TsId> GetTsId() const;
-    void SetTsId(shared_ptr<TsId> tsId);
-    void SetTsId(TsId tsId);
-
     shared_ptr<ServiceId> GetServiceId() const;
     void SetServiceId(shared_ptr<ServiceId> serviceId);
     void SetServiceId(ServiceId serviceId);
-    
-    shared_ptr<Pid> GetPmtPid() const;
-    void SetPmtPid(shared_ptr<Pid> pmtPid);
-    void SetPmtPid(Pid pmtPid);
-
-    /* stream_type in TS_program_map_section */
-    shared_ptr<StreamType> GetStreamType() const;
-    void SetStreamType(shared_ptr<StreamType> streamType);
-    void SetStreamType(StreamType streamType);
-
-    /* elementary_PID in TS_program_map_section */
-    shared_ptr<Pid> GetPosterPid() const;
-    void SetPosterPid(shared_ptr<Pid> posterPid);
-    void SetPosterPid(Pid posterPid);
 
     shared_ptr<string> GetDescription() const;
     void SetDescription(shared_ptr<string> description);
@@ -130,6 +114,9 @@ public:
     
     weak_ptr<TsEntity> GetTs() const;
     void SetTs(weak_ptr<TsEntity> ts);
+
+	shared_ptr<PstsEntity> GetPsts() const;
+	void SetPsts(shared_ptr<PstsEntity> psts);
 
     const list<shared_ptr<RefsEventEntity>>& GetRefsEvents() const;
     list<shared_ptr<RefsEventEntity>>& GetRefsEvents();
@@ -141,6 +128,11 @@ public:
     string ToString() const;
 
 private:
+	void Bind(shared_ptr<PstsEntity> psts);
+	void Unbind(shared_ptr<PstsEntity>);
+	void Bind(weak_ptr<PstsEntity> psts);
+	void Unbind(weak_ptr<PstsEntity>);
+
     void Bind(shared_ptr<TsEntity> ts);
     void Unbind(shared_ptr<TsEntity>);
     void Bind(weak_ptr<TsEntity> ts);
@@ -151,14 +143,11 @@ private:
 
 private:
     TableId id;                       /* not null */
-    shared_ptr<TsId> tsId;            /* not null */
     shared_ptr<ServiceId> serviceId;  /* not null */
-    shared_ptr<Pid> pmtPid;           /* not null */
-    shared_ptr<StreamType> streamType;  /* Program Map Table's stream_type, default 0x80 */
-    shared_ptr<Pid> posterPid;          /* Program Map Table's elementary_PID */
     shared_ptr<string> description;   /* null */
 
     weak_ptr<TsEntity> ts;
+	shared_ptr<PstsEntity> psts;
     list<shared_ptr<RefsEventEntity>> refsEvents;
 };
 
@@ -346,20 +335,16 @@ class TmssEntity : public std::enable_shared_from_this<TmssEntity>
 public:
     friend class MemberHelper;
 
-    TmssEntity(TableId id, shared_ptr<TsId> tsId, shared_ptr<ServiceId> serviceId, 
+    TmssEntity(TableId id, shared_ptr<ServiceId> serviceId, 
 		shared_ptr<Pid> pmtPid, shared_ptr<Pid> pcrPid, shared_ptr<Pid> audioPid, shared_ptr<Pid> videoPid,
 		shared_ptr<string> description);
     TmssEntity();
     TmssEntity(const TmssEntity& right);
-	TmssEntity(TableId id, TsId tsId, ServiceId serviceId, Pid pmtPid, Pid pcrPid, Pid audioPid, Pid videoPid);
+	TmssEntity(TableId id, ServiceId serviceId, Pid pmtPid, Pid pcrPid, Pid audioPid, Pid videoPid);
     virtual ~TmssEntity();
 
     TableId GetId() const;
     void SetId(TableId id);
-
-    shared_ptr<TsId> GetTsId() const;
-    void SetTsId(shared_ptr<TsId> tsId);
-    void SetTsId(TsId tsId);
 
     shared_ptr<ServiceId> GetServiceId() const;
     void SetServiceId(shared_ptr<ServiceId> serviceId);
@@ -408,7 +393,6 @@ private:
 
 private:
     TableId id;                      /* not null */
-    shared_ptr<TsId> tsId;           /* not null */
     shared_ptr<ServiceId> serviceId; /* not null */
 	shared_ptr<Pid> pmtPid;          /* not null */
 	shared_ptr<Pid> pcrPid;          /* not null */
@@ -474,8 +458,67 @@ private:
     shared_ptr<EventId> eventId;           /* not null */
     shared_ptr<TimePoint> startTimePoint;  /* not null */
     shared_ptr<Duration> duration;         /* not null */
+
     weak_ptr<TmssEntity> tmss;             /* not null */
     shared_ptr<RefsEventEntity> refsEvent; /* not null */
+};
+
+/**********************class PstsEntity**********************/
+/* Poster Service Entity,  poster service and relative reference service must be in
+the same TS.
+*/
+class PstsEntity : public std::enable_shared_from_this<PstsEntity>
+{
+public:
+	friend class MemberHelper;
+
+	PstsEntity(TableId id, shared_ptr<ServiceId> serviceId, 
+		shared_ptr<Pid> pmtPid, shared_ptr<StreamType> streamType, shared_ptr<Pid> posterPid);
+	PstsEntity();
+	PstsEntity(const PstsEntity& right);
+	PstsEntity(TableId id, ServiceId serviceId, 
+		Pid pmtPid, StreamType streamType, 
+		Pid posterPid);
+	~PstsEntity();
+
+	TableId GetId() const;
+	void SetId(TableId id);
+
+	shared_ptr<ServiceId> GetServiceId() const;
+	void SetServiceId(shared_ptr<ServiceId> serviceId);
+	void SetServiceId(ServiceId serviceId);
+
+	shared_ptr<Pid> GetPmtPid() const;
+	void SetPmtPid(shared_ptr<Pid> pmtPid);
+	void SetPmtPid(Pid pmtPid);
+
+	/* stream_type in TS_program_map_section */
+	shared_ptr<StreamType> GetStreamType() const;
+	void SetStreamType(shared_ptr<StreamType> streamType);
+	void SetStreamType(StreamType streamType);
+
+	/* elementary_PID in TS_program_map_section */
+	shared_ptr<Pid> GetPosterPid() const;
+	void SetPosterPid(shared_ptr<Pid> posterPid);
+	void SetPosterPid(Pid posterPid);
+
+    weak_ptr<RefsEntity> GetRefs() const;
+    void SetRefs(weak_ptr<RefsEntity> refs);
+
+private:
+	void Bind(shared_ptr<RefsEntity> refs);
+	void Unbind(shared_ptr<RefsEntity>);
+	void Bind(weak_ptr<RefsEntity> refs);
+	void Unbind(weak_ptr<RefsEntity>);
+
+private:
+	TableId id;                      /* not null */
+	shared_ptr<ServiceId> serviceId; /* not null */
+	shared_ptr<Pid> pmtPid;           /* not null */
+	shared_ptr<StreamType> streamType;  /* Program Map Table's stream_type, default 0x80 */
+	shared_ptr<Pid> posterPid;          /* Program Map Table's elementary_PID */
+
+	weak_ptr<RefsEntity> refs;
 };
 
 /**********************class GlobalCfgEntity**********************/
@@ -516,50 +559,6 @@ private:
     shared_ptr<Duration> patInterval;
     shared_ptr<Duration> pmtInterval;
     shared_ptr<Duration> posterInterval;
-
-    //list<weak_ptr<DataPipeTsEntity>> dataPipeTses;
-};
-
-/**********************class RefsViewEntity**********************/
-class PosterViewEntity
-{
-public:
-    PosterViewEntity(TableId id, shared_ptr<PosterId> posterId, 
-        shared_ptr<string> remotePath, shared_ptr<string> localPath);
-    PosterViewEntity();
-    PosterViewEntity(const PosterViewEntity& right);
-    PosterViewEntity(TableId id, PosterId posterId,
-        const char *remotePath, const char *localPath);
-    ~PosterViewEntity();
-
-    TableId GetId() const;
-    void SetId(TableId id);
-
-    shared_ptr<PosterId> GetPosterId() const;
-    void SetPosterId(shared_ptr<PosterId> posterId);
-    void SetPosterId(PosterId posterId);
-
-    shared_ptr<string> GetRemotePath() const;
-    void SetRemotePath(shared_ptr<string> remotePath);
-    void SetRemotePath(const string& remotePath);
-
-    shared_ptr<string> GetLocalPath() const;
-    void SetLocalPath(shared_ptr<string> localPath);
-    void SetLocalPath(const string& localPath);
-
-	const list<shared_ptr<RefsEntity>>& GetRefses() const;
-    list<shared_ptr<RefsEntity>>& GetRefses();
-    void SetRefses(const list<shared_ptr<RefsEntity>>& refses);
-    void Bind(shared_ptr<RefsEntity> refs);
-    void Unbind(shared_ptr<RefsEntity> refs);
-
-private:
-    TableId id;                    /* not null */
-    shared_ptr<PosterId> posterId;
-    shared_ptr<string> remotePath;
-    shared_ptr<string> localPath;  /* tansient, not null */
-
-    list<shared_ptr<RefsEntity>> refses;
 };
 
 #endif
