@@ -165,6 +165,9 @@
     <ClCompile Include="..\Codes\SocketServer.cpp">
       <Filter>CommonCodes\源文件\Functions-L2\SocketServer</Filter>
     </ClCompile>
+    <ClCompile Include="Codes\UtSocketServer.cpp">
+      <Filter>源文件</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\Codes\ClassFactories.h">
@@ -289,6 +292,9 @@
     </ClInclude>
     <ClInclude Include="..\Codes\SocketServerInterface.h">
       <Filter>CommonCodes\头文件\Functions-L2</Filter>
+    </ClInclude>
+    <ClInclude Include="Codes\UtSocketServer.h">
+      <Filter>头文件</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>

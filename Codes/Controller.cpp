@@ -15,6 +15,8 @@
 #include "DownloaderInterface.h"
 
 using namespace std;
+using namespace std::chrono;
+using namespace std::placeholders;
 
 /**********************class ControllerInterface**********************/
 ControllerInterface &ControllerInterface::GetInstance()
@@ -97,11 +99,18 @@ void Controller::TheControllerThread(const char *xmlPath)
             break;
         }
         
-        CreateEntities(xmlPath, globalCfg, tses);
+        if (!CreateEntities(xmlPath, globalCfg, tses))
+        {
+            errstrm << "CreateEntities() failed, TheControllerThread() stopped.";
+            isOnGoing = false;
+            break;
+        }
+
         if (!CreatePlayers(globalCfg, tses, players))
 		{ 
-			errstrm << "CreatePlayers() failed, TheControllerThread() is exiting.";
+			errstrm << "CreatePlayers() failed, TheControllerThread() stopped.";
 			isOnGoing = false;
+            break;
 		}
 
 		if (duration == milliseconds::zero())
@@ -168,6 +177,8 @@ bool Controller::CreatePlayers(shared_ptr<GlobalCfgEntity> globalCfg, list<share
 		}
     };
     shared_ptr<DownloaderInterface> downloader(CreateDownloaderInstance("DownloaderFtp", handler));
+    auto downloaderP = bind(&Controller::Download<shared_ptr<PosterEntity>>, this, downloader, ref(fileNumber), _1);
+    auto downloaderM = bind(&Controller::Download<shared_ptr<MovieEntity>>, this, downloader, ref(fileNumber), _1);
 
     /* download .ts and .jpg files */
     for (auto ts = tses.begin(); ts != tses.end(); ++ts)
@@ -177,32 +188,12 @@ bool Controller::CreatePlayers(shared_ptr<GlobalCfgEntity> globalCfg, list<share
         {
             list<shared_ptr<RefsEventEntity>>& refsEvents = (*refs)->GetRefsEvents();
             for (auto refsEvent = refsEvents.begin(); refsEvent != refsEvents.end(); ++refsEvent)
-            {
+            {                
                 list<shared_ptr<PosterEntity>>& posters = (*refsEvent)->GetPosters();
-                for (auto poster = posters.begin(); poster != posters.end(); ++poster)
-                {
-                    if (access((*poster)->GetLocalPath().c_str(), 0) != 0)
-                    {
-						++fileNumber;
-						auto ftpResource = make_shared<FtpResource>((*poster)->GetId(),
-                            (*poster)->GetRemotePath().c_str(),
-                            (*poster)->GetLocalPath().c_str());
-                        downloader->Download(ftpResource);
-                    }
-                }
-                
+                for_each(posters.begin(), posters.end(), downloaderP);
+
                 list<shared_ptr<MovieEntity>>& movies = (*refsEvent)->GetMovies();
-                for (auto movie = movies.begin(); movie != movies.end(); ++movie)
-                {
-                    if (access((*movie)->GetLocalPath().c_str(), 0) != 0)
-                    {
-						++fileNumber;
-						auto ftpResource = make_shared<FtpResource>((*movie)->GetId(),
-                            (*movie)->GetRemotePath().c_str(),
-                            (*movie)->GetLocalPath().c_str());
-                        downloader->Download(ftpResource);
-                    }
-                }
+                for_each(movies.begin(), movies.end(), downloaderM);
             }            
         }
     }

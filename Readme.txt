@@ -14,6 +14,7 @@
 
 
 5 History
- ver.1.0(svn:382):  优化了代码TmssPlayer的结构，并通过基本测试。 添加了EditNvodSchedule.py 辅助工具用于自动修改单元测试需要的xml文件。
-                    需要根据TmssPlayer的代码机构, 修改PatPlayer 和 RefsPlayer。
+ ver.1.0(svn:382):  优化了代码TmssPlayer的结构，并通过基本测试。 添加了EditNvodSchedule.py 辅助工具用于自动修改单元测试需要的xml文件。需要根据TmssPlayer的代码结构, 修改PatPlayer 和 RefsPlayer。
+ ver.1.0(svn:435):  基本完成了编码的工作, 并在VcUnitTestProject 中做了基本的测试.  
+ ver.1.0(svn:4440): 完成了所有编码的工作, 并在VcUnitTestProject 中做了基本的测试. 
                                

@@ -23,6 +23,7 @@ NvodWebUrlWrapper::NvodWebUrlWrapper(const char *xmlPath)
     if ((access(xmlPath, 0)) != 0)
     {
         errstrm << "Error when reading " << xmlPath << endl;
+        throw runtime_error("the xmlPath file does not exist!");
         return;
     }
 
@@ -31,6 +32,7 @@ NvodWebUrlWrapper::NvodWebUrlWrapper(const char *xmlPath)
     if (doc == nullptr)
     {
         errstrm << "Error when reading " << xmlPath << endl;
+        throw runtime_error("xmlParseFile() failed!");
         return;
     }
 

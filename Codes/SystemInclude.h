@@ -16,6 +16,10 @@
 #       define _CRT_SECURE_NO_WARNINGS 
 #   endif
 
+#   ifndef _WINSOCK_DEPRECATED_NO_WARNINGS
+#       define _WINSOCK_DEPRECATED_NO_WARNINGS
+#   endif
+
 	// 包括 SDKDDKVer.h 将定义可用的最高版本的 Windows 平台。
 	// 如果要为以前的 Windows 平台生成应用程序，请包括 WinSDKVer.h，并将
 	// WIN32_WINNT 宏设置为要支持的平台，然后再包括 SDKDDKVer.h。
@@ -51,8 +55,8 @@
 //#   include <windows.h>
 
 #   include <Winsock2.h>
-//#   include <ws2tcpip.h>
-//#   include <iphlpapi.h>
+#   include <ws2tcpip.h>
+#   include <iphlpapi.h>
 
     /* Debug memory leack. */
 #   include "crtdbg.h"

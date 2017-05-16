@@ -1,17 +1,16 @@
 ﻿#ifndef _TmssPlayer_h_
 #define _TmssPlayer_h_
 
-/* Foundation */
-#include "SystemInclude.h"
+#include "PlayerInterface.h"
 
 /* Type */
 #include "BaseType.h"
 
+/* Foundation */
+#include "SystemInclude.h"
+
 /* Entity */
 #include "Entities.h"
-
-/* Functions */
-#include "PlayerInterface.h"
 
 using std::shared_ptr;
 class TransportPacketHelperInterface;

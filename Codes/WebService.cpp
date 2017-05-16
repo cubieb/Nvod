@@ -80,7 +80,9 @@ bool WebService::DownloadConfigXml(const char* url, const char* to)
     if (GetResultSBit(resultCode) != SBitOk)
     {
         if (GetResultWBit(resultCode) == WBitTrue)
+        {
             errstrm << "oops, curl_easy_perform failed. curlCode = " << curlCode << endl;
+        }
 
         if (GetResultFBit(resultCode) == FBitTrue)
             ret = DownloadConfigXml(url, to);

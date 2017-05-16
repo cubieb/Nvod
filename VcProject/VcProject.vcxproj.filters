@@ -5,175 +5,240 @@
       <UniqueIdentifier>{67DA6AB6-F800-4c08-8B7A-83BB121AAD01}</UniqueIdentifier>
       <Extensions>rc;ico;cur;bmp;dlg;rc2;rct;bin;rgs;gif;jpg;jpeg;jpe;resx;tiff;tif;png;wav;mfcribbon-ms</Extensions>
     </Filter>
-    <Filter Include="CommonCodes">
-      <UniqueIdentifier>{7c51dd09-b79d-4127-93b2-4ec7b3cdfab3}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="CommonCodes\头文件">
-      <UniqueIdentifier>{93995380-89BD-4b04-88EB-625FBE52EBFB}</UniqueIdentifier>
-      <Extensions>h;hh;hpp;hxx;hm;inl;inc;xsd</Extensions>
-    </Filter>
-    <Filter Include="CommonCodes\头文件\Controller">
-      <UniqueIdentifier>{116e85bb-440c-4ff6-a40d-44762c2a9d6d}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="CommonCodes\头文件\Foundation">
-      <UniqueIdentifier>{60951ba0-d722-4960-914e-4815b9e5a89e}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="CommonCodes\头文件\NvodServiceEntity">
-      <UniqueIdentifier>{2d57759f-d7ba-4c55-8df0-30f0a685d3c0}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="CommonCodes\头文件\NvodServiceEntity\TsSvcId">
-      <UniqueIdentifier>{8d866455-ec18-4278-8af3-43a6439c549e}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="CommonCodes\头文件\NvodServiceEntity\NvodService">
-      <UniqueIdentifier>{1f94382c-5954-4ce8-acdc-81f1c849d649}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="CommonCodes\头文件\Player">
-      <UniqueIdentifier>{95a9750d-80cf-404e-a3d2-f28f92abd660}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="CommonCodes\头文件\TableIndexHelper">
-      <UniqueIdentifier>{faefbef9-236d-40e2-ba71-fd41a39dcdd3}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="CommonCodes\头文件\Database">
-      <UniqueIdentifier>{1d9d4023-173c-48df-af85-a115f916175b}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="CommonCodes\源文件">
-      <UniqueIdentifier>{4FC737F1-C7A5-4376-A066-2A32D752A2FF}</UniqueIdentifier>
-      <Extensions>cpp;c;cc;cxx;def;odl;idl;hpj;bat;asm;asmx</Extensions>
-    </Filter>
-    <Filter Include="CommonCodes\源文件\Controller">
-      <UniqueIdentifier>{279483de-d58f-47e3-8460-8ca56083ed6c}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="CommonCodes\源文件\Foundation">
-      <UniqueIdentifier>{a5263473-767a-4b54-ac4f-bf1a236ad857}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="CommonCodes\源文件\NvodServiceEntity">
-      <UniqueIdentifier>{c260fe28-b0c1-467f-9af6-f1ae867440b1}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="CommonCodes\源文件\Player">
-      <UniqueIdentifier>{99623099-f91a-47f4-826f-ec91f200c2c4}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="CommonCodes\源文件\TableIndexHelper">
-      <UniqueIdentifier>{d5c9c062-105b-42c4-b347-602d68cf0639}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="CommonCodes\源文件\Command">
-      <UniqueIdentifier>{3440921a-0714-4cd6-932f-c15a2404b55f}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="CommonCodes\源文件\Database">
-      <UniqueIdentifier>{71d25653-0df9-4bd1-a760-04e11a4c5b4e}</UniqueIdentifier>
-    </Filter>
     <Filter Include="头文件">
       <UniqueIdentifier>{443fb417-1240-4739-a5e1-32f701cbc761}</UniqueIdentifier>
     </Filter>
     <Filter Include="源文件">
       <UniqueIdentifier>{ebee3f4d-b52f-4aa0-b2ea-c25fb55053f0}</UniqueIdentifier>
     </Filter>
+    <Filter Include="CommonCodes">
+      <UniqueIdentifier>{ef5dc0e8-dc1f-41bd-a8d2-14ffa4d0715c}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="CommonCodes\头文件">
+      <UniqueIdentifier>{4dce8912-9296-4661-a43d-13078cf10867}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="CommonCodes\头文件\Foundation">
+      <UniqueIdentifier>{7bfb07d8-39a7-4cc6-a3ab-0e857f9ab09f}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="CommonCodes\头文件\Functions-L1">
+      <UniqueIdentifier>{a8c0b8e6-c24a-4f95-942d-c5959401c353}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="CommonCodes\头文件\Functions-L2">
+      <UniqueIdentifier>{00071e38-a880-46d4-b40e-a66b0898cd3a}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="CommonCodes\头文件\Functions-L3">
+      <UniqueIdentifier>{b3224384-0e1e-4203-8ee2-940912c6c2e7}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="CommonCodes\头文件\Entity">
+      <UniqueIdentifier>{9563a1eb-7254-4401-b07a-7c18e94c2c91}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="CommonCodes\头文件\Type">
+      <UniqueIdentifier>{113cc527-f0c8-46bd-aa8b-cb71e759fa20}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="CommonCodes\源文件">
+      <UniqueIdentifier>{caa51c3d-ddc4-48e5-9d3e-164a3bc94ed8}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="CommonCodes\源文件\Foundation">
+      <UniqueIdentifier>{82fadf23-d62c-48fe-8801-a5a5a55c1649}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="CommonCodes\源文件\Entity">
+      <UniqueIdentifier>{b8edc612-752a-4231-a5fe-edcde3e20be4}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="CommonCodes\源文件\Functions-L1">
+      <UniqueIdentifier>{f305bfba-d958-4c09-9135-2d178445628f}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="CommonCodes\源文件\Functions-L1\Miscellaneous">
+      <UniqueIdentifier>{b13845d8-0731-4eff-b9ad-e322a688e8e0}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="CommonCodes\源文件\Functions-L1\Downloader">
+      <UniqueIdentifier>{492707c7-2e83-42e7-a71f-c1e835bca636}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="CommonCodes\源文件\Functions-L1\TransportPacket">
+      <UniqueIdentifier>{a44cbaaf-ba72-4977-8c53-93a8af003c12}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="CommonCodes\源文件\Functions-L1\XmlWrapper">
+      <UniqueIdentifier>{779e5b4a-ba42-4521-88b9-94847adaaf7b}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="CommonCodes\源文件\Functions-L1\WebService">
+      <UniqueIdentifier>{69167252-c6fc-4dfa-8b4a-684ca034a0e9}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="CommonCodes\源文件\Functions-L2">
+      <UniqueIdentifier>{507c3b4e-f03e-4369-a2c6-6be5ad158902}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="CommonCodes\源文件\Functions-L2\TmssPlayer">
+      <UniqueIdentifier>{56a4917f-a3e4-4ab2-8a17-3c086b2e0b6c}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="CommonCodes\源文件\Functions-L2\PatPlayer">
+      <UniqueIdentifier>{10988116-aee7-4bfa-a556-d3eeb8d65914}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="CommonCodes\源文件\Functions-L2\RefsPlayer">
+      <UniqueIdentifier>{0c7de548-15c1-4f18-af54-97f048c75df4}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="CommonCodes\源文件\Functions-L2\SocketServer">
+      <UniqueIdentifier>{287c72b3-4dd9-4b14-aa8a-556444553107}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="CommonCodes\源文件\Functions-L3">
+      <UniqueIdentifier>{87a20d64-84b0-4799-a136-dd49aaadd381}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="..\Codes\ControllerInterface.h">
-      <Filter>CommonCodes\头文件\Controller</Filter>
-    </ClInclude>
-    <ClInclude Include="..\Codes\SystemInclude.h">
-      <Filter>CommonCodes\头文件\Foundation</Filter>
-    </ClInclude>
-    <ClInclude Include="..\Codes\Type.h">
-      <Filter>CommonCodes\头文件\Foundation</Filter>
-    </ClInclude>
-    <ClInclude Include="..\Codes\TsSvcId.h">
-      <Filter>CommonCodes\头文件\NvodServiceEntity</Filter>
-    </ClInclude>
-    <ClInclude Include="..\Codes\PlayerInterface.h">
-      <Filter>CommonCodes\头文件\Player</Filter>
-    </ClInclude>
-    <ClInclude Include="..\Codes\Controller.h">
-      <Filter>CommonCodes\源文件\Controller</Filter>
-    </ClInclude>
-    <ClInclude Include="..\Codes\TmssPlayer.h">
-      <Filter>CommonCodes\源文件\Player</Filter>
-    </ClInclude>
-    <ClInclude Include="..\Codes\TsSvcId-odb.h">
-      <Filter>CommonCodes\头文件\NvodServiceEntity\TsSvcId</Filter>
+    <ClInclude Include="Codes\Main.h">
+      <Filter>头文件</Filter>
     </ClInclude>
     <ClInclude Include="..\Codes\ClassFactories.h">
       <Filter>CommonCodes\头文件\Foundation</Filter>
     </ClInclude>
-    <ClInclude Include="..\Codes\TableIndexHelperInterface.h">
-      <Filter>CommonCodes\头文件\TableIndexHelper</Filter>
-    </ClInclude>
-    <ClInclude Include="..\Codes\TableIndexHelper.h">
-      <Filter>CommonCodes\源文件\TableIndexHelper</Filter>
-    </ClInclude>
-    <ClInclude Include="..\Codes\NvodService.h">
-      <Filter>CommonCodes\头文件\NvodServiceEntity</Filter>
-    </ClInclude>
-    <ClInclude Include="..\Codes\NvodService-odb.h">
-      <Filter>CommonCodes\头文件\NvodServiceEntity\NvodService</Filter>
-    </ClInclude>
-    <ClInclude Include="..\Codes\TmssCommand.h">
-      <Filter>CommonCodes\源文件\Command</Filter>
-    </ClInclude>
-    <ClInclude Include="..\Codes\DatabaseInterface.h">
-      <Filter>CommonCodes\头文件\Database</Filter>
-    </ClInclude>
-    <ClInclude Include="..\Codes\Database.h">
-      <Filter>CommonCodes\源文件\Database</Filter>
-    </ClInclude>
-    <ClInclude Include="Codes\Main.h">
-      <Filter>头文件</Filter>
+    <ClInclude Include="..\Codes\Crc32.h">
+      <Filter>CommonCodes\头文件\Foundation</Filter>
     </ClInclude>
     <ClInclude Include="..\Codes\Debug.h">
       <Filter>CommonCodes\头文件\Foundation</Filter>
     </ClInclude>
+    <ClInclude Include="..\Codes\ResultCode.h">
+      <Filter>CommonCodes\头文件\Foundation</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Codes\PacketHelper.h">
+      <Filter>CommonCodes\头文件\Foundation</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Codes\SystemInclude.h">
+      <Filter>CommonCodes\头文件\Foundation</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Codes\DownloaderInterface.h">
+      <Filter>CommonCodes\头文件\Functions-L1</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Codes\WebServiceInterface.h">
+      <Filter>CommonCodes\头文件\Functions-L1</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Codes\XmlWrapperInterface.h">
+      <Filter>CommonCodes\头文件\Functions-L1</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Codes\MovieRepositoryInterface.h">
+      <Filter>CommonCodes\头文件\Functions-L1</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Codes\EpgServerInterface.h">
+      <Filter>CommonCodes\头文件\Functions-L1</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Codes\TableIndexHelperInterface.h">
+      <Filter>CommonCodes\头文件\Functions-L1</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Codes\TransportPacketInterface.h">
+      <Filter>CommonCodes\头文件\Functions-L1</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Codes\XmlHelper.h">
+      <Filter>CommonCodes\头文件\Functions-L1</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Codes\SocketServerInterface.h">
+      <Filter>CommonCodes\头文件\Functions-L2</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Codes\PlayerInterface.h">
+      <Filter>CommonCodes\头文件\Functions-L2</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Codes\ControllerInterface.h">
+      <Filter>CommonCodes\头文件\Functions-L3</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Codes\Entities.h">
+      <Filter>CommonCodes\头文件\Entity</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Codes\MemberHelper.h">
+      <Filter>CommonCodes\头文件\Entity</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Codes\BaseType.h">
+      <Filter>CommonCodes\头文件\Type</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Codes\CurlOutputHandler.h">
+      <Filter>CommonCodes\源文件\Functions-L1\Miscellaneous</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Codes\TableIndexHelper.h">
+      <Filter>CommonCodes\源文件\Functions-L1\Miscellaneous</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Codes\DownloaderFtp.h">
+      <Filter>CommonCodes\源文件\Functions-L1\Downloader</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Codes\TransportPacket.h">
+      <Filter>CommonCodes\源文件\Functions-L1\TransportPacket</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Codes\DynamicConfigWrapper.h">
+      <Filter>CommonCodes\源文件\Functions-L1\XmlWrapper</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Codes\NvodWebUrlWrapper.h">
+      <Filter>CommonCodes\源文件\Functions-L1\XmlWrapper</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Codes\StaticConfigWrapper.h">
+      <Filter>CommonCodes\源文件\Functions-L1\XmlWrapper</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Codes\WebService.h">
+      <Filter>CommonCodes\源文件\Functions-L1\WebService</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Codes\TmssPlayer.h">
+      <Filter>CommonCodes\源文件\Functions-L2\TmssPlayer</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Codes\PatPlayer.h">
+      <Filter>CommonCodes\源文件\Functions-L2\PatPlayer</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Codes\RefsPlayer.h">
+      <Filter>CommonCodes\源文件\Functions-L2\RefsPlayer</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Codes\SocketServer.h">
+      <Filter>CommonCodes\源文件\Functions-L2\SocketServer</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Codes\Controller.h">
+      <Filter>CommonCodes\源文件\Functions-L3</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="..\Codes\Controller.cpp">
-      <Filter>CommonCodes\源文件\Controller</Filter>
-    </ClCompile>
-    <ClCompile Include="..\Codes\LibLinking.cpp">
-      <Filter>CommonCodes\源文件\Foundation</Filter>
-    </ClCompile>
-    <ClCompile Include="..\Codes\ReferenceService.cpp">
-      <Filter>CommonCodes\源文件\NvodServiceEntity</Filter>
-    </ClCompile>
-    <ClCompile Include="..\Codes\TimeShiftedService.cpp">
-      <Filter>CommonCodes\源文件\NvodServiceEntity</Filter>
-    </ClCompile>
-    <ClCompile Include="..\Codes\TmssPlayer.cpp">
-      <Filter>CommonCodes\源文件\Player</Filter>
-    </ClCompile>
-    <ClCompile Include="..\Codes\TsSvcId-odb.cpp">
-      <Filter>CommonCodes\头文件\NvodServiceEntity\TsSvcId</Filter>
-    </ClCompile>
-    <ClCompile Include="..\Codes\TableIndexHelper.cpp">
-      <Filter>CommonCodes\源文件\TableIndexHelper</Filter>
-    </ClCompile>
-    <ClCompile Include="..\Codes\NvodService-odb.cpp">
-      <Filter>CommonCodes\头文件\NvodServiceEntity\NvodService</Filter>
-    </ClCompile>
-    <ClCompile Include="..\Codes\TmssCommand.cpp">
-      <Filter>CommonCodes\源文件\Command</Filter>
-    </ClCompile>
-    <ClCompile Include="..\Codes\Database.cpp">
-      <Filter>CommonCodes\源文件\Database</Filter>
-    </ClCompile>
     <ClCompile Include="Codes\Main.cpp">
       <Filter>源文件</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Codes\Crc32.cpp">
+      <Filter>CommonCodes\源文件\Foundation</Filter>
     </ClCompile>
     <ClCompile Include="..\Codes\Debug.cpp">
       <Filter>CommonCodes\源文件\Foundation</Filter>
     </ClCompile>
-  </ItemGroup>
-  <ItemGroup>
-    <None Include="..\Codes\TsSvcId-odb.ixx">
-      <Filter>CommonCodes\头文件\NvodServiceEntity\TsSvcId</Filter>
-    </None>
-    <None Include="..\Codes\TsSvcId-odb.sql">
-      <Filter>CommonCodes\头文件\NvodServiceEntity\TsSvcId</Filter>
-    </None>
-    <None Include="..\Codes\NvodService-odb.ixx">
-      <Filter>CommonCodes\头文件\NvodServiceEntity\NvodService</Filter>
-    </None>
-    <None Include="..\Codes\NvodService-odb.sql">
-      <Filter>CommonCodes\头文件\NvodServiceEntity\NvodService</Filter>
-    </None>
+    <ClCompile Include="..\Codes\LibLinking.cpp">
+      <Filter>CommonCodes\源文件\Foundation</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Codes\Entities.cpp">
+      <Filter>CommonCodes\源文件\Entity</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Codes\CurlOutputHandler.cpp">
+      <Filter>CommonCodes\源文件\Functions-L1\Miscellaneous</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Codes\TableIndexHelper.cpp">
+      <Filter>CommonCodes\源文件\Functions-L1\Miscellaneous</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Codes\DownloaderFtp.cpp">
+      <Filter>CommonCodes\源文件\Functions-L1\Downloader</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Codes\TransportPacket.cpp">
+      <Filter>CommonCodes\源文件\Functions-L1\TransportPacket</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Codes\DynamicConfigWrapper.cpp">
+      <Filter>CommonCodes\源文件\Functions-L1\XmlWrapper</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Codes\NvodWebUrlWrapper.cpp">
+      <Filter>CommonCodes\源文件\Functions-L1\XmlWrapper</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Codes\StaticConfigWrapper.cpp">
+      <Filter>CommonCodes\源文件\Functions-L1\XmlWrapper</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Codes\WebService.cpp">
+      <Filter>CommonCodes\源文件\Functions-L1\WebService</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Codes\TmssPlayer.cpp">
+      <Filter>CommonCodes\源文件\Functions-L2\TmssPlayer</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Codes\PatPlayer.cpp">
+      <Filter>CommonCodes\源文件\Functions-L2\PatPlayer</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Codes\RefsPlayer.cpp">
+      <Filter>CommonCodes\源文件\Functions-L2\RefsPlayer</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Codes\SocketServer.cpp">
+      <Filter>CommonCodes\源文件\Functions-L2\SocketServer</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Codes\Controller.cpp">
+      <Filter>CommonCodes\源文件\Functions-L3</Filter>
+    </ClCompile>
   </ItemGroup>
 </Project>

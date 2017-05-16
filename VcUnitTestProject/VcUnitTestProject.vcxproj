@@ -106,6 +106,7 @@
     <ClCompile Include="Codes\UtRefsPlayer.cpp" />
     <ClCompile Include="Codes\UtDownloaderFtp.cpp" />
     <ClCompile Include="Codes\UtPatPlayer.cpp" />
+    <ClCompile Include="Codes\UtSocketServer.cpp" />
     <ClCompile Include="Codes\UtTmssPlayer.cpp" />
     <ClCompile Include="Codes\UtWebService.cpp" />
     <ClCompile Include="Codes\UtXmlWrapper.cpp" />
@@ -149,6 +150,7 @@
     <ClInclude Include="Codes\UtRefsPlayer.h" />
     <ClInclude Include="Codes\UtDownloaderFtp.h" />
     <ClInclude Include="Codes\UtPatPlayer.h" />
+    <ClInclude Include="Codes\UtSocketServer.h" />
     <ClInclude Include="Codes\UtTmssPlayer.h" />
     <ClInclude Include="Codes\UtWebService.h" />
     <ClInclude Include="Codes\UtXmlWrapper.h" />
