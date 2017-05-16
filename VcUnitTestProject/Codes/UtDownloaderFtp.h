@@ -6,7 +6,7 @@
 /* Foundation */
 #include "SystemInclude.h"
 
-class EntityHelper;
+class FtpResource;
 CxxBeginNameSpace(UnitTest)
 
 /**********************UtDownloaderFtp**********************/
@@ -23,7 +23,7 @@ protected:
     void TestDownload();
     
 private:
-    std::shared_ptr<EntityHelper> entityHelper;
+    std::list<std::shared_ptr<FtpResource>> ftpResources;
 };
 
 CxxEndNameSpace

@@ -4,11 +4,8 @@
 #include "Debug.h"
 using namespace std;
 
-map<string, bool> DebugFlag::flags;
-
 DebugFlag::DebugFlag()
-{
-}
+{}
 
 bool DebugFlag::GetState(string const& funcName)
 {
@@ -43,8 +40,8 @@ ostream& DbgClearStream(char const* funcName, uint32_t line)
         nullStream.clear(ios::eofbit);
     }
 
-    DebugFlag flag;
-    ostream& os = flag.GetState(funcName) ? cout : nullStream;
+    DebugFlag& debugFlag = DebugFlag::GetInstance();
+    ostream& os = debugFlag.GetState(funcName) ? cout : nullStream;
 
     return os;
 }
@@ -75,8 +72,8 @@ wostream& DbgClearWstream(char const* funcName, uint32_t line)
         wcout.imbue(locale("chs"));
     }
 
-    DebugFlag flag;
-    wostream& wos = flag.GetState(funcName) ? wcout : nullStream;
+    DebugFlag& debugFlag = DebugFlag::GetInstance();
+    wostream& wos = debugFlag.GetState(funcName) ? wcout : nullStream;
 
     return wos;
 }
@@ -94,3 +91,4 @@ wostream& ErrWostream(char const* funcName, uint32_t line)
     wcerr << funcName << ", " << line << "> ";
     return wcerr;
 }
+

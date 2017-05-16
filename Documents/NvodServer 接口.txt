@@ -1,0 +1,17 @@
+1 socket tcp 端口号可配置.
+
+2 命令格式:
+    2.1 获取nvod server src ip
+        2.1.1 命令
+            语法              字节数（bytes） 	注释
+            command_tag       1（value: 0x01）             
+
+        2.1.2 返回值
+            语法              字节数（bytes） 	注释
+            command_tag       1（value: 0x01）
+            ip_addr_number    1                 IP 地址个数
+            for(i=0;i<N;i++)					N=ip_addr_number
+            {
+                ip_addr       4 				IP地址           
+            }
+

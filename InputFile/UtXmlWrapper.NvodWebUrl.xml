@@ -1,0 +1,5 @@
+<?xml version='1.0' encoding='utf-8'?>
+<root>
+    <ServiceConfigUrl>http://192.168.3.140:8080/nvodsocket!createtsxml.shtml</ServiceConfigUrl>
+    <EventConfigUrl>http://192.168.3.140:8080/nvodsocket!movieparamxml.shtml</EventConfigUrl>
+</root>

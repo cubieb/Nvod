@@ -1,7 +1,9 @@
 #include "TmssPlayer.h"
 
-/* Foundation */
+/* Type */
 #include "BaseType.h"
+
+/* Foundation */
 #include "SystemInclude.h"
 #include "PacketHelper.h"
 #include "Debug.h"
@@ -11,10 +13,12 @@
 
 /* Functions */
 #include "TransportPacketInterface.h"
-#include "TmssPlayerCookie.h"
+
+#define MovieBufferSize 188*1024*8
 
 using namespace std;
 using namespace std::chrono;
+using namespace std::placeholders;
 
 typedef ClassFactoriesRegistor<PlayerInterface, string, shared_ptr<TmssEntity>> Registor;
 RegisterClassFactory(Registor, reg, "TmssPlayer", TmssPlayer::CreateInstance);
@@ -25,33 +29,66 @@ static set<uint8_t> videoStreamTypes = { 0x01, 0x02, 0x10, 0x1B, 0x80 };
 /**********************class TmssPlayer**********************/
 /* public functions */
 TmssPlayer::TmssPlayer(shared_ptr<TmssEntity> tmss)
-    : mtx(), cv(), cookie(tmss)
-{}
+{
+    isOnGoing = false;
+
+    this->ts = make_shared<TsEntity>(*tmss->GetTs());
+    this->tmss = make_shared<TmssEntity>(*tmss);
+
+    steady_clock::time_point now = steady_clock::now();
+    for (auto iter = tmss->GetTmssEvents().begin(); iter != tmss->GetTmssEvents().end(); ++iter)
+    {
+        if ((*iter)->GetStartTimePoint() + (*iter)->GetDuration() < now)
+        {
+            continue;
+        }
+
+        /* bind TmssEventEntity to TmssEntity */
+        shared_ptr<TmssEventEntity> tmssEvent = make_shared<TmssEventEntity>(**iter);
+        this->tmss->Bind(tmssEvent);
+
+        /* bind RefsEventEntity and TmssEventEntity */
+        shared_ptr<RefsEventEntity> refsEvent = make_shared<RefsEventEntity>(*(*iter)->GetRefsEvent());
+        refsEvent->Bind(tmssEvent);
+
+        list<shared_ptr<MovieEntity>>& movies = (*iter)->GetRefsEvent()->GetMovies();
+        for (auto iter = movies.begin(); iter != movies.end(); ++iter)
+        {
+            shared_ptr<MovieEntity> movie = make_shared<MovieEntity>(**iter);
+            refsEvent->Bind(movie);
+        }
+    }    
+}
 
 TmssPlayer::~TmssPlayer()
 {
     if (theMovieThread.joinable())
     {
         /* thread exited because of no more movie (not calling of Stop()),
-           join the thread.
-        */
+         * join the thread.
+         */
         theMovieThread.join();
     }
 }
 
 void TmssPlayer::Start()
 {
-    theMovieThread = thread(bind(&TmssPlayer::TheMovieThreadMain, this));
+    {
+        std::lock_guard<std::mutex> lock(mtx);
+        if (isOnGoing)
+            return;
+        isOnGoing = true;
+    }
 
-    std::lock_guard<std::mutex> lock(mtx);
-    isOnGoing = true;
-    cv.notify_one();
+    theMovieThread = thread(bind(&TmssPlayer::TheMovieThreadMain, this));
 }
 
 void TmssPlayer::Stop()
 {
     {
         std::lock_guard<std::mutex> lock(mtx);
+        if (!isOnGoing)
+            return;
         isOnGoing = false;
         cv.notify_one();
     }
@@ -67,60 +104,253 @@ bool TmssPlayer::IsRunning()
 /* private functions */
 void TmssPlayer::TheMovieThreadMain()
 {	
-	socketFd = socket(AF_INET, SOCK_DGRAM, IPPROTO_UDP);
+    int socketFd = socket(AF_INET, SOCK_DGRAM, IPPROTO_UDP);
+    shared_ptr<char> buffer(new char[MovieBufferSize], [](void* ptr){ delete[] ptr; });
+    size_t tsSize = 0;
+    /* Pcr information in movie .ts file. */
+    shared_ptr<Pcr> firstPcr, lastPcr;    
+    /* eventDuration: 当前tmss event 相关的所有已播放完成的电影的总时长。*/
+    milliseconds eventDuration = milliseconds::zero();
 
-	PrepareMovie();
-	Duration duration = Duration::zero();
+    std::map<Pid, SectionHandler> sectionHandlers;
+    sectionHandlers.insert(make_pair(PatPid, bind(&TmssPlayer::HandlePatSection, this, _1, _2)));
+
+    TmssEntity::TmssEvents::iterator  curTmssEvent = SelectEvent(tmss->GetTmssEvents().begin());
+    if (curTmssEvent == tmss->GetTmssEvents().end())
+    {
+        std::lock_guard<std::mutex> lock(mtx);
+        isOnGoing = false;
+        return;
+    }
+    RefsEventEntity::Movies::iterator curMovie = (*curTmssEvent)->GetRefsEvent()->GetMovies().begin();
+    std::ifstream ifstrm((*curMovie)->GetLocalPath().c_str(), ios::binary);
+    milliseconds duration = duration_cast<milliseconds>((*curTmssEvent)->GetStartTimePoint() - steady_clock::now());
     while (true)
     {
-        cout << *cookie.GetTmss()->GetServiceId() << ", "
-            << duration_cast<Milliseconds>(duration).count() << endl;
         std::unique_lock<std::mutex> lock(mtx);
-		if (cv.wait_for(lock, duration, [this]{return !isOnGoing; }))
+        dbgstrm << duration.count() << endl;
+        if (cv.wait_for(lock, duration, [this]{ return !isOnGoing; }))
+        {
+            if (ifstrm.is_open())
+                ifstrm.close();
             break;
+        }
 
-		duration = Play();
+        system_clock::time_point now = steady_clock::now();
+        if (tsSize != 0)
+        {
+            milliseconds mtime = (firstPcr != nullptr ? CalcTimeIntv(*firstPcr, *lastPcr) : milliseconds::zero());
+            if ((*curTmssEvent)->GetStartTimePoint() + eventDuration + mtime + milliseconds(200) > now)
+            {
+                Send(socketFd, buffer.get(), tsSize);
+            }
+
+            tsSize = 0;
+        }
+
+        /* if current movie has been finished */
+        if (!ifstrm.is_open())
+        {
+            if (++curMovie == (*curTmssEvent)->GetRefsEvent()->GetMovies().end())
+            {
+                curTmssEvent = SelectEvent(++curTmssEvent);
+                if (curTmssEvent == tmss->GetTmssEvents().end())
+                {
+                    isOnGoing = false;
+                    break;
+                }
+                curMovie = (*curTmssEvent)->GetRefsEvent()->GetMovies().begin();
+                eventDuration = milliseconds::zero();
+            }
+            else
+            {
+                if (firstPcr != nullptr && lastPcr != nullptr)
+                {
+                    eventDuration = eventDuration + CalcTimeIntv(*firstPcr, *lastPcr);
+                }
+            }
+
+            firstPcr.reset();
+            lastPcr.reset();
+            sectionHandlers.clear();
+            sectionHandlers.insert(make_pair(PatPid, bind(&TmssPlayer::HandlePatSection, this, _1, _2)));
+            ifstrm.open((*curMovie)->GetLocalPath().c_str(), ios::binary);
+            duration = duration_cast<milliseconds>((*curTmssEvent)->GetStartTimePoint() + eventDuration - now);
+            continue;
+        }
+        
+        auto pair = Play(sectionHandlers, ifstrm, buffer.get(), MovieBufferSize);
+        tsSize = pair.first;
+        if (firstPcr == nullptr)
+        {            
+            firstPcr = lastPcr = pair.second;
+            duration = duration_cast<milliseconds>((*curTmssEvent)->GetStartTimePoint() + eventDuration - now);
+        }
+        else
+        { 
+            if (pair.second != nullptr)
+                lastPcr = pair.second;
+            milliseconds mtime = CalcTimeIntv(*firstPcr, *lastPcr);
+            duration = duration_cast<milliseconds>((*curTmssEvent)->GetStartTimePoint() + mtime + eventDuration - now);
+        }        
     }
 
     closesocket(socketFd);
 }
 
-void TmssPlayer::PrepareMovie()
+TmssEntity::TmssEvents::iterator TmssPlayer::SelectEvent(TmssEntity::TmssEvents::iterator curTmssEvent)
 {
-    if (fstm.is_open())
+    while (curTmssEvent != tmss->GetTmssEvents().end())
     {
-        fstm.close();
-    }
-
-    TimePoint now = steady_clock::now();    
-    shared_ptr<TmssEventEntity> tmssEvent = cookie.GetCurTmssEvent();
-    while (tmssEvent != nullptr)
-    {
-        if (*tmssEvent->GetStartTimePoint() + *tmssEvent->GetDuration() > now)
+        if ((*curTmssEvent)->GetStartTimePoint() + (*curTmssEvent)->GetDuration() > steady_clock::now())
         {
-            shared_ptr<MovieEntity> movie = cookie.GetCurMovie();
-            if (movie != nullptr)
-            {
-				shared_ptr<MovieRuntimeInfoEntity> movieRuntimeInfo = cookie.GetMovieRuntimeInfo();
-                movieRuntimeInfo->SetStartTimePoint(*tmssEvent->GetStartTimePoint() + cookie.GetEventDuration());
+            list<shared_ptr<MovieEntity>>& movies = (*curTmssEvent)->GetRefsEvent()->GetMovies();
+            if (!movies.empty())
                 break;
-            }            
         }
 
-        cookie.ForwardTmssEvent();
-		cookie.SetEventDuration(Duration::zero());
-		cookie.GetMovieRuntimeInfo()->SetStartTimePoint(*tmssEvent->GetStartTimePoint());
-        tmssEvent = cookie.GetCurTmssEvent();
+        ++curTmssEvent;
+    }
+    return curTmssEvent;
+}
+
+std::pair<bool, shared_ptr<Pcr>> TmssPlayer::HandlePatSection(TransportPacketHelperInterface& tsPacket, void* handlers)
+{
+    /* Pat Table */
+    shared_ptr<PatHelperInterface> patTable(PatHelperInterface::CreateInstance(tsPacket.GetPayLoadHeader()));
+
+    uchar_t *ptr = patTable->GetHeader() + patTable->GetMinSize() - patTable->GetCrcCodeSize();
+    while (ptr < patTable->GetHeader() + patTable->GetSize())
+    {
+        shared_ptr<PatElementaryInterface> patElementary(PatElementaryInterface::CreateInstance(ptr));
+        if (patElementary->GetProgramNumber() != 0)
+        {
+            std::map<Pid, SectionHandler>& sectionHandlers = *reinterpret_cast<std::map<Pid, SectionHandler>*>(handlers);
+            Pid pmtPid = patElementary->GetPmtPid();
+            if (sectionHandlers.find(pmtPid) == sectionHandlers.end())
+            {
+                /* save ts file's program_map_PID */
+                dbgstrm << "pmtPid = " << hex << setfill('0') << setw(4) << pmtPid << dec << endl;                
+                sectionHandlers.insert(make_pair(pmtPid, bind(&TmssPlayer::HandlePmtSection, this, _1, _2)));
+            }
+
+            /* replace pat table's program_number and program_map_PID */
+            patElementary->SetProgramNumber(tmss->GetServiceId());
+            patElementary->SetPmtPid(tmss->GetPmtPid());
+            break;
+        }
+        ptr = ptr + patElementary->GetSize();
+    }
+    patTable->UpdateCrcCode();
+
+    /* discard pat packet */
+    return make_pair(false, nullptr);
+}
+
+std::pair<bool, shared_ptr<Pcr>> TmssPlayer::HandlePmtSection(TransportPacketHelperInterface& tsPacket, void* handlers)
+{
+    /* Pmt Table */
+    std::map<Pid, SectionHandler>& sectionHandlers = *reinterpret_cast<std::map<Pid, SectionHandler>*>(handlers);
+
+    shared_ptr<PmtHelperInterface> pmtTable(PmtHelperInterface::CreateInstance(tsPacket.GetPayLoadHeader()));
+    Pid pcrPid = pmtTable->GetPcrPid();
+    if (sectionHandlers.find(pcrPid) == sectionHandlers.end())
+    {
+        dbgstrm << "pcrPid = " << pcrPid << endl;
+
+        sectionHandlers.insert(make_pair(pcrPid, bind(&TmssPlayer::HandlePcrSection, this, _1, _2)));
     }
 
-    if (tmssEvent == nullptr)
+    uint32_t flag = 0;
+    uchar_t *ptr = pmtTable->GetHeader() + pmtTable->GetMinSize() - pmtTable->GetCrcCodeSize() 
+        + pmtTable->GetProgramInfoLength();
+    while (ptr < pmtTable->GetHeader() + pmtTable->GetSize() && flag != 0x3)
     {
-        assert(cookie.GetCurMovie() == nullptr);
-		isOnGoing = false;
-		return;
-	}
-	
-	fstm.open(cookie.GetCurMovie()->GetLocalPath()->c_str(), ios::binary);
+        shared_ptr<PmtElementaryInterface> pmtElementary(PmtElementaryInterface::CreateInstance(ptr));
+        if (audioStreamTypes.find(pmtElementary->GetStreamType()) != audioStreamTypes.end())
+        {
+            Pid audioPid = pmtElementary->GetElementaryPid();
+            if (sectionHandlers.find(audioPid) == sectionHandlers.end())
+            {
+                /* save ts file's audio pid */
+                dbgstrm << "audioPid = " << audioPid << endl;
+
+                sectionHandlers.insert(make_pair(audioPid, bind(&TmssPlayer::HandleAudioSection, this, _1, _2)));
+            }
+            /* replace pmt table's elementary_PID */
+            pmtElementary->SetElementaryPid(tmss->GetAudioPid());
+            flag = flag | 1;
+        }
+
+        if (videoStreamTypes.find(pmtElementary->GetStreamType()) != videoStreamTypes.end())
+        {
+            Pid videoPid = pmtElementary->GetElementaryPid();
+            if (sectionHandlers.find(videoPid) == sectionHandlers.end())
+            {
+                /* save ts file's video pid */
+                dbgstrm << "videoPid = " << videoPid << endl;
+
+                sectionHandlers.insert(make_pair(videoPid, bind(&TmssPlayer::HandleVideoSection, this, _1, _2)));
+            }
+            /* replace pmt table's elementary_PID */
+            pmtElementary->SetElementaryPid(tmss->GetVideoPid());
+            flag = flag | 2;
+        }
+        ptr = ptr + pmtElementary->GetSize();
+    }
+    // false means we failed to get the right audio or video pid.
+    assert(flag == 0x3);
+
+    /* replace pmt table's program number and pcr pid */
+    pmtTable->SetProgramNumber(tmss->GetServiceId());
+    pmtTable->SetPcrPid(tmss->GetPcrPid());
+    pmtTable->UpdateCrcCode();
+    tsPacket.SetPid(tmss->GetPmtPid());
+
+    return make_pair(true, nullptr);
+}
+
+std::pair<bool, shared_ptr<Pcr>> TmssPlayer::HandleAudioSection(TransportPacketHelperInterface& tsPacket, void*)
+{
+    /* replace audio pid for audio PES packets */
+    tsPacket.SetPid(tmss->GetAudioPid());
+
+    return make_pair(true, nullptr);
+}
+
+std::pair<bool, shared_ptr<Pcr>> TmssPlayer::HandleVideoSection(TransportPacketHelperInterface& tsPacket, void*)
+{
+    /* replace video pid for video PES packets */
+    tsPacket.SetPid(tmss->GetVideoPid());
+
+    return make_pair(true, nullptr);
+}
+
+std::pair<bool, shared_ptr<Pcr>> TmssPlayer::HandlePcrSection(TransportPacketHelperInterface& tsPacket, void*)
+{
+    tsPacket.SetPid(tmss->GetPcrPid());
+
+    AdaptationFieldControl afc = tsPacket.GetAdaptationFieldControl();
+    if (afc != 0x2 && afc != 0x3)
+    {
+        //there is no pcr field if the adaptation_field_control not in {0x2, 0x3}.
+        return make_pair(true, nullptr);
+    }
+
+    if (tsPacket.GetAdaptationFieldLength() == 0)
+    {
+        return make_pair(true, nullptr);
+    }
+
+    if (tsPacket.GetPcrFlag() != 1)
+    {
+        return make_pair(true, nullptr);
+    }
+
+    Pcr pcr = tsPacket.GetPcr();
+    dbgstrm << "pcr = " << pcr << endl;
+    
+    return make_pair(true, make_shared<Pcr>(pcr));;
 }
 
 /* refer to iso13818-1.pdf
@@ -130,176 +360,59 @@ void TmssPlayer::PrepareMovie()
 : D.0.4 SCR and PCR Jitter
 : Table 2-6 – Transport Stream adaptation field (for packet format)
 */
-Duration TmssPlayer::Play()
-{    	
-    shared_ptr<MovieRuntimeInfoEntity> movieRuntimeInfo = cookie.GetMovieRuntimeInfo();	
-    if (movieRuntimeInfo->GetBufferHead() != movieRuntimeInfo->GetPcrPacketPtr())
+std::pair<size_t, shared_ptr<Pcr>> TmssPlayer::Play(SectionHandlers& handlers, std::ifstream& ifstrm, char* buffer, size_t size)
+{
+    std::pair<size_t, shared_ptr<Pcr>> pair(0, nullptr);
+    char *ptr = buffer;
+    while (ptr + TsPacketSize < buffer + size)
     {
-		Send((char*)movieRuntimeInfo->GetBufferHead(),
-			movieRuntimeInfo->GetPcrPacketPtr() - movieRuntimeInfo->GetBufferHead());
-        movieRuntimeInfo->SetPcrPacketPtr(movieRuntimeInfo->GetBufferHead());
-    }    
-	
-	Duration duration = Duration::zero();
-	for (uchar_t *ptr = movieRuntimeInfo->GetBufferHead();
-        ptr < movieRuntimeInfo->GetBufferHead() + movieRuntimeInfo->GetBufferSize();
-         ptr = ptr + TsPacketSize)
-    {
-        fstm.read((char*)ptr, TsPacketSize);
+        ifstrm.read((char*)ptr, TsPacketSize);
 
-		if (fstm.eof())
+        if (ifstrm.eof())
         {
-            Pcr first = *movieRuntimeInfo->GetFirstPcr();
-            Pcr last = *movieRuntimeInfo->GetLastPcr();
-            cookie.SetEventDuration(cookie.GetEventDuration() + CalcTimeIntv(first, last));
-			Send((char*)movieRuntimeInfo->GetBufferHead(), ptr + fstm.gcount() - movieRuntimeInfo->GetBufferHead());
-
-			cookie.ForwardMovie();
-			PrepareMovie();
-			break;
-		}
-		assert(fstm.gcount() == TsPacketSize);
-
-        shared_ptr<TransportPacketHelperInterface> tsPacket(TransportPacketHelperInterface::CreateInstance(ptr));
-        if (tsPacket->GetSyncByte() != 0x47)
-        {
-            assert(false);
-
-			cookie.ForwardMovie();
-			PrepareMovie();
+            ifstrm.close();
+            pair.first = ptr - buffer;
             break;
         }
-        
+        assert(ifstrm.gcount() == TsPacketSize);
+
+        shared_ptr<TransportPacketHelperInterface> tsPacket(TransportPacketHelperInterface::CreateInstance((uchar_t*)ptr));
+        assert(tsPacket->GetSyncByte() == 0x47);
+
         Pid pid = tsPacket->GetPid();
-        if (pid == PatPid)
-        {
-            /* Pat Table */
-            shared_ptr<PatHelperInterface> patTable(PatHelperInterface::CreateInstance(tsPacket->GetPayLoadHeader()));
-            uchar_t *p = patTable->GetHeader() + patTable->GetMinSize() - patTable->GetCrcCodeSize();
-            while (p < ptr + patTable->GetSize())
-            {
-                shared_ptr<PatElementaryInterface> patElementary(PatElementaryInterface::CreateInstance(p));
-                if (patElementary->GetProgramNumber() != 0)
-                {
-                    if (movieRuntimeInfo->GetPmtPid() == nullptr)
-                        movieRuntimeInfo->SetPmtPid(patElementary->GetPmtPid());
-
-					patElementary->SetProgramNumber(*cookie.GetTmss()->GetServiceId());
-                    patElementary->SetPmtPid(*cookie.GetTmss()->GetPmtPid());
-                    break;
-                }
-                p = p + patElementary->GetSize();
-            }
-            assert(movieRuntimeInfo->GetPmtPid() != nullptr);
-            patTable->UpdateCrcCode();
-
-			/* discard pat packet */
-			ptr = ptr - TsPacketSize;			
-        }
-
-        if (movieRuntimeInfo->GetPmtPid() != nullptr && pid == *movieRuntimeInfo->GetPmtPid())
-        {
-            /* Pmt Table */
-            shared_ptr<PmtHelperInterface> pmtTable(PmtHelperInterface::CreateInstance(tsPacket->GetPayLoadHeader()));
-            if (movieRuntimeInfo->GetPcrPid() == nullptr)
-            {
-                movieRuntimeInfo->SetPcrPid(pmtTable->GetPcrPid());
-            } 
-
-            uint32_t flag = 0;
-            uchar_t *p = pmtTable->GetHeader() + pmtTable->GetMinSize() 
-                - pmtTable->GetCrcCodeSize() + pmtTable->GetProgramInfoLength();
-            while (p < ptr + pmtTable->GetSize() && flag != 0x3)
-            {
-                shared_ptr<PmtElementaryInterface> pmtElementary(PmtElementaryInterface::CreateInstance(p));
-                if (audioStreamTypes.find(pmtElementary->GetStreamType()) != audioStreamTypes.end())
-                {
-                    if (movieRuntimeInfo->GetAudioPid() == nullptr)
-                        movieRuntimeInfo->SetAudioPid(pmtElementary->GetElementaryPid());
-                    pmtElementary->SetElementaryPid(*cookie.GetTmss()->GetAudioPid());
-                    flag = flag | 1;
-                }
-
-                if (videoStreamTypes.find(pmtElementary->GetStreamType()) != videoStreamTypes.end())
-                {
-                    if (movieRuntimeInfo->GetVideoPid() == nullptr)
-                        movieRuntimeInfo->SetVideoPid(pmtElementary->GetElementaryPid());
-                    pmtElementary->SetElementaryPid(*cookie.GetTmss()->GetVideoPid());
-                    flag = flag | 2;
-                }
-                p = p + pmtElementary->GetSize();
-            }
-            // false means we failed to get the right audio or video pid.
-            assert(flag == 0x3);
-            
-			pmtTable->SetProgramNumber(*cookie.GetTmss()->GetServiceId());
-            pmtTable->SetPcrPid(*cookie.GetTmss()->GetPcrPid());
-            pmtTable->UpdateCrcCode();
-            tsPacket->SetPid(*cookie.GetTmss()->GetPmtPid());
-        }
-
-        if (movieRuntimeInfo->GetAudioPid() != nullptr && pid == *movieRuntimeInfo->GetAudioPid())
-        { 
-            tsPacket->SetPid(*cookie.GetTmss()->GetAudioPid());
-        }
-
-        if (movieRuntimeInfo->GetVideoPid() != nullptr && pid == *movieRuntimeInfo->GetVideoPid())
-        {
-            tsPacket->SetPid(*cookie.GetTmss()->GetVideoPid());
-        }
-
-        AdaptationFieldControl afc = tsPacket->GetAdaptationFieldControl();
-        if (afc != 0x2 && afc != 0x3) 
-        {
-            //there is no pcr field if the adaptation_field_control not in {0x2, 0x3}.
+        //dbgstrm << "pcrPid = " << hex << setfill('0') << setw(4) << pid << dec << endl;
+        auto handler = handlers.find(tsPacket->GetPid());
+        if (handler == handlers.end())
             continue;
+        
+        auto ret = handler->second(*tsPacket, &handlers);
+        if (ret.second != nullptr)
+        {
+            pair.first = ptr + TsPacketSize - buffer;
+            pair.second = ret.second;
+            break;
         }
 
-        if (movieRuntimeInfo->GetPcrPid() != nullptr && pid == *movieRuntimeInfo->GetPcrPid())
+        if (ret.first)
         {
-            tsPacket->SetPid(*cookie.GetTmss()->GetPcrPid());
-            if (tsPacket->GetAdaptationFieldLength() == 0)
-            {
-                continue;
-            }
+            ptr = ptr + TsPacketSize;
+        }
+    } /* while (ptr < buffer + bufferSize && duration == nullptr) */
 
-            if (tsPacket->GetPcrFlag() != 1)
-            {
-                continue;
-            }
-
-            Pcr pcr = tsPacket->GetPcr();
-            if (movieRuntimeInfo->GetFirstPcr() == 0)
-			{
-				movieRuntimeInfo->SetFirstPcr(pcr);
-                movieRuntimeInfo->SetPcrPacketPtr(ptr + TsPacketSize);
-            }
-            else
-            {
-				movieRuntimeInfo->SetPcrPacketPtr(ptr + TsPacketSize);
-                Pcr firstPcr = *movieRuntimeInfo->GetFirstPcr();
-                TimePoint startTimePoint = *movieRuntimeInfo->GetStartTimePoint();
-                duration = startTimePoint + CalcTimeIntv(firstPcr, pcr) - steady_clock::now();
-            }
-			movieRuntimeInfo->SetLastPcr(pcr);
-			break;
-        } /* if (pid == FilePcrPid) */
-    } /* for (ptr = movie->GetBufferHead(); ...;  ptr = ptr + TsPacketSize) */
-    
-	/* buffer is not enought */
-    assert(movieRuntimeInfo->GetPcrPacketPtr() < movieRuntimeInfo->GetBufferHead() + movieRuntimeInfo->GetBufferSize());
-    return duration;
+    /* buffer is not enought */
+    assert(ptr < buffer + size);
+    return pair;
 }
 
-void TmssPlayer::Send(char *buffer, size_t size)
+void TmssPlayer::Send(int socketFd, char *buffer, size_t size)
 {
-	struct sockaddr_in dest = *cookie.GetTs()->GetDstAddr();
-    
+    const struct sockaddr_in& dest = ts->GetDstAddr();
+
 #ifdef _DEBUG
     //ofstream ofstrm;    
     //while (!ofstrm.is_open())
     //{
-    //    ofstrm.open("Movies\\output.ts", ios::binary | ios::app);        
+    //    ofstrm.open("Movies\\output.ts", std::ofstream::binary | std::ofstream::app);        
     //    if (!ofstrm.good())
     //    {
     //        /* 如果频繁调用ofstream::wirte(), 可能会失败, errono == EACCES.
@@ -316,21 +429,16 @@ void TmssPlayer::Send(char *buffer, size_t size)
     //ofstrm.close();
 #endif
 
-	shared_ptr<MovieRuntimeInfoEntity> movieRuntimeInfo = cookie.GetMovieRuntimeInfo();
-	Duration duration = CalcTimeIntv(*movieRuntimeInfo->GetFirstPcr(), *movieRuntimeInfo->GetLastPcr());
-	if (*movieRuntimeInfo->GetStartTimePoint() + duration + Milliseconds(200) > steady_clock::now())
-	{
-		char* ptr = buffer;
-		while (ptr < buffer + size)
-		{
-			size_t len = std::min(buffer + size - ptr, TsPacketBufSize);
-			sendto(socketFd, ptr, (int)len, 0, (SOCKADDR *)&dest, sizeof(struct sockaddr_in));
-			ptr = ptr + len;
-		}
-	}
+    char* ptr = buffer;
+    while (ptr < buffer + size)
+    {
+        size_t len = std::min(buffer + size - ptr, TsPacketBufSize);
+        sendto(socketFd, ptr, (int)len, 0, (SOCKADDR *)&dest, sizeof(struct sockaddr_in));
+        ptr = ptr + len;
+    }
 }
 
-Duration TmssPlayer::CalcTimeIntv(Pcr t0, Pcr t1)
+milliseconds TmssPlayer::CalcTimeIntv(Pcr t0, Pcr t1)
 {
-	return Milliseconds((t1 - t0) / 27000);
+    return milliseconds((t1 - t0) / 27000);
 }

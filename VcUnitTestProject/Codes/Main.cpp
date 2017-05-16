@@ -12,10 +12,14 @@
 /* Curl*/
 #include <curl/curl.h>
 
+/* local head files */
+#include "version.h"
+
 using namespace std;
 
 int main(int argc, char **argv)
 {
+    cout << "Software Svn Version: " << ExeVersion << endl;
     WSADATA wsaData;
     int iResult = WSAStartup(MAKEWORD(2, 2), &wsaData);
     CURLcode curlCode = curl_global_init(CURL_GLOBAL_ALL);

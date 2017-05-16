@@ -1,0 +1,30 @@
+<?xml version='1.0' encoding='utf-8'?>
+<root>
+    <ReferenceServiceList>
+        <ReferenceService ServiceID="1" TsId="1" Version="0">
+            <Event Duration="86400" Id="1" StartTime="2017-05-11 23:22:11">
+                <Poster Id="1001">ftp://127.0.0.1/sample.1001.jpg</Poster>
+                <Movie Id="1001">ftp://127.0.0.1/sample.1001.ts</Movie>
+            </Event>
+        </ReferenceService>
+    </ReferenceServiceList>    
+    
+    <TimeShiftedServiceList>
+        <TimeShiftedService ServiceID="3" TsId="1" Version="0">
+            <Event Duration="1200" Id="301" StartTime="2017-05-11 23:22:11">
+                <ReferenceService EventId="1" ServiceID="1" TsId="1" />
+            </Event>
+            <Event Duration="1200" Id="302" StartTime="2017-05-11 23:42:11">
+                <ReferenceService EventId="1" ServiceID="1" TsId="1" />
+            </Event>
+        </TimeShiftedService>
+        <TimeShiftedService ServiceID="4" TsId="1" Version="0">
+            <Event Duration="1200" Id="401" StartTime="2017-05-11 23:23:11">
+                <ReferenceService EventId="1" ServiceID="1" TsId="1" />
+            </Event>
+            <Event Duration="1200" Id="402" StartTime="2017-05-11 23:43:11">
+                <ReferenceService EventId="1" ServiceID="1" TsId="1" />
+            </Event>
+        </TimeShiftedService>
+    </TimeShiftedServiceList>
+</root>

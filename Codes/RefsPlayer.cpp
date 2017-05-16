@@ -3,34 +3,80 @@
 /* Entity */
 #include "Entities.h"
 
+/* Foundation */
+#include "SystemInclude.h"
+#include "Debug.h"
+
 /* Functions */
 #include "TransportPacketInterface.h"
 #include "PacketHelper.h"
 
-
-#include "RefsPlayerCookie.h"
-
 using namespace std;
 using namespace std::chrono;
+using namespace std::placeholders;
 
 typedef ClassFactoriesRegistor<PlayerInterface, string, shared_ptr<GlobalCfgEntity>, shared_ptr<RefsEntity>> Registor;
 RegisterClassFactory(Registor, reg, "RefsPlayer", RefsPlayer::CreateInstance);
 
 /**********************class RefsPlayer**********************/
-RefsPlayer::RefsPlayer(shared_ptr<GlobalCfgEntity> dataPipeGlobal,  shared_ptr<RefsEntity> refs)
-    : cookie(dataPipeGlobal, refs)
-{}
+RefsPlayer::RefsPlayer(shared_ptr<GlobalCfgEntity> globalCfg, shared_ptr<RefsEntity> refs)
+{
+    isOnGoing = false;
+
+	shared_ptr<TsEntity> ts = refs->GetTs();
+	this->globalCfg = make_shared<GlobalCfgEntity>(*globalCfg);
+	this->ts = make_shared<TsEntity>(*ts);
+	this->refs = make_shared<RefsEntity>(*refs);
+	this->refs->SetPsts(make_shared<PstsEntity>(*refs->GetPsts()));
+
+	this->ts->Bind(this->refs);
+
+	list<shared_ptr<RefsEventEntity>> refsEvents = refs->GetRefsEvents();
+	for (auto iter = refsEvents.begin(); iter != refsEvents.end(); ++iter)
+	{
+		shared_ptr<RefsEventEntity> refsEvent = *iter;
+		list<shared_ptr<PosterEntity>> posters = refsEvent->GetPosters();
+
+		for (auto iter = posters.begin(); iter != posters.end(); ++iter)
+		{
+			shared_ptr<PosterEntity> poster = *iter;
+			auto cmp = [poster](shared_ptr<PosterViewEntity> right)->bool
+			{
+				return poster->GetPosterId() == right->posterId;
+			};
+			auto result = find_if(posterViews.begin(), posterViews.end(), cmp);
+
+			shared_ptr<PosterViewEntity> posterView;
+			if (result == posterViews.end())
+			{
+				posterView = make_shared<PosterViewEntity>();
+				posterView->id = poster->GetId();
+				posterView->posterId = poster->GetPosterId();
+				posterView->remotePath = poster->GetRemotePath();
+				posterView->localPath = poster->GetLocalPath();
+				posterViews.push_back(posterView);
+			}
+			else
+			{
+				posterView = *result;
+			}
+
+			posterView->refsEventIds.push_back((*iter)->GetPosterId());
+		}
+	}
+}
 
 RefsPlayer::~RefsPlayer()
 {}
 
 void RefsPlayer::Start()
 {
-    theDataPipeThread = thread(bind(&RefsPlayer::TheDataPipeThreadMain, this));
+    {
+        std::lock_guard<std::mutex> lock(mtx);
+        isOnGoing = true;
+    }
 
-    std::lock_guard<std::mutex> lock(mtx);
-    isOnGoing = true;
-    cv.notify_one();
+    theDataPipeThread = thread(bind(&RefsPlayer::TheDataPipeThreadMain, this));
 }
 
 void RefsPlayer::Stop()
@@ -52,124 +98,97 @@ bool RefsPlayer::IsRunning()
 /* private functions */
 void RefsPlayer::TheDataPipeThreadMain()
 {
-    socketFd = socket(AF_INET, SOCK_DGRAM, IPPROTO_UDP);
+	int socketFd = socket(AF_INET, SOCK_DGRAM, IPPROTO_UDP);
+	ContinuityCounter pmtContinuityCounter = 0;
+	ContinuityCounter posterContinuityCounter = 0;
 
-    TimerHandler pmtHandler = bind(&RefsPlayer::HandlePmtTimer, this);
-    TimerHandler posterHandler = bind(&RefsPlayer::HandlePosterTimer, this);
+	TimerHandler pmtHandler = bind(&RefsPlayer::HandlePmtTimer, this, _1, _2);
+	milliseconds pmtInterval = milliseconds::zero();
 
-    shared_ptr<RefsRuntimeInfoEntity> rt = cookie.GetDataPipeRuntimeInfo();
-    shared_ptr<GlobalCfgEntity> dpg = cookie.GetGlobalCfg();
+	TimerHandler posterHandler = bind(&RefsPlayer::HandlePosterTimer, this, _1, _2);
+	milliseconds posterInterval = milliseconds::zero();
+
     while (true)
     {
         std::unique_lock<std::mutex> lock(mtx);
-        if (cv.wait_for(lock, Milliseconds(10), [this]{return !isOnGoing; }))
+        if (cv.wait_for(lock, milliseconds(10), [this]{return !isOnGoing; }))
             break;
         
-        rt->SetPmtInterval(HandlerTimer(rt->GetPmtInterval(), *dpg->GetPmtInterval(), pmtHandler));
-        rt->SetPosterInterval(HandlerTimer(rt->GetPosterInterval(), *dpg->GetPosterInterval(), posterHandler));
+		pmtInterval = HandlerTimer(socketFd, pmtInterval, globalCfg->GetPmtInterval(), 
+			pmtHandler, pmtContinuityCounter);
+
+		posterInterval = HandlerTimer(socketFd, posterInterval, globalCfg->GetPosterInterval(), 
+			posterHandler, posterContinuityCounter);
     }    
 
     closesocket(socketFd);
 }
 
-Duration RefsPlayer::HandlerTimer(Duration invl, Duration initInvl, TimerHandler handler)
+milliseconds RefsPlayer::HandlerTimer(int socketFd, milliseconds invl, milliseconds initInvl, 
+	TimerHandler handler, ContinuityCounter& continuityCounter)
 {
-    if (invl < Milliseconds(10))
+    if (invl < milliseconds(10))
     {
-        handler();
+		handler(socketFd, continuityCounter);
         invl = initInvl;
     }
     else
     {
-        invl = invl - Milliseconds(10);
+        invl = invl - milliseconds(10);
     }
     return invl;
 }
 
-void RefsPlayer::HandlePmtTimer()
+void RefsPlayer::HandlePmtTimer(int socketFd, ContinuityCounter& continuityCounter)
 {
     uchar_t buffer[TsPacketSize];
-    shared_ptr<RefsEntity> refs = cookie.GetRefs();
 
-    shared_ptr<TransportPacketHelperInterface> tsHelper(TransportPacketHelperInterface::CreateInstance(buffer));
-    tsHelper->SetSyncByte(0x47);
-    tsHelper->SetTransportErrorIndicator(0);
-    tsHelper->SetPayloadUnitStartIndicator(1);
-    tsHelper->SetTransportPriority(0);
-    tsHelper->SetPid(*refs->GetPsts()->GetPmtPid());
-    tsHelper->SetTransportScramblingControl(0);
-    tsHelper->SetAdaptationFieldControl(1);
-    tsHelper->SetContinuityCounter(cookie.GetDataPipeRuntimeInfo()->GetNewPmtContinuityCounter());
+	shared_ptr<TransportPacketHelperInterface> tsHelper(
+		TransportPacketHelperInterface::CreateInstance(buffer, 1, refs->GetPsts()->GetPmtPid(), continuityCounter)
+		);
 
-    shared_ptr<PmtHelperInterface> pmtHelper(PmtHelperInterface::CreateInstance(tsHelper->GetPayLoadHeader()));
-    pmtHelper->SetSectionLength(pmtHelper->GetMinSectionLength());
-	pmtHelper->SetProgramNumber(*refs->GetPsts()->GetServiceId());
-    pmtHelper->SetVersionNumber(0);
-    pmtHelper->SetCurrentNextIndicator(1);
-    pmtHelper->SetSectionMumber(0);
-    pmtHelper->SetLastSectionMumber(0);
-    pmtHelper->SetPcrPid(0);
-    pmtHelper->SetProgramInfoLength(0);
+	shared_ptr<PmtHelperInterface> pmtHelper(
+		PmtHelperInterface::CreateInstance(tsHelper->GetPayLoadHeader(), refs->GetPsts()->GetServiceId())
+		);
 
     uchar_t *ptr = pmtHelper->GetHeader() + pmtHelper->GetSize() - pmtHelper->GetCrcCodeSize();
     shared_ptr<PmtElementaryInterface> pmtElementary(PmtElementaryInterface::CreateInstance(ptr));
-	pmtElementary->SetStreamType(*refs->GetPsts()->GetStreamType());
-	pmtElementary->SetElementaryPid(*refs->GetPsts()->GetPosterPid());
+	pmtElementary->SetStreamType(refs->GetPsts()->GetStreamType());
+	pmtElementary->SetElementaryPid(refs->GetPsts()->GetPosterPid());
     pmtElementary->SetEsInfoLength(0);
 
     pmtHelper->SetSectionLength(pmtHelper->GetSectionLength() + pmtElementary->GetSize());
     pmtHelper->UpdateCrcCode();
 
     tsHelper->FillPad(pmtHelper->GetSize());
-    Send((char*)buffer, TsPacketSize);
+	Send(socketFd, (char*)buffer, TsPacketSize);
 }
 
-void RefsPlayer::HandlePosterTimer()
+void RefsPlayer::HandlePosterTimer(int socketFd, ContinuityCounter& continuityCounter)
 {
-    HandlePosterDitTimer();
-    HandlePosterDdtTimer();
+	HandlePosterDitTimer(socketFd, continuityCounter);
+	HandlePosterDdtTimer(socketFd, continuityCounter);
 }
 
-void RefsPlayer::HandlePosterDitTimer()
+void RefsPlayer::HandlePosterDitTimer(int socketFd, ContinuityCounter& continuityCounter)
 {
-    auto WriteTs = [this](shared_ptr<TransportPacketHelperInterface> tsHelper,
-        PayloadUnitStartIndicator payloadUnitStartIndicator)
-    {
-        shared_ptr<RefsEntity> refs = cookie.GetRefs();
-        shared_ptr<RefsRuntimeInfoEntity> rtInfo = cookie.GetDataPipeRuntimeInfo();
-
-        tsHelper->SetSyncByte(0x47);
-        tsHelper->SetTransportErrorIndicator(0);
-        tsHelper->SetPayloadUnitStartIndicator(payloadUnitStartIndicator);
-        tsHelper->SetTransportPriority(0);
-		tsHelper->SetPid(*refs->GetPsts()->GetPosterPid());
-        tsHelper->SetTransportScramblingControl(0);
-        tsHelper->SetAdaptationFieldControl(1);
-        tsHelper->SetContinuityCounter(rtInfo->GetNewPosterContinuityCounter());
-    };
-
-    auto WriteDit = [](shared_ptr<DitHelperInterface> ditHelper)
-    {
-        ditHelper->SetSectionLength(ditHelper->GetMinSectionLength());
-        ditHelper->SetVersionNumber(0);
-        ditHelper->SetSectionMumber(0);
-        ditHelper->SetLastSectionMumber(0);
-    };
-
-    size_t const bufSize = TsPacketSize * std::numeric_limits<DitSectionNumber>::max();
-    uchar_t *buffer = new uchar_t[bufSize];
-    uchar_t *bptr = buffer;
+    size_t const size = TsPacketSize * std::numeric_limits<DitSectionNumber>::max();
+	uchar_t *buffer = new uchar_t[size];
+    uchar_t *ptr = buffer;
     
-    shared_ptr<TransportPacketHelperInterface> tsHelper(TransportPacketHelperInterface::CreateInstance(bptr));
-    WriteTs(tsHelper, 1);
-    shared_ptr<DitHelperInterface> ditHelper(DitHelperInterface::CreateInstance(tsHelper->GetPayLoadHeader()));    
-    WriteDit(ditHelper);
+	Pid pid = refs->GetPsts()->GetPosterPid();
+	shared_ptr<TransportPacketHelperInterface> tsHelper(
+		TransportPacketHelperInterface::CreateInstance(ptr, 1, pid, continuityCounter)
+		);
+
+	shared_ptr<DitHelperInterface> ditHelper(
+		DitHelperInterface::CreateInstance(tsHelper->GetPayLoadHeader(), VersionNumber(0))
+		);
 
     shared_ptr<list<shared_ptr<PosterViewEntity>>::iterator> posterIter;
 	shared_ptr<list<EventId>::iterator> refsEventIdIter;
 
-    list<shared_ptr<PosterViewEntity>>& posters = cookie.GetPosterViews();
-    for (auto iter1 = posters.begin(); iter1 != posters.end(); ++iter1)
+	for (auto iter1 = posterViews.begin(); iter1 != posterViews.end(); ++iter1)
     {
         if (posterIter != nullptr)
         {
@@ -178,12 +197,10 @@ void RefsPlayer::HandlePosterDitTimer()
         }
         if (tsHelper->GetSize() + ditHelper->GetSize() + 6 > TsPacketSize)
         {
-            bptr = bptr + TsPacketSize;
-            assert(bptr < buffer + bufSize);
-            tsHelper.reset(TransportPacketHelperInterface::CreateInstance(bptr));
-            WriteTs(tsHelper, 0);
-            ditHelper.reset(DitHelperInterface::CreateInstance(tsHelper->GetPayLoadHeader()));
-            WriteDit(ditHelper);
+			ptr = ptr + TsPacketSize;
+			assert(ptr < buffer + size);
+			tsHelper.reset(TransportPacketHelperInterface::CreateInstance(ptr, 0, pid, continuityCounter));
+			ditHelper.reset(DitHelperInterface::CreateInstance(tsHelper->GetPayLoadHeader(), VersionNumber(0)));
         }
 		
         uchar_t *ptr = ditHelper->GetHeader() + ditHelper->GetSize() - ditHelper->GetCrcCodeSize();
@@ -213,11 +230,11 @@ void RefsPlayer::HandlePosterDitTimer()
     }
     
     DitSectionNumber cur = 0;
-    DitSectionNumber last = (bptr - buffer) / TsPacketSize;
-    for (uchar_t *ptr = buffer; ptr <= bptr; ptr = ptr + TsPacketSize)
+    DitSectionNumber last = (ptr - buffer) / TsPacketSize;
+    for (uchar_t *p = buffer; p <= ptr; p = p + TsPacketSize)
     {
-        tsHelper.reset(TransportPacketHelperInterface::CreateInstance(ptr));
-        ditHelper.reset(DitHelperInterface::CreateInstance(tsHelper->GetPayLoadHeader()));
+		shared_ptr<TransportPacketHelperInterface> tsHelper(TransportPacketHelperInterface::CreateInstance(p));
+		shared_ptr<DitHelperInterface> ditHelper(DitHelperInterface::CreateInstance(tsHelper->GetPayLoadHeader()));
         ditHelper->SetSectionMumber(cur++);
         ditHelper->SetLastSectionMumber(last);
         ditHelper->UpdateCrcCode();
@@ -225,54 +242,33 @@ void RefsPlayer::HandlePosterDitTimer()
         tsHelper->FillPad(ditHelper->GetSize());
     }
 
-    Send((char*)buffer, bptr + TsPacketSize - buffer);
+	Send(socketFd, (char*)buffer, ptr + TsPacketSize - buffer);
     delete[] buffer;
 }
 
-void RefsPlayer::HandlePosterDdtTimer()
+void RefsPlayer::HandlePosterDdtTimer(int socketFd, ContinuityCounter& continuityCounter)
 {
-    auto WriteTs = [this](shared_ptr<TransportPacketHelperInterface> tsHelper,
-        PayloadUnitStartIndicator payloadUnitStartIndicator)
-    {
-        shared_ptr<RefsEntity> refs = cookie.GetRefs();
-        shared_ptr<RefsRuntimeInfoEntity> rtInfo = cookie.GetDataPipeRuntimeInfo();
+	Pid pid = refs->GetPsts()->GetPosterPid();
 
-        tsHelper->SetSyncByte(0x47);
-        tsHelper->SetTransportErrorIndicator(0);
-        tsHelper->SetPayloadUnitStartIndicator(payloadUnitStartIndicator);
-        tsHelper->SetTransportPriority(0);
-        tsHelper->SetPid(*refs->GetPsts()->GetPosterPid());
-        tsHelper->SetTransportScramblingControl(0);
-        tsHelper->SetAdaptationFieldControl(1);
-        tsHelper->SetContinuityCounter(rtInfo->GetNewPosterContinuityCounter());
-    };
+    size_t const size = TsPacketSize * std::numeric_limits<DdtSectionNumber>::max();
+	uchar_t *buffer = new uchar_t[size];
 
-    auto WriteDdt = [](shared_ptr<DdtHelperInterface> ddtHelper, PosterId posterId)
+	for (auto iter = posterViews.begin(); iter != posterViews.end(); ++iter)
     {
-        ddtHelper->SetSectionLength(ddtHelper->GetMinSectionLength());
-        ddtHelper->SetPosterId(posterId);
-        ddtHelper->SetVersionNumber(0);
-        ddtHelper->SetSectionMumber(0);
-        ddtHelper->SetLastSectionMumber(0);
-    };
-
-    size_t const bufSize = TsPacketSize * std::numeric_limits<DdtSectionNumber>::max();
-    uchar_t *buffer = new uchar_t[bufSize];    
-        
-    list<shared_ptr<PosterViewEntity>>& posters = cookie.GetPosterViews();
-    for (auto iter = posters.begin(); iter != posters.end(); ++iter)
-    {
-        uchar_t *bptr = buffer;
+        uchar_t *ptr = buffer;
+        PayloadUnitStartIndicator payloadUnitStartIndicator = 1;
 
         ifstream ifstrm((*iter)->localPath.c_str(), ios::binary);
 		assert(ifstrm.good());
-		while (!ifstrm.eof() && bptr < buffer + bufSize)
+		while (!ifstrm.eof() && ptr < buffer + size)
         {
-            shared_ptr<TransportPacketHelperInterface> tsHelper(TransportPacketHelperInterface::CreateInstance(bptr));
-            WriteTs(tsHelper, bptr == buffer ? 1 : 0);
+			shared_ptr<TransportPacketHelperInterface> tsHelper(
+				TransportPacketHelperInterface::CreateInstance(ptr, payloadUnitStartIndicator, pid, continuityCounter)
+				);
 
-            shared_ptr<DdtHelperInterface> ddtHelper(DdtHelperInterface::CreateInstance(tsHelper->GetPayLoadHeader()));            
-            WriteDdt(ddtHelper, (*iter)->posterId);
+			shared_ptr<DdtHelperInterface> ddtHelper(
+				DdtHelperInterface::CreateInstance(tsHelper->GetPayLoadHeader(), (*iter)->posterId)
+				);
 
             size_t readSize = TsPacketSize - tsHelper->GetSize() - ddtHelper->GetSize();
             ifstrm.read((char*)ddtHelper->GetHeader() + ddtHelper->GetSize() - ddtHelper->GetCrcCodeSize(), readSize);
@@ -281,18 +277,32 @@ void RefsPlayer::HandlePosterDdtTimer()
             ddtHelper->UpdateCrcCode();
             tsHelper->FillPad(ddtHelper->GetSize());
 
-            bptr = bptr + TsPacketSize;
+			ptr = ptr + TsPacketSize;
+            payloadUnitStartIndicator = 0;
         }
 
-        Send((char*)buffer, bptr - buffer);
+		DdtSectionNumber cur = 0;
+		DdtSectionNumber last = (ptr - buffer) / TsPacketSize;
+		for (uchar_t *p = buffer; p <= ptr; p = p + TsPacketSize)
+		{
+			shared_ptr<TransportPacketHelperInterface> tsHelper(TransportPacketHelperInterface::CreateInstance(p));
+			shared_ptr<DdtHelperInterface> ditHelper(DdtHelperInterface::CreateInstance(tsHelper->GetPayLoadHeader()));
+			ditHelper->SetSectionMumber(cur++);
+			ditHelper->SetLastSectionMumber(last);
+			ditHelper->UpdateCrcCode();
+
+			tsHelper->FillPad(ditHelper->GetSize());
+		}
+		
+		Send(socketFd, (char*)buffer, ptr - buffer);
     }
 
     delete[] buffer;
 }
 
-void RefsPlayer::Send(char *buffer, size_t size)
+void RefsPlayer::Send(int socketFd, char *buffer, size_t size)
 {
-    struct sockaddr_in dest = *cookie.GetTs()->GetDstAddr();
+    const struct sockaddr_in& dest = ts->GetDstAddr();
 
 #ifdef _DEBUG
     //ofstream ofstrm;    

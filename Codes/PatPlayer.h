@@ -1,24 +1,28 @@
 #ifndef _PatPlayer_h_
 #define _PatPlayer_h_
 
-/* Foundation */
+/* Type */
 #include "BaseType.h"
+
+/* Foundation */
 #include "SystemInclude.h"
+
+/* Entity */
+#include "Entities.h"
 
 /* Functions */
 #include "PlayerInterface.h"
 
-#include "PatPlayerCookie.h"
-
 using std::shared_ptr;
 
-class PatPlayerCookie;
+class TransportPacketHelperInterface;
+class PatHelperInterface;
 
 /**********************class DataPipePlayer**********************/
 class PatPlayer : public PlayerInterface
 {
 public:
-    PatPlayer(shared_ptr<GlobalCfgEntity> dataPipeGlobal, shared_ptr<TsEntity> ts);
+	PatPlayer(shared_ptr<GlobalCfgEntity> globalCfg, shared_ptr<TsEntity> ts);
     ~PatPlayer();
     static PlayerInterface* CreateInstance(shared_ptr<GlobalCfgEntity> dataPipeGlobal, shared_ptr<TsEntity> ts)
     {
@@ -31,20 +35,19 @@ public:
 
 private:
     void ThePatThreadMain();
-    void HandlePatTimer();
-    void Send(char *buffer, size_t size);
+	void HandlePatTimer(int socketFd, ContinuityCounter& continuityCounter);
+	void Send(int socketFd, char *buffer, size_t size);
 
 private:
     /* member variable initialized by constructor */
     std::mutex mtx;
     std::condition_variable cv;
-    PatPlayerCookie cookie;
+    bool isOnGoing;
+	shared_ptr<GlobalCfgEntity> globalCfg;
+	shared_ptr<TsEntity> ts;
     
     /* thread relative variable */
     std::thread thePatThread;
-    bool isOnGoing;
-    std::ifstream fstm;
-    int socketFd;
 };
 
 #endif

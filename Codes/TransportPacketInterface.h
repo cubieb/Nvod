@@ -12,6 +12,9 @@ public:
     TransportPacketHelperInterface() {};
     virtual ~TransportPacketHelperInterface() {};
     static TransportPacketHelperInterface* CreateInstance(uchar_t *tsPacketHeader);
+	static TransportPacketHelperInterface* CreateInstance(uchar_t *tsPacketHeader, 
+		PayloadUnitStartIndicator payloadUnitStartIndicator, Pid pid, 
+		ContinuityCounter& continuityCounter);
 
     virtual SyncByte GetSyncByte() const = 0;
     virtual void SetSyncByte(SyncByte syncByte) = 0;
@@ -49,6 +52,7 @@ public:
     virtual uchar_t* GetPayLoadHeader() const = 0;
     virtual void FillPad(size_t payLoadSize) = 0;
 
+    virtual uchar_t* GetHeader() const = 0;
     virtual size_t GetSize() const = 0;
 };
 
@@ -58,7 +62,8 @@ class PatHelperInterface
 public:
     PatHelperInterface() {};
     virtual ~PatHelperInterface() {};
-    static PatHelperInterface* CreateInstance(uchar_t *patTableHeader);
+	static PatHelperInterface* CreateInstance(uchar_t *patHeader);
+	static PatHelperInterface* CreateInstance(uchar_t *patHeader, TsId tsId);
 
     virtual SiPsiTableId GetTableId() const = 0;
 
@@ -116,7 +121,8 @@ class PmtHelperInterface
 public:
     PmtHelperInterface() {};
     virtual ~PmtHelperInterface() {};
-    static PmtHelperInterface* CreateInstance(uchar_t *pmtTableHeader);
+	static PmtHelperInterface* CreateInstance(uchar_t *pmtHeader);
+	static PmtHelperInterface* CreateInstance(uchar_t *pmtHeader, ProgramNumber programNumber);
 
     virtual SiPsiTableId GetTableId() const = 0;
 
@@ -181,6 +187,7 @@ public:
     DitHelperInterface() {}
     virtual ~DitHelperInterface() {}
     static DitHelperInterface* CreateInstance(uchar_t *ditHeader);
+	static DitHelperInterface* CreateInstance(uchar_t *ditHeader, VersionNumber versionNumber);
 
     virtual SiPsiTableId GetTableId() const = 0;
 
@@ -230,6 +237,7 @@ public:
     DdtHelperInterface() {}
     virtual ~DdtHelperInterface() {}
     static DdtHelperInterface* CreateInstance(uchar_t *ddtHeader);
+	static DdtHelperInterface* CreateInstance(uchar_t *ddtHeader, PosterId posterId);
 
     virtual SiPsiTableId GetTableId() const = 0;
 

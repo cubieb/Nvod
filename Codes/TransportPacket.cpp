@@ -14,10 +14,22 @@ TransportPacketHelperInterface* TransportPacketHelperInterface::CreateInstance(u
     return new TransportPacketHelper(tsPacketHeader);
 }
 
+TransportPacketHelperInterface* TransportPacketHelperInterface::CreateInstance(uchar_t *tsPacketHeader,
+	PayloadUnitStartIndicator payloadUnitStartIndicator, Pid pid,
+	ContinuityCounter& continuityCounter)
+{
+	return new TransportPacketHelper(tsPacketHeader, payloadUnitStartIndicator, pid, continuityCounter);
+}
+
 /**********************class PatHelperInterface**********************/
 PatHelperInterface* PatHelperInterface::CreateInstance(uchar_t *patHeader)
 {
     return new PatHelper(patHeader);
+}
+
+PatHelperInterface* PatHelperInterface::CreateInstance(uchar_t *patHeader, TsId tsId)
+{
+	return new PatHelper(patHeader, tsId);
 }
 
 PatElementaryInterface* PatElementaryInterface::CreateInstance(uchar_t *patElementary)
@@ -31,6 +43,11 @@ PmtHelperInterface* PmtHelperInterface::CreateInstance(uchar_t *pmtHeader)
     return new PmtHelper(pmtHeader);
 }
 
+PmtHelperInterface* PmtHelperInterface::CreateInstance(uchar_t *pmtHeader, ProgramNumber programNumber)
+{
+	return new PmtHelper(pmtHeader, programNumber);
+}
+
 PmtElementaryInterface* PmtElementaryInterface::CreateInstance(uchar_t *pmtElementary)
 {
     return new PmtElementary(pmtElementary);
@@ -40,6 +57,11 @@ PmtElementaryInterface* PmtElementaryInterface::CreateInstance(uchar_t *pmtEleme
 DitHelperInterface* DitHelperInterface::CreateInstance(uchar_t *ditHeader)
 {
     return new DitHelper(ditHeader);
+}
+
+DitHelperInterface* DitHelperInterface::CreateInstance(uchar_t *ditHeader, VersionNumber versionNumber)
+{
+	return new DitHelper(ditHeader, versionNumber);
 }
 
 DitElementaryInterface* DitElementaryInterface::CreateInstance(uchar_t *ditElementary)
@@ -53,11 +75,31 @@ DdtHelperInterface* DdtHelperInterface::CreateInstance(uchar_t *ddtHeader)
     return new DdtHelper(ddtHeader);
 }
 
+DdtHelperInterface* DdtHelperInterface::CreateInstance(uchar_t *ddtHeader, PosterId posterId)
+{
+	return new DdtHelper(ddtHeader, posterId);
+}
 
 /**********************class TransportPacketHelper**********************/
 TransportPacketHelper::TransportPacketHelper(uchar_t *tsPacketHeader)
     : tsPacketHeader(reinterpret_cast<transport_packet*>(tsPacketHeader))
 {}
+
+TransportPacketHelper::TransportPacketHelper(uchar_t *tsPacketHeader, 
+	PayloadUnitStartIndicator payloadUnitStartIndicator, 
+	Pid pid, ContinuityCounter& continuityCounter)
+	: tsPacketHeader(reinterpret_cast<transport_packet*>(tsPacketHeader))
+{
+	SetSyncByte(0x47);
+	SetTransportErrorIndicator(0);
+	SetPayloadUnitStartIndicator(payloadUnitStartIndicator);
+	SetTransportPriority(0);
+	SetPid(pid);
+	SetTransportScramblingControl(0);
+	SetAdaptationFieldControl(1);
+	SetContinuityCounter(continuityCounter);
+	continuityCounter = (continuityCounter + 1) & 0x0F;
+}
 
 TransportPacketHelper::~TransportPacketHelper()
 {}
@@ -217,6 +259,11 @@ void TransportPacketHelper::FillPad(size_t payLoadSize)
     }        
 }
 
+uchar_t* TransportPacketHelper::GetHeader() const
+{
+    return reinterpret_cast<uchar_t*>(tsPacketHeader);
+}
+
 size_t TransportPacketHelper::GetSize() const
 {
     size_t size = 4;
@@ -244,6 +291,17 @@ PatHelper::PatHelper(uchar_t *patHeader)
     WriteBuffer(&this->patHeader->pseudo_member1, (uint16_t)0x0, 14, 1);
     WriteBuffer(&this->patHeader->pseudo_member1, (uint16_t)0x3, 12, 2);
     WriteBuffer(&this->patHeader->pseudo_member2, (uint8_t)0x3, 6, 2);
+}
+
+PatHelper::PatHelper(uchar_t *patHeader, TsId tsId)
+	: PatHelper(patHeader)
+{
+	SetSectionLength(GetMinSectionLength());
+	SetTransportStreamId(tsId);
+	SetVersionNumber(0);
+	SetCurrentNextIndicator(1);
+	SetSectionMumber(0);
+	SetLastSectionMumber(0);
 }
 
 PatHelper::~PatHelper()
@@ -404,6 +462,19 @@ PmtHelper::PmtHelper(uchar_t *pmtHeader)
 
     /* reserved4 */
     WriteBuffer(&this->pmtHeader->pseudo_member4, (uint16_t)0xF, 12, 4);
+}
+
+PmtHelper::PmtHelper(uchar_t *pmtHeader, ProgramNumber programNumber)
+	: PmtHelper(pmtHeader)
+{
+	SetSectionLength(GetMinSectionLength());
+	SetProgramNumber(programNumber);
+	SetVersionNumber(0);
+	SetCurrentNextIndicator(1);
+	SetSectionMumber(0);
+	SetLastSectionMumber(0);
+	SetPcrPid(0);
+	SetProgramInfoLength(0);
 }
 
 PmtHelper::~PmtHelper()
@@ -601,6 +672,15 @@ DitHelper::DitHelper(uchar_t *ditHeader)
     WriteBuffer(&this->ditHeader->pseudo_member2, (uint8_t)0x3, 6, 2);
 }
 
+DitHelper::DitHelper(uchar_t *ditHeader, VersionNumber versionNumber)
+	: DitHelper(ditHeader)
+{
+	SetSectionLength(GetMinSectionLength());
+	SetVersionNumber(versionNumber);
+	SetSectionMumber(0);
+	SetLastSectionMumber(0);
+}
+
 DitHelper::~DitHelper()
 {}
 
@@ -735,6 +815,18 @@ DdtHelper::DdtHelper(uchar_t *ddtHeader)
 
     /* reserved2 */
     WriteBuffer(&this->ddtHeader->pseudo_member2, (uint8_t)0x3, 6, 2);
+
+	SetSectionLength(GetMinSectionLength());
+	SetPosterId(0);
+	SetVersionNumber(0);
+	SetSectionMumber(0);
+	SetLastSectionMumber(0);
+}
+
+DdtHelper::DdtHelper(uchar_t *ddtHeader, PosterId posterId)
+	: DdtHelper(ddtHeader)
+{
+	SetPosterId(posterId);
 }
 
 DdtHelper::~DdtHelper()

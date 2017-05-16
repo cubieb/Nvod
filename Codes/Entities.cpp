@@ -43,14 +43,9 @@ void TsEntity::SetId(TableId id)
     this->id = id;
 }
 
-shared_ptr<TsId> TsEntity::GetTsId() const
+TsId TsEntity::GetTsId() const
 {
-    return tsId;
-}
-
-void TsEntity::SetTsId(shared_ptr<TsId> tsId)
-{
-    this->tsId = tsId;
+    return *tsId;
 }
 
 void TsEntity::SetTsId(TsId tsId)
@@ -68,19 +63,14 @@ void TsEntity::SetSrcAddr(shared_ptr<in_addr> srcAddr)
     this->srcAddr = srcAddr;
 }
 
-void TsEntity::SetSrcAddr(in_addr srcAddr)
+void TsEntity::SetSrcAddr(const in_addr& srcAddr)
 {
     MemberHelper::SetMember(this->srcAddr, srcAddr, nullptr);
 }
 
-shared_ptr<sockaddr_in> TsEntity::GetDstAddr() const
+const sockaddr_in& TsEntity::GetDstAddr() const
 {
-    return dstAddr;
-}
-
-void TsEntity::SetDstAddr(shared_ptr<sockaddr_in> dstAddr)
-{
-    this->dstAddr = dstAddr;
+    return *dstAddr;
 }
 
 void TsEntity::SetDstAddr(const sockaddr_in& dstAddr)
@@ -139,6 +129,7 @@ void TsEntity::Unbind(shared_ptr<TmssEntity> tmss)
 }
 
 /* private functions */
+/* Bind, Unbind */
 void TsEntity::Bind(weak_ptr<RefsEntity> refs)
 {
     MemberHelper::BindMember(this->refses, refs, shared_from_this());
@@ -194,14 +185,9 @@ void RefsEntity::SetId(TableId id)
     this->id = id;
 }
 
-shared_ptr<ServiceId> RefsEntity::GetServiceId() const
+ServiceId RefsEntity::GetServiceId() const
 {
-    return serviceId;
-}
-
-void RefsEntity::SetServiceId(shared_ptr<ServiceId> serviceId)
-{
-    this->serviceId = serviceId;
+    return *serviceId;
 }
 
 void RefsEntity::SetServiceId(ServiceId serviceId)
@@ -224,14 +210,14 @@ void RefsEntity::SetDescription(const string& description)
     MemberHelper::SetMember(this->description, description, nullptr);
 }
 
-weak_ptr<TsEntity> RefsEntity::GetTs() const
+shared_ptr<TsEntity> RefsEntity::GetTs() const
 {
-	return ts;
+    return ts.lock();
 }
 
-void RefsEntity::SetTs(weak_ptr<TsEntity> ts)
+void RefsEntity::SetTs(shared_ptr<TsEntity> ts)
 {
-	MemberHelper::SetMember(this->ts, ts, shared_from_this());
+    SetTsPtr(ts);
 }
 
 shared_ptr<PstsEntity> RefsEntity::GetPsts() const
@@ -276,6 +262,18 @@ string RefsEntity::ToString() const
 }
 
 /* private functions */
+/* odb::access special functions */
+weak_ptr<TsEntity> RefsEntity::GetTsPtr() const
+{
+    return ts;
+}
+
+void RefsEntity::SetTsPtr(weak_ptr<TsEntity> ts)
+{
+    MemberHelper::SetMember(this->ts, ts, shared_from_this());
+}
+
+/* Bind, Unbind */
 void RefsEntity::Bind(shared_ptr<PstsEntity> psts)
 {
 	MemberHelper::BindMember(this->psts, psts, shared_from_this());
@@ -328,7 +326,7 @@ void RefsEntity::Unbind(weak_ptr<RefsEventEntity> refsEvent)
 
 /**********************class RefsEventEntity**********************/
 RefsEventEntity::RefsEventEntity(TableId id, shared_ptr<EventId> eventId,
-    shared_ptr<TimePoint> startTimePoint, shared_ptr<Duration> duration)
+    shared_ptr<system_clock::time_point> startTimePoint, shared_ptr<seconds> duration)
     : id(id), eventId(eventId), startTimePoint(startTimePoint), duration(duration)
 {}
 
@@ -338,13 +336,13 @@ RefsEventEntity::RefsEventEntity()
 
 RefsEventEntity::RefsEventEntity(const RefsEventEntity& right)
     : RefsEventEntity(right.id, make_shared<EventId>(*right.eventId),
-    make_shared<TimePoint>(*right.startTimePoint), make_shared<Duration>(*right.duration))
+    make_shared<system_clock::time_point>(*right.startTimePoint), make_shared<seconds>(*right.duration))
 {}
 
 RefsEventEntity::RefsEventEntity(TableId id, EventId eventId,
-    TimePoint startTimePoint, Duration duration)
+    system_clock::time_point startTimePoint, seconds duration)
     : RefsEventEntity(id, make_shared<EventId>(eventId),
-    make_shared<TimePoint>(startTimePoint), make_shared<Duration>(duration))
+    make_shared<system_clock::time_point>(startTimePoint), make_shared<seconds>(duration))
 {}
 
 RefsEventEntity::~RefsEventEntity()
@@ -360,14 +358,9 @@ void RefsEventEntity::SetId(TableId id)
     this->id = id;
 }
 
-shared_ptr<EventId> RefsEventEntity::GetEventId() const
+EventId RefsEventEntity::GetEventId() const
 {
-    return eventId;
-}
-
-void RefsEventEntity::SetEventId(shared_ptr<EventId> eventId)
-{
-    this->eventId = eventId;
+    return *eventId;
 }
 
 void RefsEventEntity::SetEventId(EventId eventId)
@@ -375,44 +368,34 @@ void RefsEventEntity::SetEventId(EventId eventId)
     MemberHelper::SetMember(this->eventId, eventId, nullptr);
 }
 
-shared_ptr<TimePoint> RefsEventEntity::GetStartTimePoint() const
+system_clock::time_point RefsEventEntity::GetStartTimePoint() const
 {
-    return startTimePoint;
+    return *startTimePoint;
 }
 
-void RefsEventEntity::SetStartTimePoint(shared_ptr<TimePoint> startTimePoint)
-{
-    this->startTimePoint = startTimePoint;
-}
-
-void RefsEventEntity::SetStartTimePoint(TimePoint startTimePoint)
+void RefsEventEntity::SetStartTimePoint(system_clock::time_point startTimePoint)
 {
     MemberHelper::SetMember(this->startTimePoint, startTimePoint, nullptr);
 }
 
-shared_ptr<Duration> RefsEventEntity::GetDuration() const
+seconds RefsEventEntity::GetDuration() const
 {
-    return duration;
+    return *duration;
 }
 
-void RefsEventEntity::SetDuration(shared_ptr<Duration> duration)
-{
-    this->duration = duration;
-}
-
-void RefsEventEntity::SetDuration(Duration duration)
+void RefsEventEntity::SetDuration(seconds duration)
 {
     MemberHelper::SetMember(this->duration, duration, nullptr);
 }
 
-weak_ptr<RefsEntity> RefsEventEntity::GetRefs() const
+shared_ptr<RefsEntity> RefsEventEntity::GetRefs() const
 {
-    return refs;
+    return refs.lock();
 }
 
-void RefsEventEntity::SetRefs(weak_ptr<RefsEntity> refs)
+void RefsEventEntity::SetRefs(shared_ptr<RefsEntity> refs)
 {
-    MemberHelper::SetMember(this->refs, refs, shared_from_this());
+    SetRefsPtr(refs);
 }
 
 const list<shared_ptr<MovieEntity>>& RefsEventEntity::GetMovies() const
@@ -496,6 +479,16 @@ string RefsEventEntity::ToString() const
 }
 
 /* private functions */
+weak_ptr<RefsEntity> RefsEventEntity::GetRefsPtr() const
+{
+    return refs;
+}
+
+void RefsEventEntity::SetRefsPtr(weak_ptr<RefsEntity> refs)
+{
+    MemberHelper::SetMember(this->refs, refs, shared_from_this());
+}
+
 void RefsEventEntity::Bind(shared_ptr<RefsEntity> refs)
 {
     MemberHelper::BindMember(this->refs, refs, shared_from_this());
@@ -554,7 +547,7 @@ MovieEntity::MovieEntity(TableId id, shared_ptr<MovieId> movieId,
 {}
 
 MovieEntity::MovieEntity()
-    : MovieEntity(InvalidMovieId, nullptr, nullptr, nullptr)
+    : MovieEntity(InvalidTableId, nullptr, nullptr, nullptr)
 {}
 
 MovieEntity::MovieEntity(const MovieEntity& right)
@@ -584,14 +577,9 @@ void MovieEntity::SetId(TableId id)
     this->id = id;
 }
 
-shared_ptr<MovieId> MovieEntity::GetMovieId() const
+MovieId MovieEntity::GetMovieId() const
 {
-    return movieId;
-}
-
-void MovieEntity::SetMovieId(shared_ptr<MovieId> movieId)
-{
-    this->movieId = movieId;
+    return *movieId;
 }
 
 void MovieEntity::SetMovieId(MovieId movieId)
@@ -599,14 +587,9 @@ void MovieEntity::SetMovieId(MovieId movieId)
     MemberHelper::SetMember(this->movieId, movieId, nullptr);
 }
 
-shared_ptr<string> MovieEntity::GetRemotePath() const
+const string& MovieEntity::GetRemotePath() const
 {
-    return remotePath;
-}
-
-void MovieEntity::SetRemotePath(shared_ptr<string> remotePath)
-{
-    this->remotePath = remotePath;
+    return *remotePath;
 }
 
 void MovieEntity::SetRemotePath(const string& remotePath)
@@ -614,14 +597,9 @@ void MovieEntity::SetRemotePath(const string& remotePath)
     MemberHelper::SetMember(this->remotePath, remotePath, nullptr);
 }
 
-shared_ptr<string> MovieEntity::GetLocalPath() const
+const string& MovieEntity::GetLocalPath() const
 {
-    return localPath;
-}
-
-void MovieEntity::SetLocalPath(shared_ptr<string> localPath)
-{
-    this->localPath = localPath;
+    return *localPath;
 }
 
 void MovieEntity::SetLocalPath(const string& localPath)
@@ -678,7 +656,7 @@ PosterEntity::PosterEntity(TableId id, shared_ptr<PosterId> posterId,
 {}
 
 PosterEntity::PosterEntity()
-	: PosterEntity(InvalidMovieId, nullptr, nullptr, nullptr)
+	: PosterEntity(InvalidTableId, nullptr, nullptr, nullptr)
 {}
 
 PosterEntity::PosterEntity(const PosterEntity& right)
@@ -691,7 +669,7 @@ PosterEntity::PosterEntity(const PosterEntity& right)
 	}
 }
 
-PosterEntity::PosterEntity(TableId id, PosterId movieId, const char *remotePath)
+PosterEntity::PosterEntity(TableId id, PosterId posterId, const char *remotePath)
 	: PosterEntity(id, make_shared<PosterId>(posterId), make_shared<string>(remotePath), nullptr)
 {}
 
@@ -708,14 +686,9 @@ void PosterEntity::SetId(TableId id)
 	this->id = id;
 }
 
-shared_ptr<PosterId> PosterEntity::GetPosterId() const
+PosterId PosterEntity::GetPosterId() const
 {
-	return posterId;
-}
-
-void PosterEntity::SetPosterId(shared_ptr<PosterId> posterId)
-{
-	this->posterId = posterId;
+	return *posterId;
 }
 
 void PosterEntity::SetPosterId(PosterId posterId)
@@ -723,14 +696,9 @@ void PosterEntity::SetPosterId(PosterId posterId)
 	MemberHelper::SetMember(this->posterId, posterId, nullptr);
 }
 
-shared_ptr<string> PosterEntity::GetRemotePath() const
+const string& PosterEntity::GetRemotePath() const
 {
-	return remotePath;
-}
-
-void PosterEntity::SetRemotePath(shared_ptr<string> remotePath)
-{
-	this->remotePath = remotePath;
+	return *remotePath;
 }
 
 void PosterEntity::SetRemotePath(const string& remotePath)
@@ -738,14 +706,9 @@ void PosterEntity::SetRemotePath(const string& remotePath)
 	MemberHelper::SetMember(this->remotePath, remotePath, nullptr);
 }
 
-shared_ptr<string> PosterEntity::GetLocalPath() const
+const string& PosterEntity::GetLocalPath() const
 {
-	return localPath;
-}
-
-void PosterEntity::SetLocalPath(shared_ptr<string> localPath)
-{
-	this->localPath = localPath;
+	return *localPath;
 }
 
 void PosterEntity::SetLocalPath(const string& localPath)
@@ -839,14 +802,9 @@ void TmssEntity::SetId(TableId id)
     this->id = id;
 }
 
-shared_ptr<ServiceId> TmssEntity::GetServiceId() const
+ServiceId TmssEntity::GetServiceId() const
 {
-    return serviceId;
-}
-
-void TmssEntity::SetServiceId(shared_ptr<ServiceId> serviceId)
-{
-    this->serviceId = serviceId;
+    return *serviceId;
 }
 
 void TmssEntity::SetServiceId(ServiceId serviceId)
@@ -854,14 +812,9 @@ void TmssEntity::SetServiceId(ServiceId serviceId)
     MemberHelper::SetMember(this->serviceId, serviceId, nullptr);
 }
 
-shared_ptr<Pid> TmssEntity::GetPmtPid() const
+Pid TmssEntity::GetPmtPid() const
 {
-	return pmtPid;
-}
-
-void TmssEntity::SetPmtPid(shared_ptr<Pid> pmtPid)
-{
-	this->pmtPid = pmtPid;
+	return *pmtPid;
 }
 
 void TmssEntity::SetPmtPid(Pid pmtPid)
@@ -869,14 +822,9 @@ void TmssEntity::SetPmtPid(Pid pmtPid)
 	MemberHelper::SetMember(this->pmtPid, pmtPid, nullptr);
 }
 
-shared_ptr<Pid> TmssEntity::GetPcrPid() const
+Pid TmssEntity::GetPcrPid() const
 {
-	return pcrPid;
-}
-
-void TmssEntity::SetPcrPid(shared_ptr<Pid> pcrPid)
-{
-	this->pcrPid = pcrPid;
+	return *pcrPid;
 }
 
 void TmssEntity::SetPcrPid(Pid pcrPid)
@@ -884,14 +832,9 @@ void TmssEntity::SetPcrPid(Pid pcrPid)
 	MemberHelper::SetMember(this->pcrPid, pcrPid, nullptr);
 }
 
-shared_ptr<Pid> TmssEntity::GetAudioPid() const
+Pid TmssEntity::GetAudioPid() const
 {
-	return audioPid;
-}
-
-void TmssEntity::SetAudioPid(shared_ptr<Pid> audioPid)
-{
-	this->audioPid = audioPid;
+	return *audioPid;
 }
 
 void TmssEntity::SetAudioPid(Pid audioPid)
@@ -899,14 +842,9 @@ void TmssEntity::SetAudioPid(Pid audioPid)
 	MemberHelper::SetMember(this->audioPid, audioPid, nullptr);
 }
 
-shared_ptr<Pid> TmssEntity::GetVideoPid() const
+Pid TmssEntity::GetVideoPid() const
 {
-	return videoPid;
-}
-
-void TmssEntity::SetVideoPid(shared_ptr<Pid> videoPid)
-{
-	this->videoPid = videoPid;
+	return *videoPid;
 }
 
 void TmssEntity::SetVideoPid(Pid videoPid)
@@ -929,14 +867,14 @@ void TmssEntity::SetDescription(const string& description)
     MemberHelper::SetMember(this->description, description, nullptr);
 }
 
-weak_ptr<TsEntity> TmssEntity::GetTs() const
+shared_ptr<TsEntity> TmssEntity::GetTs() const
 {
-    return ts;
+    return ts.lock();
 }
 
-void TmssEntity::SetTs(weak_ptr<TsEntity> ts)
+void TmssEntity::SetTs(shared_ptr<TsEntity> ts)
 {
-    MemberHelper::SetMember(this->ts, ts, shared_from_this());
+    SetTsPtr(ts);
 }
 
 const list<shared_ptr<TmssEventEntity>>& TmssEntity::GetTmssEvents() const
@@ -970,6 +908,16 @@ string TmssEntity::ToString() const
 }
 
 /* private functions */
+weak_ptr<TsEntity> TmssEntity::GetTsPtr() const
+{
+    return ts;
+}
+
+void TmssEntity::SetTsPtr(weak_ptr<TsEntity> ts)
+{
+    MemberHelper::SetMember(this->ts, ts, shared_from_this());
+}
+
 void TmssEntity::Bind(shared_ptr<TsEntity> ts)
 {
     MemberHelper::BindMember(this->ts, ts, shared_from_this());
@@ -1003,7 +951,7 @@ void TmssEntity::Unbind(weak_ptr<TmssEventEntity> tmssEvent)
 /**********************class TmssEventEntity**********************/
 /* public functions */
 TmssEventEntity::TmssEventEntity(TableId id, shared_ptr<EventId> eventId,
-    shared_ptr<TimePoint> startTimePoint, shared_ptr<Duration> duration)
+    shared_ptr<system_clock::time_point> startTimePoint, shared_ptr<seconds> duration)
     : id(id), eventId(eventId), startTimePoint(startTimePoint), duration(duration)
 {}
 
@@ -1013,13 +961,13 @@ TmssEventEntity::TmssEventEntity()
 
 TmssEventEntity::TmssEventEntity(const TmssEventEntity& right)
     : TmssEventEntity(right.id, make_shared<EventId>(*right.eventId),
-    make_shared<TimePoint>(*right.startTimePoint), make_shared<Duration>(*right.duration))
+    make_shared<system_clock::time_point>(*right.startTimePoint), make_shared<seconds>(*right.duration))
 {}
 
 TmssEventEntity::TmssEventEntity(TableId id, EventId eventId,
-    TimePoint startTimePoint, Duration duration)
+    system_clock::time_point startTimePoint, seconds duration)
     : TmssEventEntity(id, make_shared<EventId>(eventId),
-    make_shared<TimePoint>(startTimePoint), make_shared<Duration>(duration))
+    make_shared<system_clock::time_point>(startTimePoint), make_shared<seconds>(duration))
 {}
 
 TmssEventEntity::~TmssEventEntity()
@@ -1035,14 +983,9 @@ void TmssEventEntity::SetId(TableId id)
     this->id = id;
 }
 
-shared_ptr<EventId> TmssEventEntity::GetEventId() const
+EventId TmssEventEntity::GetEventId() const
 {
-    return eventId;
-}
-
-void TmssEventEntity::SetEventId(shared_ptr<EventId> eventId)
-{
-    this->eventId = eventId;
+    return *eventId;
 }
 
 void TmssEventEntity::SetEventId(EventId eventId)
@@ -1050,44 +993,34 @@ void TmssEventEntity::SetEventId(EventId eventId)
     MemberHelper::SetMember(this->eventId, eventId, nullptr);
 }
 
-shared_ptr<TimePoint> TmssEventEntity::GetStartTimePoint() const
+system_clock::time_point TmssEventEntity::GetStartTimePoint() const
 {
-    return startTimePoint;
+    return *startTimePoint;
 }
 
-void TmssEventEntity::SetStartTimePoint(shared_ptr<TimePoint> startTimePoint)
-{
-    this->startTimePoint = startTimePoint;
-}
-
-void TmssEventEntity::SetStartTimePoint(TimePoint startTimePoint)
+void TmssEventEntity::SetStartTimePoint(system_clock::time_point startTimePoint)
 {
     MemberHelper::SetMember(this->startTimePoint, startTimePoint, nullptr);
 }
 
-shared_ptr<Duration> TmssEventEntity::GetDuration() const
+seconds TmssEventEntity::GetDuration() const
 {
-    return duration;
+    return *duration;
 }
 
-void TmssEventEntity::SetGetDuration(shared_ptr<Duration> duration)
-{
-    this->duration = duration;
-}
-
-void TmssEventEntity::SetGetDuration(Duration duration)
+void TmssEventEntity::SetGetDuration(seconds duration)
 {
     MemberHelper::SetMember(this->duration, duration, nullptr);
 }
 
-weak_ptr<TmssEntity> TmssEventEntity::GetTmss() const
+shared_ptr<TmssEntity> TmssEventEntity::GetTmss() const
 {
-    return tmss;
+    return tmss.lock();
 }
 
-void TmssEventEntity::SetTmss(weak_ptr<TmssEntity> tmss)
+void TmssEventEntity::SetTmss(shared_ptr<TmssEntity> tmss)
 {
-    MemberHelper::SetMember(this->tmss, tmss, shared_from_this());
+    SetTmssPtr(tmss);
 }
 
 shared_ptr<RefsEventEntity> TmssEventEntity::GetRefsEvent() const
@@ -1116,6 +1049,16 @@ string TmssEventEntity::ToString() const
 }
 
 /* private functions */
+weak_ptr<TmssEntity> TmssEventEntity::GetTmssPtr() const
+{
+    return tmss;
+}
+
+void TmssEventEntity::SetTmssPtr(weak_ptr<TmssEntity> tmss)
+{
+    MemberHelper::SetMember(this->tmss, tmss, shared_from_this());
+}
+
 void TmssEventEntity::Bind(shared_ptr<TmssEntity> tmss)
 {
     MemberHelper::BindMember(this->tmss, tmss, shared_from_this());
@@ -1180,14 +1123,9 @@ void PstsEntity::SetId(TableId id)
 	this->id = id;
 }
 
-shared_ptr<ServiceId> PstsEntity::GetServiceId() const
+ServiceId PstsEntity::GetServiceId() const
 {
-	return serviceId;
-}
-
-void PstsEntity::SetServiceId(shared_ptr<ServiceId> serviceId)
-{
-	this->serviceId = serviceId;
+	return *serviceId;
 }
 
 void PstsEntity::SetServiceId(ServiceId serviceId)
@@ -1195,14 +1133,9 @@ void PstsEntity::SetServiceId(ServiceId serviceId)
 	MemberHelper::SetMember(this->serviceId, serviceId, nullptr);
 }
 
-shared_ptr<Pid> PstsEntity::GetPmtPid() const
+Pid PstsEntity::GetPmtPid() const
 {
-	return pmtPid;
-}
-
-void PstsEntity::SetPmtPid(shared_ptr<Pid> pmtPid)
-{
-	this->pmtPid = pmtPid;
+	return *pmtPid;
 }
 
 void PstsEntity::SetPmtPid(Pid pmtPid)
@@ -1210,14 +1143,9 @@ void PstsEntity::SetPmtPid(Pid pmtPid)
 	MemberHelper::SetMember(this->pmtPid, pmtPid, nullptr);
 }
 
-shared_ptr<StreamType> PstsEntity::GetStreamType() const
+StreamType PstsEntity::GetStreamType() const
 {
-	return streamType;
-}
-
-void PstsEntity::SetStreamType(shared_ptr<StreamType> streamType)
-{
-	this->streamType = streamType;
+	return *streamType;
 }
 
 void PstsEntity::SetStreamType(StreamType streamType)
@@ -1225,14 +1153,9 @@ void PstsEntity::SetStreamType(StreamType streamType)
 	MemberHelper::SetMember(this->streamType, streamType, nullptr);
 }
 
-shared_ptr<Pid> PstsEntity::GetPosterPid() const
+Pid PstsEntity::GetPosterPid() const
 {
-	return posterPid;
-}
-
-void PstsEntity::SetPosterPid(shared_ptr<Pid> posterPid)
-{
-	this->posterPid = posterPid;
+	return *posterPid;
 }
 
 void PstsEntity::SetPosterPid(Pid posterPid)
@@ -1272,8 +1195,8 @@ void PstsEntity::Unbind(weak_ptr<RefsEntity>)
 }
 
 /**********************class GlobalCfgEntity**********************/
-GlobalCfgEntity::GlobalCfgEntity(TableId id, shared_ptr<Duration> patInterval,
-    shared_ptr<Duration> pmtInterval, shared_ptr<Duration> posterInterval)
+GlobalCfgEntity::GlobalCfgEntity(TableId id, shared_ptr<milliseconds> patInterval,
+    shared_ptr<milliseconds> pmtInterval, shared_ptr<milliseconds> posterInterval)
     : id(id), patInterval(patInterval), pmtInterval(pmtInterval), posterInterval(posterInterval)
 {}
 
@@ -1282,14 +1205,14 @@ GlobalCfgEntity::GlobalCfgEntity()
 {}
 
 GlobalCfgEntity::GlobalCfgEntity(const GlobalCfgEntity& right)
-    : GlobalCfgEntity(right.id, make_shared<Duration>(*right.patInterval),
-    make_shared<Duration>(*right.pmtInterval), make_shared<Duration>(*right.posterInterval))
+    : GlobalCfgEntity(right.id, make_shared<milliseconds>(*right.patInterval),
+    make_shared<milliseconds>(*right.pmtInterval), make_shared<milliseconds>(*right.posterInterval))
 {}
 
-GlobalCfgEntity::GlobalCfgEntity(TableId id, Duration patInterval,
-    Duration pmtInterval, Duration posterInterval)
-    : GlobalCfgEntity(id, make_shared<Duration>(patInterval),
-    make_shared<Duration>(pmtInterval), make_shared<Duration>(posterInterval))
+GlobalCfgEntity::GlobalCfgEntity(TableId id, milliseconds patInterval,
+    milliseconds pmtInterval, milliseconds posterInterval)
+    : GlobalCfgEntity(id, make_shared<milliseconds>(patInterval),
+    make_shared<milliseconds>(pmtInterval), make_shared<milliseconds>(posterInterval))
 {}
 
 GlobalCfgEntity::~GlobalCfgEntity()
@@ -1305,47 +1228,32 @@ void GlobalCfgEntity::SetId(TableId id)
     this->id = id;
 }
 
-shared_ptr<Duration> GlobalCfgEntity::GetPatInterval() const
+milliseconds GlobalCfgEntity::GetPatInterval() const
 {
-    return patInterval;
+    return *patInterval;
 }
 
-void GlobalCfgEntity::SetPatInterval(shared_ptr<Duration> patInterval)
-{
-    this->patInterval = patInterval;
-}
-
-void GlobalCfgEntity::SetPatInterval(Duration patInterval)
+void GlobalCfgEntity::SetPatInterval(milliseconds patInterval)
 {
     MemberHelper::SetMember(this->patInterval, patInterval, nullptr);
 }
 
-shared_ptr<Duration> GlobalCfgEntity::GetPmtInterval() const
+milliseconds GlobalCfgEntity::GetPmtInterval() const
 {
-    return pmtInterval;
+    return *pmtInterval;
 }
 
-void GlobalCfgEntity::SetPmtInterval(shared_ptr<Duration> pmtInterval)
-{
-    this->pmtInterval = pmtInterval;
-}
-
-void GlobalCfgEntity::SetPmtInterval(Duration pmtInterval)
+void GlobalCfgEntity::SetPmtInterval(milliseconds pmtInterval)
 {
     MemberHelper::SetMember(this->pmtInterval, pmtInterval, nullptr);
 }
 
-shared_ptr<Duration> GlobalCfgEntity::GetPosterInterval() const
+milliseconds GlobalCfgEntity::GetPosterInterval() const
 {
-    return posterInterval;
+    return *posterInterval;
 }
 
-void GlobalCfgEntity::SetPosterInterval(shared_ptr<Duration> posterInterval)
-{
-    this->posterInterval = posterInterval;
-}
-
-void GlobalCfgEntity::SetPosterInterval(Duration posterInterval)
+void GlobalCfgEntity::SetPosterInterval(milliseconds posterInterval)
 {
     MemberHelper::SetMember(this->posterInterval, posterInterval, nullptr);
 }

@@ -50,6 +50,9 @@ class TransportPacketHelper : public TransportPacketHelperInterface
 {
 public:
     TransportPacketHelper(uchar_t *tsPacketHeader);
+	TransportPacketHelper(uchar_t *tsPacketHeader, 
+		PayloadUnitStartIndicator payloadUnitStartIndicator, 
+		Pid pid, ContinuityCounter& continuityCounter);
     ~TransportPacketHelper();
 
     SyncByte GetSyncByte() const;
@@ -88,7 +91,12 @@ public:
 	uchar_t* GetPayLoadHeader() const;
 	void FillPad(size_t payLoadSize);
 
+    uchar_t* GetHeader() const;
     size_t GetSize() const;
+
+private:
+	/* disable default copy constructor */
+	TransportPacketHelper(const TransportPacketHelper&);
 
 private:
     transport_packet *tsPacketHeader;
@@ -132,6 +140,7 @@ class PatHelper : public PatHelperInterface
 {
 public:
     PatHelper(uchar_t *patHeader);
+	PatHelper(uchar_t *patHeader, TsId tsId);
     ~PatHelper();
 
     SiPsiTableId GetTableId() const;
@@ -233,6 +242,7 @@ class PmtHelper : public PmtHelperInterface
 {
 public:
     PmtHelper(uchar_t *pmtHeader);
+	PmtHelper(uchar_t *pmtHeader, ProgramNumber programNumber);
     ~PmtHelper();
     
     SiPsiTableId GetTableId() const;
@@ -336,6 +346,7 @@ class DitHelper : public DitHelperInterface
 {
 public:
     DitHelper(uchar_t *ditHeader);
+	DitHelper(uchar_t *ditHeader, VersionNumber versionNumber);
     ~DitHelper();
 
     SiPsiTableId GetTableId() const;
@@ -411,7 +422,8 @@ struct ts_packet_poster_ddt_data
 class DdtHelper : public DdtHelperInterface
 {
 public:
-    DdtHelper(uchar_t *ddtHeader);
+	DdtHelper(uchar_t *ddtHeader);
+	DdtHelper(uchar_t *ddtHeader, PosterId posterId);
     ~DdtHelper(); 
 
     SiPsiTableId GetTableId() const;

@@ -15,10 +15,8 @@ RegisterClassFactory(ClassFactoriesType, reg, "DownloaderFtp", DownloaderFtp::Cr
 
 /**********************class DownloaderFtp**********************/
 DownloaderFtp::DownloaderFtp(DownloaderInterface::Handler handler)
-: movieTuples(), movieEntities(), handler(handler), mtx()
+    : handler(handler), ftpResources()
 {
-    mcurl = curl_multi_init();
-    assert(mcurl != nullptr);
     isOnGoing = false;
 }
 
@@ -27,32 +25,30 @@ DownloaderFtp::~DownloaderFtp()
     if (threadMain.joinable())
     {
         threadMain.join();
-    }
-    CURLMcode mcurlCode = curl_multi_cleanup(mcurl);
-    assert(mcurlCode == CURLM_OK);
+    }    
 }
 
-void DownloaderFtp::Download(shared_ptr<MovieEntity> movieEntity)
+void DownloaderFtp::Download(shared_ptr<FtpResource> ftpResource)
 {    
     lock_guard<mutex> lock(mtx);
-    auto cmp = [movieEntity](shared_ptr<MovieEntity> iter)
+    auto cmp = [ftpResource](shared_ptr<FtpResource> iter)
     {
-        return (movieEntity->GetId() == iter->GetId());
+        return (ftpResource->GetId() == iter->GetId());
     };
 
     if (isOnGoing == false)
     {
-        assert(movieEntities.empty() && movieTuples.empty());
+        assert(ftpResources.empty());
         isOnGoing = true;
         threadMain = thread(bind(&DownloaderFtp::ThreadMain, this));
     }
 
-    auto iter = find_if(movieEntities.begin(), movieEntities.end(), cmp);
-    if (iter != movieEntities.end())
+    auto iter = find_if(ftpResources.begin(), ftpResources.end(), cmp);
+    if (iter != ftpResources.end())
     {
         return;
     }
-    movieEntities.push_back(movieEntity);
+    ftpResources.push_back(ftpResource);
 }
 
 bool DownloaderFtp::IsRunning()
@@ -76,6 +72,11 @@ void DownloaderFtp::Stop()
 /* private functions */
 void DownloaderFtp::ThreadMain()
 {
+    CURLM *mcurl = curl_multi_init();
+    assert(mcurl != nullptr);
+    
+    std::list<FtpResourceTuple> ftpResourceTuples;
+    
     unique_lock<mutex> lock(mtx, std::defer_lock);    
     int runningHandles = 1;
     while (runningHandles != 0)
@@ -86,16 +87,16 @@ void DownloaderFtp::ThreadMain()
             break;
         }
 
-        for (auto iter = movieEntities.begin(); iter != movieEntities.end(); ++iter)
+        for (auto iter = ftpResources.begin(); iter != ftpResources.end(); ++iter)
         {
-            ofstream *fstm = new ofstream((*iter)->GetLocalPath()->c_str(), ofstream::binary);
+            ofstream *fstm = new ofstream((*iter)->GetLocalPath().c_str(), ofstream::binary);
             assert(fstm != nullptr);
 
             CURL *curl = curl_easy_init();
             assert(curl != nullptr); 
 
             CURLcode curlCode;
-            curlCode = curl_easy_setopt(curl, CURLOPT_URL, (*iter)->GetRemotePath()->c_str());
+            curlCode = curl_easy_setopt(curl, CURLOPT_URL, (*iter)->GetRemotePath().c_str());
             assert(curl != nullptr);
             //curlCode = curl_easy_setopt(curl, CURLOPT_USERPWD, "anonymous:password");
             //assert(curlCode == CURLE_OK);
@@ -108,9 +109,9 @@ void DownloaderFtp::ThreadMain()
             CURLMcode mcurlCode = curl_multi_add_handle(mcurl, curl);
             assert(mcurlCode == CURLM_OK);
 
-            movieTuples.push_back(make_tuple(*iter, curl, fstm));
+            ftpResourceTuples.push_back(make_tuple(*iter, curl, fstm));
         }
-        movieEntities.clear();
+        ftpResources.clear();
         lock.unlock();
         
         struct timeval timeout = { 0, 500 * 1000 };
@@ -143,43 +144,79 @@ void DownloaderFtp::ThreadMain()
             int retCode = select(maxFd + 1, &fdRead, &fdWrite, &fdExcep, &timeout);
             assert(retCode != -1);
         }
-
-        lock.lock();
-        int msgq = 0;
-        for (CURLMsg *m = curl_multi_info_read(mcurl, &msgq); 
-            m != nullptr; 
-            m = curl_multi_info_read(mcurl, &msgq))
-        {
-            if (m->msg != CURLMSG_DONE)
-                continue;
-
-            CURL *curl = m->easy_handle;
-            auto cmp = [curl](MovieTuple& i)->bool { return std::get<TupleIdxCurlPtr>(i) == curl; };
-            MovieTuple movieTuple = *find_if(movieTuples.begin(), movieTuples.end(), cmp);
-            handler(std::get<TupleIdxMovieEntity>(movieTuple));
-        }
-        lock.unlock();
+        CloseDoneCurl(mcurl, ftpResourceTuples);
 
         mcurlCode = curl_multi_perform(mcurl, &runningHandles);
-        assert(mcurlCode == CURLM_OK || mcurlCode == CURLM_CALL_MULTI_PERFORM);        
+        assert(mcurlCode == CURLM_OK || mcurlCode == CURLM_CALL_MULTI_PERFORM);
     } /* while (isOnGoing) */
 
-    lock.lock();
+    lock.lock();    
     isOnGoing = false;
-    movieEntities.clear();
-
-    auto CleanUp = [](MovieTuple& movieTuple)
+    
+    CloseDoneCurl(mcurl, ftpResourceTuples);
+    if (!ftpResourceTuples.empty())
     {
-        curl_easy_cleanup(std::get<TupleIdxCurlPtr>(movieTuple));
-        std::get<TupleIdxCurlPtr>(movieTuple) = nullptr;
+        /* if this function exit because of the calling of Stop(), we need clear up the ftpResourceTuples */
+		auto CleanUp = [this](FtpResourceTuple& ftpResourceTuple)
+        {
+			handler(std::get<TupleIdxMovieEntity>(ftpResourceTuple), false);
 
-        std::get<TupleIdxFilePtr>(movieTuple)->close();
-        delete std::get<TupleIdxFilePtr>(movieTuple);
-        std::get<TupleIdxFilePtr>(movieTuple) = nullptr;
-    };
-    for_each(movieTuples.begin(), movieTuples.end(), CleanUp);
-    movieTuples.clear();
+			curl_easy_cleanup(std::get<TupleIdxCurlPtr>(ftpResourceTuple));
+			std::get<TupleIdxCurlPtr>(ftpResourceTuple) = nullptr;
+
+			std::get<TupleIdxFilePtr>(ftpResourceTuple)->close();
+			delete std::get<TupleIdxFilePtr>(ftpResourceTuple);
+			std::get<TupleIdxFilePtr>(ftpResourceTuple) = nullptr;
+        };
+        for_each(ftpResourceTuples.begin(), ftpResourceTuples.end(), CleanUp);
+        ftpResourceTuples.clear();
+    }
+    ftpResources.clear();
     lock.unlock();
+
+    CURLMcode mcurlCode = curl_multi_cleanup(mcurl);
+    assert(mcurlCode == CURLM_OK);
+}
+
+void DownloaderFtp::CloseDoneCurl(CURLM *mcurl, std::list<FtpResourceTuple>& ftpResourceTuples)
+{
+    int msgq = 0;
+    for (CURLMsg *m = curl_multi_info_read(mcurl, &msgq);
+        m != nullptr;
+        m = curl_multi_info_read(mcurl, &msgq))
+    {
+        if (m->msg != CURLMSG_DONE)
+            continue;
+
+        CURL *curl = m->easy_handle;
+        auto cmp = [curl](FtpResourceTuple& i)->bool { return std::get<TupleIdxCurlPtr>(i) == curl; };
+		auto ftpResourceTuple = find_if(ftpResourceTuples.begin(), ftpResourceTuples.end(), cmp);
+		assert(ftpResourceTuple != ftpResourceTuples.end());
+
+		std::get<TupleIdxFilePtr>(*ftpResourceTuple)->close();
+		delete std::get<TupleIdxFilePtr>(*ftpResourceTuple);
+		std::get<TupleIdxFilePtr>(*ftpResourceTuple) = nullptr;
+
+        double filesize = 0.0;
+        CURLcode curlCode = curl_easy_getinfo(curl, CURLINFO_CONTENT_LENGTH_DOWNLOAD, &filesize);
+        dbgstrm << "curlCode = " << curlCode << ", filesize = " << filesize << endl;
+        // if file not existed, the filesize should be -1. for simple and convenient, we 
+        // assume all file size > 16 byte.
+        if (curlCode == CURLE_OK && filesize > 16)
+        {   
+			handler(std::get<TupleIdxMovieEntity>(*ftpResourceTuple), true);
+        }
+        else
+        {
+			/* delete the empty file (file size is zero). */
+			remove(std::get<TupleIdxMovieEntity>(*ftpResourceTuple)->GetLocalPath().c_str());
+			handler(std::get<TupleIdxMovieEntity>(*ftpResourceTuple), false);
+        }
+
+		curl_easy_cleanup(std::get<TupleIdxCurlPtr>(*ftpResourceTuple));
+		std::get<TupleIdxCurlPtr>(*ftpResourceTuple) = nullptr;
+		ftpResourceTuples.erase(ftpResourceTuple);
+    }
 }
 
 size_t DownloaderFtp::HandleCurlMessage(void *buffer, size_t size, size_t nmemb, void *para)

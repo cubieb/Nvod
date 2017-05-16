@@ -4,6 +4,7 @@
 #include <string>  // std::string
 #include <list>    // std::list
 #include <memory>  // std::std::shared_ptr, std::weak_ptr
+#include <chrono>  /* time_point, duration, seconds, ... */
 #include <Winsock2.h>
 
 #include "BaseType.h"
@@ -12,6 +13,9 @@ using std::list;
 using std::shared_ptr;
 using std::weak_ptr;
 using std::string;
+using std::chrono::seconds;
+using std::chrono::milliseconds;
+using std::chrono::system_clock;
 
 class TsEntity;
 class RefsEntity;
@@ -22,7 +26,6 @@ class TmssEntity;
 class TmssEventEntity;
 class PstsEntity;
 class GlobalCfgEntity; 
-class DataPipeTsEntity;
 
 /**********************class TsEntity**********************/
 class TsEntity : public std::enable_shared_from_this<TsEntity>
@@ -41,16 +44,14 @@ public:
     TableId GetId() const;
     void SetId(TableId id);
 
-    shared_ptr<TsId> GetTsId() const;
-    void SetTsId(shared_ptr<TsId> tsId);
+    TsId GetTsId() const;
     void SetTsId(TsId tsId);
 
     shared_ptr<in_addr> GetSrcAddr() const;
     void SetSrcAddr(shared_ptr<in_addr> srcAddr);
-    void SetSrcAddr(in_addr srcAddr);
+    void SetSrcAddr(const in_addr& srcAddr);
 
-    shared_ptr<sockaddr_in> GetDstAddr() const;
-    void SetDstAddr(shared_ptr<sockaddr_in> dstAddr);
+    const sockaddr_in& GetDstAddr() const;
     void SetDstAddr(const sockaddr_in& dstAddr);
 
     const list<shared_ptr<RefsEntity>>& GetRefses() const;
@@ -65,13 +66,8 @@ public:
     void Bind(shared_ptr<TmssEntity> tmss);
     void Unbind(shared_ptr<TmssEntity> tmss);
 
-	const list<shared_ptr<PstsEntity>>& GetPstses() const;
-	list<shared_ptr<PstsEntity>>& GetPstses();
-	void SetPstses(list<shared_ptr<PstsEntity>>& pstses);
-	void Bind(shared_ptr<PstsEntity> psts);
-	void Unbind(shared_ptr<PstsEntity> psts);
-
 private:
+    /* Bind, Unbind */
     void Bind(weak_ptr<RefsEntity> refs);
     void Unbind(weak_ptr<RefsEntity> refs);
 
@@ -86,7 +82,6 @@ private:
 
     list<shared_ptr<RefsEntity>>  refses;
     list<shared_ptr<TmssEntity>>  tmsses;
-	list<shared_ptr<PstsEntity>>  pstses;
 };
 
 /**********************class RefsEntity**********************/
@@ -104,16 +99,15 @@ public:
     TableId GetId() const;
     void SetId(TableId id);
 
-    shared_ptr<ServiceId> GetServiceId() const;
-    void SetServiceId(shared_ptr<ServiceId> serviceId);
+    ServiceId GetServiceId() const;
     void SetServiceId(ServiceId serviceId);
 
     shared_ptr<string> GetDescription() const;
     void SetDescription(shared_ptr<string> description);
     void SetDescription(const string& description);
     
-    weak_ptr<TsEntity> GetTs() const;
-    void SetTs(weak_ptr<TsEntity> ts);
+    shared_ptr<TsEntity> GetTs() const;
+    void SetTs(shared_ptr<TsEntity> ts);
 
 	shared_ptr<PstsEntity> GetPsts() const;
 	void SetPsts(shared_ptr<PstsEntity> psts);
@@ -128,6 +122,11 @@ public:
     string ToString() const;
 
 private:
+    /* odb::access special functions */
+    weak_ptr<TsEntity> GetTsPtr() const;
+    void SetTsPtr(weak_ptr<TsEntity> ts);
+
+    /* Bind, Unbind */
 	void Bind(shared_ptr<PstsEntity> psts);
 	void Unbind(shared_ptr<PstsEntity>);
 	void Bind(weak_ptr<PstsEntity> psts);
@@ -156,32 +155,30 @@ class RefsEventEntity : public std::enable_shared_from_this<RefsEventEntity>
 {
 public:
     friend class MemberHelper;
+    typedef list<shared_ptr<MovieEntity>> Movies;
 
     RefsEventEntity(TableId id, shared_ptr<EventId> eventId,
-        shared_ptr<TimePoint> startTimePoint, shared_ptr<Duration> duration);
+        shared_ptr<system_clock::time_point> startTimePoint, shared_ptr<seconds> duration);
     RefsEventEntity();
     RefsEventEntity(const RefsEventEntity& right);
     RefsEventEntity(TableId id, EventId eventId,
-        TimePoint startTimePoint, Duration duration);
+        system_clock::time_point startTimePoint, seconds duration);
     virtual ~RefsEventEntity();
 
     TableId GetId() const;
     void SetId(TableId id);
 
-    shared_ptr<EventId> GetEventId() const;
-    void SetEventId(shared_ptr<EventId> eventId);
+    EventId GetEventId() const;
     void SetEventId(EventId eventId);
 
-    shared_ptr<TimePoint> GetStartTimePoint() const;
-    void SetStartTimePoint(shared_ptr<TimePoint> startTimePoint);
-    void SetStartTimePoint(TimePoint startTimePoint);
+    system_clock::time_point GetStartTimePoint() const;
+    void SetStartTimePoint(system_clock::time_point startTimePoint);
 
-    shared_ptr<Duration> GetDuration() const;
-    void SetDuration(shared_ptr<Duration> duration);
-    void SetDuration(Duration duration);
+    seconds GetDuration() const;
+    void SetDuration(seconds duration);
 
-    weak_ptr<RefsEntity> GetRefs() const;
-    void SetRefs(weak_ptr<RefsEntity> refs);
+    shared_ptr<RefsEntity> GetRefs() const;
+    void SetRefs(shared_ptr<RefsEntity> refs);
 
     const list<shared_ptr<MovieEntity>>& GetMovies() const;
     list<shared_ptr<MovieEntity>>& GetMovies();
@@ -205,6 +202,9 @@ public:
     string ToString() const;
 
 private:
+    weak_ptr<RefsEntity> GetRefsPtr() const;
+    void SetRefsPtr(weak_ptr<RefsEntity> refs);
+
     void Bind(shared_ptr<RefsEntity> refs);
     void Unbind(shared_ptr<RefsEntity>);
     void Bind(weak_ptr<RefsEntity> refs);
@@ -222,8 +222,8 @@ private:
 private:
     TableId id;                                   /* not null */
     shared_ptr<EventId> eventId;                  /* not null */
-    shared_ptr<TimePoint> startTimePoint;         /* not null */
-    shared_ptr<Duration> duration;                /* not null */
+    shared_ptr<system_clock::time_point> startTimePoint;         /* not null */
+    shared_ptr<seconds> duration;                 /* not null */
 
     weak_ptr<RefsEntity> refs;                   /* not null */
     list<shared_ptr<MovieEntity>> movies;         /* value not null */
@@ -246,16 +246,13 @@ public:
     TableId GetId() const;
     void SetId(TableId id);
 
-    shared_ptr<MovieId> GetMovieId() const;
-    void SetMovieId(shared_ptr<MovieId> movieId);
+    MovieId GetMovieId() const;
     void SetMovieId(MovieId movieId);
 
-    shared_ptr<string> GetRemotePath() const;
-    void SetRemotePath(shared_ptr<string> remotePath);
+    const string& GetRemotePath() const;
     void SetRemotePath(const string& remotePath);
 
-    shared_ptr<string> GetLocalPath() const;
-    void SetLocalPath(shared_ptr<string> localPath);
+    const string& GetLocalPath() const;
     void SetLocalPath(const string& localPath);
 
     const list<weak_ptr<RefsEventEntity>>& GetRefsEvents() const;
@@ -295,16 +292,13 @@ public:
 	TableId GetId() const;
 	void SetId(TableId id);
 
-	shared_ptr<PosterId> GetPosterId() const;
-	void SetPosterId(shared_ptr<PosterId> posterId);
+	PosterId GetPosterId() const;
 	void SetPosterId(PosterId posterId);
 
-	shared_ptr<string> GetRemotePath() const;
-	void SetRemotePath(shared_ptr<string> remotePath);
+    const string& GetRemotePath() const;
 	void SetRemotePath(const string& remotePath);
 
-	shared_ptr<string> GetLocalPath() const;
-	void SetLocalPath(shared_ptr<string> localPath);
+    const string& GetLocalPath() const;
 	void SetLocalPath(const string& localPath);
 
     const list<weak_ptr<RefsEventEntity>>& GetRefsEvents() const;
@@ -334,6 +328,7 @@ class TmssEntity : public std::enable_shared_from_this<TmssEntity>
 {
 public:
     friend class MemberHelper;
+    typedef list<shared_ptr<TmssEventEntity>> TmssEvents;
 
     TmssEntity(TableId id, shared_ptr<ServiceId> serviceId, 
 		shared_ptr<Pid> pmtPid, shared_ptr<Pid> pcrPid, shared_ptr<Pid> audioPid, shared_ptr<Pid> videoPid,
@@ -346,32 +341,27 @@ public:
     TableId GetId() const;
     void SetId(TableId id);
 
-    shared_ptr<ServiceId> GetServiceId() const;
-    void SetServiceId(shared_ptr<ServiceId> serviceId);
+    ServiceId GetServiceId() const;
     void SetServiceId(ServiceId serviceId);
 
-	shared_ptr<Pid> GetPmtPid() const;
-	void SetPmtPid(shared_ptr<Pid> pmtPid);
+    Pid GetPmtPid() const;
 	void SetPmtPid(Pid pmtPid);
 
-	shared_ptr<Pid> GetPcrPid() const;
-	void SetPcrPid(shared_ptr<Pid> pcrPid);
+    Pid GetPcrPid() const;
 	void SetPcrPid(Pid pcrPid);
 
-	shared_ptr<Pid> GetAudioPid() const;
-	void SetAudioPid(shared_ptr<Pid> audioPid);
+    Pid GetAudioPid() const;
 	void SetAudioPid(Pid audioPid);
 
-	shared_ptr<Pid> GetVideoPid() const;
-	void SetVideoPid(shared_ptr<Pid> videoPid);
+    Pid GetVideoPid() const;
 	void SetVideoPid(Pid videoPid);
 
 	shared_ptr<string> GetDescription() const;
 	void SetDescription(shared_ptr<string> description);
 	void SetDescription(const string& description);
 
-    weak_ptr<TsEntity> GetTs() const;
-    void SetTs(weak_ptr<TsEntity> ts);
+    shared_ptr<TsEntity> GetTs() const;
+    void SetTs(shared_ptr<TsEntity> ts);
 
     const list<shared_ptr<TmssEventEntity>>& GetTmssEvents() const;
     list<shared_ptr<TmssEventEntity>>& GetTmssEvents();
@@ -383,6 +373,9 @@ public:
     string ToString() const;
 
 private:
+    weak_ptr<TsEntity> GetTsPtr() const;
+    void SetTsPtr(weak_ptr<TsEntity> ts);
+
     void Bind(shared_ptr<TsEntity> ts);
     void Unbind(shared_ptr<TsEntity>);
     void Bind(weak_ptr<TsEntity> ts);
@@ -411,30 +404,27 @@ public:
     friend class MemberHelper;
 
     TmssEventEntity(TableId id, shared_ptr<EventId> eventId,
-        shared_ptr<TimePoint> startTimePoint, shared_ptr<Duration> duration);
+        shared_ptr<system_clock::time_point> startTimePoint, shared_ptr<seconds> duration);
     TmssEventEntity();
     TmssEventEntity(const TmssEventEntity& right);
     TmssEventEntity(TableId id, EventId eventId,
-        TimePoint startTimePoint, Duration duration);
+        system_clock::time_point startTimePoint, seconds duration);
     virtual ~TmssEventEntity();
 
     TableId GetId() const;
     void SetId(TableId id);
 
-    shared_ptr<EventId> GetEventId() const;
-    void SetEventId(shared_ptr<EventId> eventId);
+    EventId GetEventId() const;
     void SetEventId(EventId eventId);
 
-    shared_ptr<TimePoint> GetStartTimePoint() const;
-    void SetStartTimePoint(shared_ptr<TimePoint> startTimePoint);
-    void SetStartTimePoint(TimePoint startTimePoint);
+    system_clock::time_point GetStartTimePoint() const;
+    void SetStartTimePoint(system_clock::time_point startTimePoint);
 
-    shared_ptr<Duration> GetDuration() const;
-    void SetGetDuration(shared_ptr<Duration> duration);
-    void SetGetDuration(Duration duration);
+    seconds GetDuration() const;
+    void SetGetDuration(seconds duration);
 
-    weak_ptr<TmssEntity> GetTmss() const;
-    void SetTmss(weak_ptr<TmssEntity> tmss);
+    shared_ptr<TmssEntity> GetTmss() const;
+    void SetTmss(shared_ptr<TmssEntity> tmss);
 
     shared_ptr<RefsEventEntity> GetRefsEvent() const;
     void SetRefsEvent(shared_ptr<RefsEventEntity> refsEvent);
@@ -445,6 +435,9 @@ public:
     string ToString() const;
 
 private:
+    weak_ptr<TmssEntity> GetTmssPtr() const;
+    void SetTmssPtr(weak_ptr<TmssEntity> tmss);
+
     void Bind(shared_ptr<TmssEntity> tmss);
     void Unbind(shared_ptr<TmssEntity>);
     void Bind(weak_ptr<TmssEntity> tmss);
@@ -456,8 +449,8 @@ private:
 private:
     TableId id;                            /* not null */
     shared_ptr<EventId> eventId;           /* not null */
-    shared_ptr<TimePoint> startTimePoint;  /* not null */
-    shared_ptr<Duration> duration;         /* not null */
+    shared_ptr<system_clock::time_point> startTimePoint;  /* not null */
+    shared_ptr<seconds> duration;         /* not null */
 
     weak_ptr<TmssEntity> tmss;             /* not null */
     shared_ptr<RefsEventEntity> refsEvent; /* not null */
@@ -484,22 +477,18 @@ public:
 	TableId GetId() const;
 	void SetId(TableId id);
 
-	shared_ptr<ServiceId> GetServiceId() const;
-	void SetServiceId(shared_ptr<ServiceId> serviceId);
+	ServiceId GetServiceId() const;
 	void SetServiceId(ServiceId serviceId);
 
-	shared_ptr<Pid> GetPmtPid() const;
-	void SetPmtPid(shared_ptr<Pid> pmtPid);
+	Pid GetPmtPid() const;
 	void SetPmtPid(Pid pmtPid);
 
 	/* stream_type in TS_program_map_section */
-	shared_ptr<StreamType> GetStreamType() const;
-	void SetStreamType(shared_ptr<StreamType> streamType);
+	StreamType GetStreamType() const;
 	void SetStreamType(StreamType streamType);
 
 	/* elementary_PID in TS_program_map_section */
-	shared_ptr<Pid> GetPosterPid() const;
-	void SetPosterPid(shared_ptr<Pid> posterPid);
+	Pid GetPosterPid() const;
 	void SetPosterPid(Pid posterPid);
 
     weak_ptr<RefsEntity> GetRefs() const;
@@ -527,38 +516,31 @@ class GlobalCfgEntity : public std::enable_shared_from_this<GlobalCfgEntity>
 public:
     friend class MemberHelper;
 
-    GlobalCfgEntity(TableId id, shared_ptr<Duration> patInterval,
-        shared_ptr<Duration> pmtInterval, shared_ptr<Duration> posterInterval);
+    GlobalCfgEntity(TableId id, shared_ptr<milliseconds> patInterval,
+        shared_ptr<milliseconds> pmtInterval, shared_ptr<milliseconds> posterInterval);
     GlobalCfgEntity();
     GlobalCfgEntity(const GlobalCfgEntity& right);
-    GlobalCfgEntity(TableId id, Duration patInterval,
-        Duration pmtInterval, Duration posterInterval);
+    GlobalCfgEntity(TableId id, milliseconds patInterval,
+        milliseconds pmtInterval, milliseconds posterInterval);
     ~GlobalCfgEntity();
 
     TableId GetId() const;
     void SetId(TableId id);
 
-    shared_ptr<Duration> GetPatInterval() const;
-    void SetPatInterval(shared_ptr<Duration> patInterval);
-    void SetPatInterval(Duration patInterval);
+    milliseconds GetPatInterval() const;
+    void SetPatInterval(milliseconds patInterval);
 
-    shared_ptr<Duration> GetPmtInterval() const;
-    void SetPmtInterval(shared_ptr<Duration> pmtInterval);
-    void SetPmtInterval(Duration pmtInterval);
+    milliseconds GetPmtInterval() const;
+    void SetPmtInterval(milliseconds pmtInterval);
 
-    shared_ptr<Duration> GetPosterInterval() const;
-    void SetPosterInterval(shared_ptr<Duration> posterInterval);
-    void SetPosterInterval(Duration posterInterval);
-
-private:
-    void Bind(weak_ptr<DataPipeTsEntity> dataPipeTs);
-    void Unbind(weak_ptr<DataPipeTsEntity> dataPipeTs);
-
+    milliseconds GetPosterInterval() const;
+    void SetPosterInterval(milliseconds posterInterval);
+    
 private:
     TableId id;                  /* not null */
-    shared_ptr<Duration> patInterval;
-    shared_ptr<Duration> pmtInterval;
-    shared_ptr<Duration> posterInterval;
+    shared_ptr<milliseconds> patInterval;
+    shared_ptr<milliseconds> pmtInterval;
+    shared_ptr<milliseconds> posterInterval;
 };
 
 #endif

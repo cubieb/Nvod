@@ -1,10 +1,19 @@
 #ifndef _BaseType_h_
 #define _BaseType_h_
 
-#include <cstdint>
-
-#include <cstdint>
-#include <chrono>
+#if defined(__cplusplus)
+#   ifdef _WIN32
+#       include <cstdint>
+#   else
+#       if GCC_VERSION > 40600
+#           include <cstdint>
+#       else
+#           include <stdint.h>
+#       endif
+#   endif
+#else
+#   include <stdint.h>
+#endif  //#if defined(__cplusplus)
 
 typedef unsigned char uchar_t;
 typedef unsigned int uint_t;
@@ -17,12 +26,6 @@ typedef uint16_t ServiceId;
 typedef uint16_t EventId;
 typedef uint16_t MovieId;
 typedef uint16_t PosterId;
-
-#define InvalidTsId       0
-#define InvalidServiceId  0
-#define InvalidEventId    0
-#define InvalidMovieId    0
-#define InvalidPosterId   0
 
 typedef uint8_t  SyncByte;
 typedef uint16_t TransportErrorIndicator;
@@ -57,10 +60,5 @@ typedef uint16_t DdtSectionNumber;
 
 #define TsPacketSize    188
 #define TsPacketBufSize 1316 /* (TsPacketSize * 7) */
-
-typedef std::chrono::steady_clock::time_point TimePoint;
-typedef std::chrono::steady_clock::duration Duration;
-typedef std::chrono::seconds Seconds;
-typedef std::chrono::milliseconds Milliseconds;
 
 #endif

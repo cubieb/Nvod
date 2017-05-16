@@ -1,6 +1,10 @@
 #ifndef _Debug_h_
 #define _Debug_h_
 
+#include <string>
+#include <map>
+#include <chrono>
+
 std::ostream& DbgClearStream(char const*, uint32_t);
 std::ostream& DbgOstream(char const*, uint32_t);
 std::ostream& ErrOstream(char const*, uint32_t);
@@ -15,13 +19,6 @@ std::wostream& ErrWostream(char const* funcName, uint32_t line);
 #define dbgwstrm DbgWostream(__func__, __LINE__)
 #define errwstrm ErrWostream(__func__, __LINE__)
 
-/*Example:  
-    char a = 10;  
-    cout <<  DbgExpandVar(a, int);
-    out put:  a = 10
-*/
-#define DbgExpandVar(v, type) #v << " = " << (type)v
-
 /*
 Example:
     DebugFlag debugFlag;
@@ -30,16 +27,21 @@ Example:
 class DebugFlag
 {
 public:
-    DebugFlag();
+    static DebugFlag& GetInstance()
+    {
+        static DebugFlag instance;
+        return instance;
+    }
 
     bool GetState(std::string const& funcName);
     void SetState(std::string const& funcName, bool doDebug);
 
 private:
-    static std::map<std::string, bool> flags;
+    DebugFlag();
+    std::map<std::string, bool> flags;
 };
 
-#define Printf(...) \
+#define Print(...) \
 {   const char* func = __func__; int line = __LINE__; \
     DebugFlag flag;                     \
     if (flag.GetState(func))            \

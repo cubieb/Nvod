@@ -17,13 +17,14 @@ using std::shared_ptr;
 class StaticConfigWrapper : public StaticConfigWrapperInterface
 {
 public:
-    StaticConfigWrapper() {};
-    ~StaticConfigWrapper() {};
-
-    void Read(const char *xmlPath);
+    StaticConfigWrapper(const char *xmlPath);
+    ~StaticConfigWrapper();    
 
     shared_ptr<GlobalCfgEntity> GetGlobalCfgEntity();
     list<shared_ptr<TsEntity>>& GetTsEntities();
+
+private:
+    void Read(const char *xmlPath);
 
 private:
     shared_ptr<GlobalCfgEntity> globalCfgEntity;

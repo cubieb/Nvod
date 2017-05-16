@@ -4,9 +4,9 @@
     <Tx>
         <TransportStreamList>
             <TransportStream TsId="1">
-                <SrcIp>10.0.0.2</SrcIp>
-                <DstIp>224.1.1.1</DstIp>
-                <DstUdpPort>5001</DstUdpPort>
+                <SrcIp>127.0.0.1</SrcIp>
+                <DstIp>127.0.0.1</DstIp>
+                <DstUdpPort>1234</DstUdpPort>
             </TransportStream>
         </TransportStreamList>
     </Tx>
@@ -15,9 +15,9 @@
         <ReferenceTransportStream TsId="1">
             <ReferenceService Id="1">
                 <PosterService>
-                    <ServiceId>1</ServiceId>
-                    <PmtPid>101</PmtPid>
-                    <DataPipePid>500</DataPipePid>
+                    <ServiceId>2</ServiceId>
+                    <PmtPid>201</PmtPid>
+                    <DataPipePid>201</DataPipePid>
                 </PosterService>
             </ReferenceService>
         </ReferenceTransportStream>
@@ -25,18 +25,24 @@
 
     <TimeShiftedTransportStreamList>
         <TimeShiftedTransportStream TsId="1">
-            <Service Id="1">
-                <PmtPid>201</PmtPid>
-                <PcrPid>202</PcrPid>
-                <AudioPid>203</AudioPid>
-                <VideoPid>204</VideoPid>
+            <Service Id="3">
+                <PmtPid>301</PmtPid>
+                <PcrPid>302</PcrPid>
+                <AudioPid>303</AudioPid>
+                <VideoPid>304</VideoPid>
+            </Service>
+            <Service Id="4">
+                <PmtPid>401</PmtPid>
+                <PcrPid>402</PcrPid>
+                <AudioPid>403</AudioPid>
+                <VideoPid>404</VideoPid>
             </Service>
         </TimeShiftedTransportStream>
     </TimeShiftedTransportStreamList>
 
     <SendingIntervalMilliseconds>
-        <Pat>500</Pat>
-        <Pmt>500</Pmt>
-        <Poster>2000</Poster>
+        <Pat>100</Pat>
+        <Pmt>100</Pmt>
+        <Poster>100</Poster>
     </SendingIntervalMilliseconds>
 </root>

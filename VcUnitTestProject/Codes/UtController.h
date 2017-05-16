@@ -12,14 +12,14 @@ CxxBeginNameSpace(UnitTest)
 class UtController : public CPPUNIT_NS::TestFixture
 {
     CPPUNIT_TEST_SUITE(UtController);
-    CPPUNIT_TEST(TestAddMovie);
+    CPPUNIT_TEST(TestStart);
     CPPUNIT_TEST_SUITE_END();
 
 public:
     void setUp();
 
 protected:
-    void TestAddMovie();
+    void TestStart();
 };
 
 CxxEndNameSpace

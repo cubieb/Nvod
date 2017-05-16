@@ -20,7 +20,7 @@ TableIndexHelper::TableIndexHelper()
     {
         { "Refs", 1 }, { "RefsEvent", 1 }, 
         { "Tmss", 1 }, { "TmssEvent", 1 },
-		{ "Movie", 1 }, { "Poster", 1 },
+		{ "MovieOrPoster", 1 }, 
         { "GlobalCfg", 1 }, {"Ts", 1}
     };
 }

@@ -73,6 +73,15 @@
     <Filter Include="CommonCodes\源文件\Functions-L1\XmlWrapper">
       <UniqueIdentifier>{65e90fb6-220d-4025-b662-c39948fadd40}</UniqueIdentifier>
     </Filter>
+    <Filter Include="CommonCodes\头文件\Type">
+      <UniqueIdentifier>{39c040c4-e429-4cb5-817f-44f690544029}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="CommonCodes\源文件\Functions-L1\WebService">
+      <UniqueIdentifier>{d1a89452-4cef-4873-bcb9-a5b7c170f3f1}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="CommonCodes\源文件\Functions-L2\SocketServer">
+      <UniqueIdentifier>{0de0dac7-a0ef-42be-8cc4-4eff88fc754b}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\Codes\LibLinking.cpp">
@@ -86,9 +95,6 @@
     </ClCompile>
     <ClCompile Include="Codes\UtController.cpp">
       <Filter>源文件</Filter>
-    </ClCompile>
-    <ClCompile Include="..\Codes\Command.cpp">
-      <Filter>CommonCodes\源文件\Functions-L1\Miscellaneous</Filter>
     </ClCompile>
     <ClCompile Include="..\Codes\Controller.cpp">
       <Filter>CommonCodes\源文件\Functions-L3</Filter>
@@ -120,12 +126,6 @@
     <ClCompile Include="..\Codes\Crc32.cpp">
       <Filter>CommonCodes\源文件\Foundation</Filter>
     </ClCompile>
-    <ClCompile Include="..\Codes\TmssPlayerCookie.cpp">
-      <Filter>CommonCodes\源文件\Functions-L2\TmssPlayer</Filter>
-    </ClCompile>
-    <ClCompile Include="..\Codes\PatPlayerCookie.cpp">
-      <Filter>CommonCodes\源文件\Functions-L2\PatPlayer</Filter>
-    </ClCompile>
     <ClCompile Include="..\Codes\PatPlayer.cpp">
       <Filter>CommonCodes\源文件\Functions-L2\PatPlayer</Filter>
     </ClCompile>
@@ -133,9 +133,6 @@
       <Filter>源文件</Filter>
     </ClCompile>
     <ClCompile Include="..\Codes\RefsPlayer.cpp">
-      <Filter>CommonCodes\源文件\Functions-L2\RefsPlayer</Filter>
-    </ClCompile>
-    <ClCompile Include="..\Codes\RefsPlayerCookie.cpp">
       <Filter>CommonCodes\源文件\Functions-L2\RefsPlayer</Filter>
     </ClCompile>
     <ClCompile Include="Codes\UtRefsPlayer.cpp">
@@ -153,6 +150,21 @@
     <ClCompile Include="..\Codes\DynamicConfigWrapper.cpp">
       <Filter>CommonCodes\源文件\Functions-L1\XmlWrapper</Filter>
     </ClCompile>
+    <ClCompile Include="..\Codes\NvodWebUrlWrapper.cpp">
+      <Filter>CommonCodes\源文件\Functions-L1\XmlWrapper</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Codes\WebService.cpp">
+      <Filter>CommonCodes\源文件\Functions-L1\WebService</Filter>
+    </ClCompile>
+    <ClCompile Include="Codes\UtWebService.cpp">
+      <Filter>源文件</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Codes\CurlOutputHandler.cpp">
+      <Filter>CommonCodes\源文件\Functions-L1\Miscellaneous</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Codes\SocketServer.cpp">
+      <Filter>CommonCodes\源文件\Functions-L2\SocketServer</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\Codes\ClassFactories.h">
@@ -164,9 +176,6 @@
     <ClInclude Include="Codes\UtController.h">
       <Filter>头文件</Filter>
     </ClInclude>
-    <ClInclude Include="..\Codes\Database.h">
-      <Filter>CommonCodes\头文件\Foundation</Filter>
-    </ClInclude>
     <ClInclude Include="..\Codes\ControllerInterface.h">
       <Filter>CommonCodes\头文件\Functions-L3</Filter>
     </ClInclude>
@@ -175,9 +184,6 @@
     </ClInclude>
     <ClInclude Include="..\Codes\Entities.h">
       <Filter>CommonCodes\头文件\Entity</Filter>
-    </ClInclude>
-    <ClInclude Include="..\Codes\Command.h">
-      <Filter>CommonCodes\源文件\Functions-L1\Miscellaneous</Filter>
     </ClInclude>
     <ClInclude Include="..\Codes\Controller.h">
       <Filter>CommonCodes\源文件\Functions-L3</Filter>
@@ -190,9 +196,6 @@
     </ClInclude>
     <ClInclude Include="..\Codes\TmssPlayer.h">
       <Filter>CommonCodes\源文件\Functions-L2\TmssPlayer</Filter>
-    </ClInclude>
-    <ClInclude Include="..\Codes\BaseType.h">
-      <Filter>CommonCodes\头文件\Foundation</Filter>
     </ClInclude>
     <ClInclude Include="Codes\UtTmssPlayer.h">
       <Filter>头文件</Filter>
@@ -233,22 +236,13 @@
     <ClInclude Include="..\Codes\Crc32.h">
       <Filter>CommonCodes\头文件\Foundation</Filter>
     </ClInclude>
-    <ClInclude Include="..\Codes\TmssPlayerCookie.h">
-      <Filter>CommonCodes\源文件\Functions-L2\TmssPlayer</Filter>
-    </ClInclude>
     <ClInclude Include="..\Codes\PatPlayer.h">
-      <Filter>CommonCodes\源文件\Functions-L2\PatPlayer</Filter>
-    </ClInclude>
-    <ClInclude Include="..\Codes\PatPlayerCookie.h">
       <Filter>CommonCodes\源文件\Functions-L2\PatPlayer</Filter>
     </ClInclude>
     <ClInclude Include="Codes\UtPatPlayer.h">
       <Filter>头文件</Filter>
     </ClInclude>
     <ClInclude Include="..\Codes\RefsPlayer.h">
-      <Filter>CommonCodes\源文件\Functions-L2\RefsPlayer</Filter>
-    </ClInclude>
-    <ClInclude Include="..\Codes\RefsPlayerCookie.h">
       <Filter>CommonCodes\源文件\Functions-L2\RefsPlayer</Filter>
     </ClInclude>
     <ClInclude Include="Codes\UtRefsPlayer.h">
@@ -268,6 +262,33 @@
     </ClInclude>
     <ClInclude Include="..\Codes\DynamicConfigWrapper.h">
       <Filter>CommonCodes\源文件\Functions-L1\XmlWrapper</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Codes\BaseType.h">
+      <Filter>CommonCodes\头文件\Type</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Codes\NvodWebUrlWrapper.h">
+      <Filter>CommonCodes\源文件\Functions-L1\XmlWrapper</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Codes\WebService.h">
+      <Filter>CommonCodes\源文件\Functions-L1\WebService</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Codes\WebServiceInterface.h">
+      <Filter>CommonCodes\头文件\Functions-L1</Filter>
+    </ClInclude>
+    <ClInclude Include="Codes\UtWebService.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Codes\CurlOutputHandler.h">
+      <Filter>CommonCodes\源文件\Functions-L1\Miscellaneous</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Codes\ResultCode.h">
+      <Filter>CommonCodes\头文件\Foundation</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Codes\SocketServer.h">
+      <Filter>CommonCodes\源文件\Functions-L2\SocketServer</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Codes\SocketServerInterface.h">
+      <Filter>CommonCodes\头文件\Functions-L2</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>

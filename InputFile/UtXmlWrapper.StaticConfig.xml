@@ -1,0 +1,48 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+
+<root>
+    <Tx>
+        <TransportStreamList>
+            <TransportStream TsId="1">
+                <SrcIp>192.168.3.60</SrcIp>
+                <DstIp>127.0.0.1</DstIp>
+                <DstUdpPort>1234</DstUdpPort>
+            </TransportStream>
+        </TransportStreamList>
+    </Tx>
+
+    <ReferenceTransportStreamList>
+        <ReferenceTransportStream TsId="1">
+            <ReferenceService Id="1">
+                <PosterService>
+                    <ServiceId>2</ServiceId>
+                    <PmtPid>201</PmtPid>
+                    <DataPipePid>202</DataPipePid>
+                </PosterService>
+            </ReferenceService>
+        </ReferenceTransportStream>
+    </ReferenceTransportStreamList>
+
+    <TimeShiftedTransportStreamList>
+        <TimeShiftedTransportStream TsId="1">
+            <Service Id="3">
+                <PmtPid>301</PmtPid>
+                <PcrPid>302</PcrPid>
+                <AudioPid>303</AudioPid>
+                <VideoPid>304</VideoPid>
+            </Service>
+            <Service Id="4">
+                <PmtPid>401</PmtPid>
+                <PcrPid>402</PcrPid>
+                <AudioPid>403</AudioPid>
+                <VideoPid>404</VideoPid>
+            </Service>
+        </TimeShiftedTransportStream>
+    </TimeShiftedTransportStreamList>
+
+    <SendingIntervalMilliseconds>
+        <Pat>100</Pat>
+        <Pmt>101</Pmt>
+        <Poster>102</Poster>
+    </SendingIntervalMilliseconds>
+</root>

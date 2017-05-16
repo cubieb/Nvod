@@ -20,14 +20,21 @@ using namespace std;
 using namespace std::placeholders;
 
 /**********************class TableIndexHelperInterface**********************/
-StaticConfigWrapperInterface& StaticConfigWrapperInterface::GetInstance()
+StaticConfigWrapperInterface* StaticConfigWrapperInterface::CreateInstance(const char *xmlPath)
 {
-    /* In C++11, the following is guaranteed to perform thread-safe initialisation: */
-    static StaticConfigWrapper instance;
-    return instance;
+    return new StaticConfigWrapper(xmlPath);
 }
 
 /**********************class StaticConfigWrapper**********************/
+StaticConfigWrapper::StaticConfigWrapper(const char *xmlPath)
+{
+    Read(xmlPath);
+}
+
+StaticConfigWrapper::~StaticConfigWrapper()
+{}
+
+/* private functions */
 void StaticConfigWrapper::Read(const char *xmlPath)
 {    
     if ((access(xmlPath, 0)) != 0)
@@ -104,7 +111,7 @@ void StaticConfigWrapper::Read(const char *xmlPath)
     }
 
     auto cmpts = [](TsId tsId, shared_ptr<TsEntity> tsEntity) ->bool
-    { return tsId == *tsEntity->GetTsId(); };
+    { return tsId == tsEntity->GetTsId(); };
 
     for (int i = 0; i < nodes->nodeNr; ++i)
     {
@@ -203,7 +210,7 @@ void StaticConfigWrapper::Read(const char *xmlPath)
 
     TableId tableId = tableIndexHelper.GetUseableTableIndex("GlobalCfg");
     globalCfgEntity = make_shared<GlobalCfgEntity>(tableId, 
-        Milliseconds(patIntv), Milliseconds(posterIntv), Milliseconds(posterIntv));
+        milliseconds(patIntv), milliseconds(pmtIntv), milliseconds(posterIntv));
 
     xmlCleanupParser();
 }

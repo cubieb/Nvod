@@ -7,28 +7,46 @@
 #include "TransportPacketInterface.h"
 #include "PacketHelper.h"
 
-#include "PatPlayerCookie.h"
-
 using namespace std;
 using namespace std::chrono;
 
 typedef ClassFactoriesRegistor<PlayerInterface, string, shared_ptr<GlobalCfgEntity>, shared_ptr<TsEntity>> Registor;
 RegisterClassFactory(Registor, reg, "PatPlayer", PatPlayer::CreateInstance);
 
-PatPlayer::PatPlayer(shared_ptr<GlobalCfgEntity> dataPipeGlobal, shared_ptr<TsEntity> ts)
-	: cookie(dataPipeGlobal, ts)
-{}
+PatPlayer::PatPlayer(shared_ptr<GlobalCfgEntity> globalCfg, shared_ptr<TsEntity> ts)
+{
+    isOnGoing = false;
+
+	this->globalCfg = make_shared<GlobalCfgEntity>(*globalCfg);
+
+	this->ts = make_shared<TsEntity>(*ts);
+	list<shared_ptr<RefsEntity>>& refses = ts->GetRefses();
+	for (auto iter = refses.begin(); iter != refses.end(); ++iter)
+	{
+		shared_ptr<RefsEntity> refs = make_shared<RefsEntity>(**iter);
+
+		refs->SetPsts(make_shared<PstsEntity>(*(*iter)->GetPsts()));
+		this->ts->Bind(refs);
+	}
+
+	list<shared_ptr<TmssEntity>>& tmsses = ts->GetTmsses();
+	for (auto iter = tmsses.begin(); iter != tmsses.end(); ++iter)
+	{
+		this->ts->Bind(make_shared<TmssEntity>(**iter));
+	}
+}
 
 PatPlayer::~PatPlayer()
 {}
 
 void PatPlayer::Start()
 {
-    thePatThread = thread(bind(&PatPlayer::ThePatThreadMain, this));
+    {
+        std::lock_guard<std::mutex> lock(mtx);
+        isOnGoing = true;
+    }
 
-    std::lock_guard<std::mutex> lock(mtx);
-    isOnGoing = true;
-    cv.notify_one();
+    thePatThread = thread(bind(&PatPlayer::ThePatThreadMain, this));
 }
 
 void PatPlayer::Stop()
@@ -50,98 +68,73 @@ bool PatPlayer::IsRunning()
 /* private functions */
 void PatPlayer::ThePatThreadMain()
 {
-    socketFd = socket(AF_INET, SOCK_DGRAM, IPPROTO_UDP);
+	int socketFd = socket(AF_INET, SOCK_DGRAM, IPPROTO_UDP);
+	ContinuityCounter patContinuityCounter = 0;
 
-    Duration duration = *cookie.GetGlobalCfg()->GetPatInterval();
+	milliseconds duration = globalCfg->GetPatInterval();
     while (true)
     {
         std::unique_lock<std::mutex> lock(mtx);
         if (cv.wait_for(lock, duration, [this]{return !isOnGoing; }))
             break;
 
-        HandlePatTimer();
+		HandlePatTimer(socketFd, patContinuityCounter);
     }
 
     closesocket(socketFd);
 }
 
-void PatPlayer::HandlePatTimer()
+void PatPlayer::HandlePatTimer(int socketFd, ContinuityCounter& continuityCounter)
 {
-    size_t const bufSize = TsPacketSize * std::numeric_limits<DitSectionNumber>::max();
-    uchar_t *buffer = new uchar_t[bufSize];
-    uchar_t *bptr = buffer;
+    size_t const size = TsPacketSize * std::numeric_limits<DitSectionNumber>::max();
+    uchar_t *buffer = new uchar_t[size];
+    uchar_t *ptr = buffer;
 
-    shared_ptr<TransportPacketHelperInterface> tsHelper(TransportPacketHelperInterface::CreateInstance(bptr));
-    tsHelper->SetSyncByte(0x47);
-    tsHelper->SetTransportErrorIndicator(0);
-    tsHelper->SetPayloadUnitStartIndicator(1);
-    tsHelper->SetTransportPriority(0);
-    tsHelper->SetPid(0);
-    tsHelper->SetTransportScramblingControl(0);
-    tsHelper->SetAdaptationFieldControl(1);
-    tsHelper->SetContinuityCounter(cookie.GetNewPatContinuityCounter());
+	shared_ptr<TransportPacketHelperInterface> tsHelper(
+		TransportPacketHelperInterface::CreateInstance(buffer, 1, 0, continuityCounter)
+		);
 
-    shared_ptr<PatHelperInterface> patHelper(PatHelperInterface::CreateInstance(tsHelper->GetPayLoadHeader()));
-    patHelper->SetSectionLength(patHelper->GetMinSectionLength());
-    patHelper->SetTransportStreamId(*cookie.GetTs()->GetTsId());
-    patHelper->SetVersionNumber(0);
-    patHelper->SetCurrentNextIndicator(1);
-    patHelper->SetSectionMumber(0);
-    patHelper->SetLastSectionMumber(0);
-    
-    auto FillPat = [this, buffer, bufSize, &bptr, &tsHelper, &patHelper](ServiceId serviceId, Pid pmtPid) ->void
-    {
-        if (tsHelper->GetSize() + patHelper->GetSize() + 4 > TsPacketSize)
-        {
-            bptr = bptr + TsPacketSize;
-            assert(bptr < buffer + bufSize);
-            tsHelper.reset(TransportPacketHelperInterface::CreateInstance(bptr));
-            tsHelper->SetSyncByte(0x47);
-            tsHelper->SetTransportErrorIndicator(0);
-            tsHelper->SetPayloadUnitStartIndicator(0);
-            tsHelper->SetTransportPriority(0);
-            tsHelper->SetPid(0);
-            tsHelper->SetTransportScramblingControl(0);
-            tsHelper->SetAdaptationFieldControl(1);
-            tsHelper->SetContinuityCounter(cookie.GetNewPatContinuityCounter());
-
-            patHelper.reset(PatHelperInterface::CreateInstance(tsHelper->GetPayLoadHeader()));
-            patHelper->SetSectionLength(patHelper->GetMinSectionLength());
-            patHelper->SetTransportStreamId(*cookie.GetTs()->GetTsId());
-            patHelper->SetVersionNumber(0);
-            patHelper->SetCurrentNextIndicator(1);
-            patHelper->SetSectionMumber(0);
-            patHelper->SetLastSectionMumber(0);
-        }
-
-        uchar_t *ptr = patHelper->GetHeader() + patHelper->GetSize() - patHelper->GetCrcCodeSize();
-        shared_ptr<PatElementaryInterface> patElementary(PatElementaryInterface::CreateInstance(ptr));
-        patElementary->SetProgramNumber(serviceId);
-        patElementary->SetPmtPid(pmtPid);
-
-        patHelper->SetSectionLength(patHelper->GetSectionLength() + patElementary->GetSize());
-    };
-	
-    list<shared_ptr<RefsEntity>>& refses = cookie.GetTs()->GetRefses();
-    list<shared_ptr<TmssEntity>>& tmsses = cookie.GetTs()->GetTmsses();
+	shared_ptr<PatHelperInterface> patHelper(
+		PatHelperInterface::CreateInstance(tsHelper->GetPayLoadHeader(), ts->GetTsId())
+		);
+ 	
+    list<shared_ptr<RefsEntity>>& refses = ts->GetRefses();
+    list<shared_ptr<TmssEntity>>& tmsses = ts->GetTmsses();
     for (auto iter = refses.begin(); iter != refses.end(); ++iter)
     {
 		shared_ptr<PstsEntity> psts = (*iter)->GetPsts();
-		FillPat(*psts->GetServiceId(), *psts->GetPmtPid());
+
+		uchar_t *ptr = patHelper->GetHeader() + patHelper->GetSize() - patHelper->GetCrcCodeSize();
+		shared_ptr<PatElementaryInterface> patElementary(PatElementaryInterface::CreateInstance(ptr));
+		patElementary->SetProgramNumber(psts->GetServiceId());
+		patElementary->SetPmtPid(psts->GetPmtPid());
+		patHelper->SetSectionLength(patHelper->GetSectionLength() + patElementary->GetSize());
+		assert(tsHelper->GetSize() + patHelper->GetSize() <= TsPacketSize);
     }
 
     for (auto iter = tmsses.begin(); iter != tmsses.end(); ++iter)
     {
-        FillPat(*(*iter)->GetServiceId(), *(*iter)->GetPmtPid());
+		if (tsHelper->GetSize() + patHelper->GetSize() + 4 > TsPacketSize)
+		{
+			tsHelper.reset(TransportPacketHelperInterface::CreateInstance(buffer, 0, 0, continuityCounter));
+			patHelper.reset(PatHelperInterface::CreateInstance(tsHelper->GetPayLoadHeader(), ts->GetTsId()));
+		}
+
+		uchar_t *ptr = patHelper->GetHeader() + patHelper->GetSize() - patHelper->GetCrcCodeSize();
+		shared_ptr<PatElementaryInterface> patElementary(PatElementaryInterface::CreateInstance(ptr));
+		patElementary->SetProgramNumber((*iter)->GetServiceId());
+		patElementary->SetPmtPid((*iter)->GetPmtPid());
+		patHelper->SetSectionLength(patHelper->GetSectionLength() + patElementary->GetSize());
+		assert(tsHelper->GetSize() + patHelper->GetSize() <= TsPacketSize);
     }
 
     SectionNumber cur = 0;
-    SectionNumber last = (bptr - buffer) / TsPacketSize;
-    for (uchar_t *ptr = buffer; ptr <= bptr; ptr = ptr + TsPacketSize)
+	SectionNumber last = (patHelper->GetHeader() + patHelper->GetSize() - buffer) / TsPacketSize;
+	for (uchar_t *ptr = buffer; ptr <= patHelper->GetHeader() + patHelper->GetSize(); ptr = ptr + TsPacketSize)
     {
         tsHelper.reset(TransportPacketHelperInterface::CreateInstance(ptr));
-
         patHelper.reset(PatHelperInterface::CreateInstance(tsHelper->GetPayLoadHeader()));
+
         patHelper->SetSectionMumber(cur++);
         patHelper->SetLastSectionMumber(last);
         patHelper->UpdateCrcCode();
@@ -149,13 +142,13 @@ void PatPlayer::HandlePatTimer()
         tsHelper->FillPad(patHelper->GetSize());
     }
     
-    Send((char*)buffer, TsPacketSize);
+	Send(socketFd, (char*)buffer, TsPacketSize);
     delete buffer;
 }
 
-void PatPlayer::Send(char *buffer, size_t size)
+void PatPlayer::Send(int socketFd, char *buffer, size_t size)
 {
-    struct sockaddr_in dest = *cookie.GetTs()->GetDstAddr();
+    const struct sockaddr_in& dest = ts->GetDstAddr();
 
 #ifdef _DEBUG
     //ofstream ofstrm;    

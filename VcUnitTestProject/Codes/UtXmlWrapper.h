@@ -12,14 +12,18 @@ CxxBeginNameSpace(UnitTest)
 class UtXmlWrapper : public CPPUNIT_NS::TestFixture
 {
     CPPUNIT_TEST_SUITE(UtXmlWrapper);
+    CPPUNIT_TEST(TestNvodWebUrlWrapper);
     CPPUNIT_TEST(TestStaticConfigWrapper);
+    CPPUNIT_TEST(TestDynamicConfigWrapper);
     CPPUNIT_TEST_SUITE_END();
 
 public:
     void setUp();
 
 protected:
+    void TestNvodWebUrlWrapper();
     void TestStaticConfigWrapper();
+    void TestDynamicConfigWrapper();
 };
 
 CxxEndNameSpace

@@ -10,12 +10,23 @@ using std::shared_ptr;
 class GlobalCfgEntity;
 class TsEntity;
 
+class NvodWebUrlWrapperInterface
+{
+public:
+    NvodWebUrlWrapperInterface() {}
+    virtual ~NvodWebUrlWrapperInterface() {}
+    static NvodWebUrlWrapperInterface* CreateInstance(const char *xmlPath);
+
+    virtual const char* GetServiceConfigUrl() const = 0;
+    virtual const char* GetEventConfigUrl() const = 0;
+};
+
 class StaticConfigWrapperInterface
 {
 public:
     StaticConfigWrapperInterface() {}
     virtual ~StaticConfigWrapperInterface() {}
-    static StaticConfigWrapperInterface& GetInstance();
+    static StaticConfigWrapperInterface* CreateInstance(const char *xmlPath);
 
     virtual void Read(const char *xmlPath) = 0;
     virtual shared_ptr<GlobalCfgEntity> GetGlobalCfgEntity() = 0;

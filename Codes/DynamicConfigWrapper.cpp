@@ -67,16 +67,16 @@ void DynamicConfigWrapper::Read(const char *xmlPath, list<shared_ptr<TsEntity>>&
     TableIndexHelperInterface &tableIndexHelper = TableIndexHelperInterface::GetInstance();
 
     auto cmpts = [](TsId tsId, shared_ptr<TsEntity> tsEntity) ->bool
-    { return tsId == *tsEntity->GetTsId(); };
+    { return tsId == tsEntity->GetTsId(); };
 
     auto cmprefs = [](ServiceId serviceId, shared_ptr<RefsEntity> refs) ->bool
-    { return serviceId == *refs->GetServiceId(); };
+    { return serviceId == refs->GetServiceId(); };
 
     auto cmprefsevent = [](EventId eventId, shared_ptr<RefsEventEntity> refsEvent) ->bool
-    { return eventId == *refsEvent->GetEventId(); };
+    { return eventId == refsEvent->GetEventId(); };
 
     auto cmptmss = [](ServiceId serviceId, shared_ptr<TmssEntity> tmss) ->bool
-    { return serviceId == *tmss->GetServiceId(); };
+    { return serviceId == tmss->GetServiceId(); };
     
     for (int i = 0; i < nodes->nodeNr; ++i)
     {
@@ -106,8 +106,9 @@ void DynamicConfigWrapper::Read(const char *xmlPath, list<shared_ptr<TsEntity>>&
             tm timeInfo = { 0 };
             std::istringstream ss((const char*)startTime.get());
             ss >> std::get_time(&timeInfo, "%Y-%m-%d %H:%M:%S");
+            /* refer to http://www.cplusplus.com/reference/ctime/gmtime/ */
             shared_ptr<RefsEventEntity> refsEvent = make_shared<RefsEventEntity>(tableId, eventId,
-                TimePoint(Seconds(mktime(&timeInfo))), Seconds(duration));
+                system_clock::from_time_t(mktime(&timeInfo)), seconds(duration));
             (*iterRefs)->Bind(refsEvent);
 
             /* Poster and Movie */
@@ -118,7 +119,7 @@ void DynamicConfigWrapper::Read(const char *xmlPath, list<shared_ptr<TsEntity>>&
                     PosterId posterId = GetXmlAttrValue<PosterId>(child, (const xmlChar*)"Id");
                     SharedXmlChar url = GetXmlContent<SharedXmlChar>(child);
 
-                    tableId = tableIndexHelper.GetUseableTableIndex("Poster");
+                    tableId = tableIndexHelper.GetUseableTableIndex("MovieOrPoster");
                     shared_ptr<PosterEntity> poster = make_shared<PosterEntity>(tableId, posterId, (const char*)url.get());
 
                     ostringstream postOs;
@@ -132,7 +133,7 @@ void DynamicConfigWrapper::Read(const char *xmlPath, list<shared_ptr<TsEntity>>&
                     MovieId movieId = GetXmlAttrValue<MovieId>(child, (const xmlChar*)"Id");
                     SharedXmlChar url = GetXmlContent<SharedXmlChar>(child);
 
-                    tableId = tableIndexHelper.GetUseableTableIndex("Movie");
+                    tableId = tableIndexHelper.GetUseableTableIndex("MovieOrPoster");
                     shared_ptr<MovieEntity> movie = make_shared<MovieEntity>(tableId, movieId, (const char*)url.get());
 
                     ostringstream movieOs;
@@ -206,7 +207,7 @@ void DynamicConfigWrapper::Read(const char *xmlPath, list<shared_ptr<TsEntity>>&
             ss >> std::get_time(&timeInfo, "%Y-%m-%d %H:%M:%S");
 
             shared_ptr<TmssEventEntity> tmssEvent = make_shared<TmssEventEntity>(tableId, eventId,
-                TimePoint(Seconds(mktime(&timeInfo))), Seconds(duration));
+                system_clock::from_time_t(mktime(&timeInfo)), seconds(duration));
             (*iterTmss)->Bind(tmssEvent);
 
             /* Find and Bind RefsEventEntity */

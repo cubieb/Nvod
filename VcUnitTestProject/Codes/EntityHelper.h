@@ -3,15 +3,14 @@
 
 #include <cppunit/extensions/HelperMacros.h>
 
-/* Foundation */
+/* Type */
 #include "BaseType.h"
+
+/* Foundation */
 #include "SystemInclude.h"
 
-class GlobalCfgEntity;
-class TsEntity;
-class RefsEntity;
-class TmssEntity;
-class DataPipeTsEntity;
+/* Entity */
+#include "Entities.h"
 
 /**********************EntityHelper**********************/
 class EntityHelper

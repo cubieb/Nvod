@@ -4,9 +4,6 @@
 /* Curl*/
 #include <curl/curl.h>
 
-/* Entity */
-#include "Entities.h"
-
 /* Functions */
 #include "DownloaderInterface.h"
 
@@ -23,25 +20,25 @@ public:
         return new DownloaderFtp(handler);
     }
 
-    void Download(shared_ptr<MovieEntity> movieEntity);
+    void Download(shared_ptr<FtpResource> ftpResource);
     bool IsRunning();
     void Stop();
-
-private:
-    void ThreadMain();
-    static size_t HandleCurlMessage(void *buffer, size_t size, size_t nmemb, void *para);
 
 private:
     #define TupleIdxMovieEntity 0
     #define TupleIdxCurlPtr     1
     #define TupleIdxFilePtr     2
-    typedef std::tuple<shared_ptr<MovieEntity>, CURL*, std::ofstream*> MovieTuple;
-    std::list<MovieTuple> movieTuples;
-    std::list<shared_ptr<MovieEntity>> movieEntities;
-    Handler handler;
+    typedef std::tuple<shared_ptr<FtpResource>, CURL*, std::ofstream*> FtpResourceTuple;
+
+    void ThreadMain();
+    void CloseDoneCurl(CURLM *mcurl, std::list<FtpResourceTuple>& ftpResourceTuples);
+    static size_t HandleCurlMessage(void *buffer, size_t size, size_t nmemb, void *para);
+
+private:    
     std::mutex mtx;
-    CURLM *mcurl;
     bool isOnGoing;
+    Handler handler;
+    std::list<shared_ptr<FtpResource>> ftpResources;
 
 private:
     std::thread threadMain;

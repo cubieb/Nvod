@@ -44,7 +44,16 @@
 #   define  __PDP_ENDIAN    3412
 #   define  __BYTE_ORDER    __LITTLE_ENDIAN
 
+    /* refer to https://msdn.microsoft.com/en-us/library/ms737629(v=vs.85).aspx for socket header file information */
+//#   ifndef WIN32_LEAN_AND_MEAN
+//#   define WIN32_LEAN_AND_MEAN
+//#   endif
+//#   include <windows.h>
+
 #   include <Winsock2.h>
+//#   include <ws2tcpip.h>
+//#   include <iphlpapi.h>
+
     /* Debug memory leack. */
 #   include "crtdbg.h"
 #   ifdef _DEBUG
@@ -131,6 +140,7 @@
 #   include <assert.h>
 #   include <errno.h>
 #   include <limits.h>
+#   include <stdint.h>
 #   ifdef __GNUC__
 #       include <stdbool.h>
 #   else
