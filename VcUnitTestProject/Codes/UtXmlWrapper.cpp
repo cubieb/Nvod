@@ -44,6 +44,8 @@ void UtXmlWrapper::setUp()
 /* protected function */
 void UtXmlWrapper::TestNvodWebUrlWrapper()
 {
+    CPPUNIT_ASSERT_THROW(NvodWebUrlWrapperInterface::CreateInstance("aBc123DeF.xml"), runtime_error);
+
     const char* xmlPath = ".\\..\\InputFile\\UtXmlWrapper.NvodWebUrl.xml";
     shared_ptr<NvodWebUrlWrapperInterface> nvodWebUrlWrapper(NvodWebUrlWrapperInterface::CreateInstance(xmlPath));
 
@@ -62,7 +64,7 @@ void UtXmlWrapper::TestStaticConfigWrapper()
     CPPUNIT_ASSERT(globalCfg->GetPmtInterval() == milliseconds(101));
     CPPUNIT_ASSERT(globalCfg->GetPosterInterval() == milliseconds(102));
 
-    list<shared_ptr<TsEntity>>& tses = staticConfigWrapper->GetTsEntities();   
+    list<shared_ptr<TsEntity>>& tses = staticConfigWrapper->GetTsEntities();
     CPPUNIT_ASSERT(tses.size() == 1);
     TsEntity& ts = **tses.begin();
     CPPUNIT_ASSERT(ts.GetSrcAddr()->s_addr == inet_addr("192.168.3.60"));

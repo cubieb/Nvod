@@ -52,13 +52,13 @@
       <WarningLevel>Level3</WarningLevel>
       <Optimization>Disabled</Optimization>
       <PreprocessorDefinitions>WIN32;_DEBUG;_CONSOLE;_LIB;%(PreprocessorDefinitions)</PreprocessorDefinitions>
-      <AdditionalIncludeDirectories>..\Codes;..\UnitTestCodes;$(GnuWin32_Home)\include;$(LIBCPPUNIT_HOME)\include;$(LIBCURL_HOME)\include;$(LIBICONV_HOME)\include;$(LIBXML2_HOME)\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>..\Codes;..\UnitTestCodes;$(LIBRESSL_HOME)\include;$(LIBCPPUNIT_HOME)\include;$(LIBCURL_HOME)\include;$(LIBICONV_HOME)\include;$(LIBJSONCPP_HOME)\include;$(LIBXML2_HOME)\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <DisableSpecificWarnings>4068; 4996</DisableSpecificWarnings>
     </ClCompile>
     <Link>
       <SubSystem>Console</SubSystem>
       <GenerateDebugInformation>true</GenerateDebugInformation>
-      <AdditionalLibraryDirectories>$(LIBCPPUNIT_HOME)\lib;$(LIBCURL_HOME);$(LIBICONV_HOME)\lib;$(LIBJSONCPP_HOME)\lib;$(LIBXML2_HOME)\lib</AdditionalLibraryDirectories>
+      <AdditionalLibraryDirectories>$(LIBCPPUNIT_HOME)\lib;$(LIBCURL_HOME);$(LIBICONV_HOME)\lib;$(LIBJSONCPP_HOME)\lib;$(LIBRESSL_HOME)\x86;$(LIBXML2_HOME)\lib</AdditionalLibraryDirectories>
     </Link>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
@@ -70,7 +70,7 @@
       <FunctionLevelLinking>true</FunctionLevelLinking>
       <IntrinsicFunctions>true</IntrinsicFunctions>
       <PreprocessorDefinitions>WIN32;NDEBUG;_CONSOLE;_LIB;%(PreprocessorDefinitions)</PreprocessorDefinitions>
-      <AdditionalIncludeDirectories>..\Codes;..\UnitTestCodes;$(GnuWin32_Home)\include;$(LIBCPPUNIT_HOME)\include;$(LIBCURL_HOME)\include;$(LIBICONV_HOME)\include;$(LIBXML2_HOME)\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>..\Codes;..\UnitTestCodes;$(LIBRESSL_HOME)\include;$(LIBCPPUNIT_HOME)\include;$(LIBCURL_HOME)\include;$(LIBICONV_HOME)\include;$(LIBJSONCPP_HOME)\include;$(LIBXML2_HOME)\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <DisableSpecificWarnings>4068</DisableSpecificWarnings>
     </ClCompile>
     <Link>
@@ -78,7 +78,7 @@
       <GenerateDebugInformation>true</GenerateDebugInformation>
       <EnableCOMDATFolding>true</EnableCOMDATFolding>
       <OptimizeReferences>true</OptimizeReferences>
-      <AdditionalLibraryDirectories>$(LIBCPPUNIT_HOME)\lib;$(LIBCURL_HOME);$(LIBICONV_HOME)\lib;$(LIBJSONCPP_HOME)\lib;$(LIBXML2_HOME)\lib</AdditionalLibraryDirectories>
+      <AdditionalLibraryDirectories>$(LIBCPPUNIT_HOME)\lib;$(LIBCURL_HOME);$(LIBICONV_HOME)\lib;$(LIBJSONCPP_HOME)\lib;$(LIBRESSL_HOME)\x86;$(LIBXML2_HOME)\lib</AdditionalLibraryDirectories>
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>

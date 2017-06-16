@@ -1,0 +1,57 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup>
+    <Filter Include="源文件">
+      <UniqueIdentifier>{4FC737F1-C7A5-4376-A066-2A32D752A2FF}</UniqueIdentifier>
+      <Extensions>cpp;c;cc;cxx;def;odl;idl;hpj;bat;asm;asmx</Extensions>
+    </Filter>
+    <Filter Include="头文件">
+      <UniqueIdentifier>{93995380-89BD-4b04-88EB-625FBE52EBFB}</UniqueIdentifier>
+      <Extensions>h;hh;hpp;hxx;hm;inl;inc;xsd</Extensions>
+    </Filter>
+    <Filter Include="资源文件">
+      <UniqueIdentifier>{67DA6AB6-F800-4c08-8B7A-83BB121AAD01}</UniqueIdentifier>
+      <Extensions>rc;ico;cur;bmp;dlg;rc2;rct;bin;rgs;gif;jpg;jpeg;jpe;resx;tiff;tif;png;wav;mfcribbon-ms</Extensions>
+    </Filter>
+    <Filter Include="OpenSourceCode">
+      <UniqueIdentifier>{85d9c47e-6932-487e-9cf9-1172d5c1a808}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="CommonCodes">
+      <UniqueIdentifier>{5ab1f692-132c-410a-b603-8c6e85bc16db}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="CommonCodes\头文件">
+      <UniqueIdentifier>{91b7992c-6ce8-46f6-b464-8237223f1ed4}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="CommonCodes\源文件">
+      <UniqueIdentifier>{4779bf36-6470-4884-940a-dcfdf8769c1f}</UniqueIdentifier>
+    </Filter>
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="Codes\Main.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
+    <ClInclude Include="..\OpenSourceCode\WMI_DeviceQuery.h">
+      <Filter>OpenSourceCode</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Codes\Des3.h">
+      <Filter>CommonCodes\头文件</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Codes\BaseType.h">
+      <Filter>CommonCodes\头文件</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Codes\SystemInclude.h">
+      <Filter>CommonCodes\头文件</Filter>
+    </ClInclude>
+  </ItemGroup>
+  <ItemGroup>
+    <ClCompile Include="Codes\Main.cpp">
+      <Filter>源文件</Filter>
+    </ClCompile>
+    <ClCompile Include="..\OpenSourceCode\WMI_DeviceQuery.cpp">
+      <Filter>OpenSourceCode</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Codes\Des3.cpp">
+      <Filter>CommonCodes\源文件</Filter>
+    </ClCompile>
+  </ItemGroup>
+</Project>

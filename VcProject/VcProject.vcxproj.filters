@@ -80,6 +80,9 @@
     <Filter Include="CommonCodes\源文件\Functions-L3">
       <UniqueIdentifier>{87a20d64-84b0-4799-a136-dd49aaadd381}</UniqueIdentifier>
     </Filter>
+    <Filter Include="OpenSourceCode">
+      <UniqueIdentifier>{0ea0c28f-6be9-4532-8c47-97235ce5261d}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Codes\Main.h">
@@ -184,6 +187,12 @@
     <ClInclude Include="..\Codes\Controller.h">
       <Filter>CommonCodes\源文件\Functions-L3</Filter>
     </ClInclude>
+    <ClInclude Include="..\Codes\Des3.h">
+      <Filter>CommonCodes\头文件\Foundation</Filter>
+    </ClInclude>
+    <ClInclude Include="..\OpenSourceCode\WMI_DeviceQuery.h">
+      <Filter>OpenSourceCode</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Codes\Main.cpp">
@@ -239,6 +248,12 @@
     </ClCompile>
     <ClCompile Include="..\Codes\Controller.cpp">
       <Filter>CommonCodes\源文件\Functions-L3</Filter>
+    </ClCompile>
+    <ClCompile Include="..\OpenSourceCode\WMI_DeviceQuery.cpp">
+      <Filter>OpenSourceCode</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Codes\Des3.cpp">
+      <Filter>CommonCodes\源文件\Foundation</Filter>
     </ClCompile>
   </ItemGroup>
 </Project>

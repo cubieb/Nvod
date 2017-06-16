@@ -7,6 +7,10 @@ Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "VcUnitTestProject", "VcUnit
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "VcProject", "VcProject\VcProject.vcxproj", "{B4180680-61C2-4B67-A31C-BE75E082C8E4}"
 EndProject
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "AuthForClient", "AuthForClient\AuthForClient.vcxproj", "{96FA3367-9E75-4228-B5F2-E2BF8F3870A9}"
+EndProject
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "AuthForGospell", "AuthForGospell\AuthForGospell.vcxproj", "{99876BC6-8C8B-4AF8-B5CF-ED945D08E4C4}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Win32 = Debug|Win32
@@ -21,6 +25,14 @@ Global
 		{B4180680-61C2-4B67-A31C-BE75E082C8E4}.Debug|Win32.Build.0 = Debug|Win32
 		{B4180680-61C2-4B67-A31C-BE75E082C8E4}.Release|Win32.ActiveCfg = Release|Win32
 		{B4180680-61C2-4B67-A31C-BE75E082C8E4}.Release|Win32.Build.0 = Release|Win32
+		{96FA3367-9E75-4228-B5F2-E2BF8F3870A9}.Debug|Win32.ActiveCfg = Debug|Win32
+		{96FA3367-9E75-4228-B5F2-E2BF8F3870A9}.Debug|Win32.Build.0 = Debug|Win32
+		{96FA3367-9E75-4228-B5F2-E2BF8F3870A9}.Release|Win32.ActiveCfg = Release|Win32
+		{96FA3367-9E75-4228-B5F2-E2BF8F3870A9}.Release|Win32.Build.0 = Release|Win32
+		{99876BC6-8C8B-4AF8-B5CF-ED945D08E4C4}.Debug|Win32.ActiveCfg = Debug|Win32
+		{99876BC6-8C8B-4AF8-B5CF-ED945D08E4C4}.Debug|Win32.Build.0 = Debug|Win32
+		{99876BC6-8C8B-4AF8-B5CF-ED945D08E4C4}.Release|Win32.ActiveCfg = Release|Win32
+		{99876BC6-8C8B-4AF8-B5CF-ED945D08E4C4}.Release|Win32.Build.0 = Release|Win32
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

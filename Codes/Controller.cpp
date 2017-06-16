@@ -1,5 +1,7 @@
 #include "Controller.h"
 
+#include <direct.h>
+
 /* Foundation */
 #include "SystemInclude.h"
 #include "Debug.h"
@@ -29,13 +31,19 @@ ControllerInterface &ControllerInterface::GetInstance()
 /**********************class Controller**********************/
 /* public function */
 Controller::Controller()
-{}
+{
+    if (access("Movies", 0) != 0)
+    {
+        /* create folder to store movies */
+        _mkdir("Movies");
+    }
+}
 
 Controller::~Controller()
 {}
 
 void Controller::Start(const char *xmlPath)
-{    
+{
     {
         std::lock_guard<std::mutex> lock(mtx);
         if (isOnGoing)
@@ -83,7 +91,7 @@ void Controller::TheControllerThread(const char *xmlPath)
     else
         t = t + 3600 * 27;
 
-	milliseconds duration = milliseconds::zero(); 
+	milliseconds duration = milliseconds::zero();
     while (true)
     {
         std::unique_lock<std::mutex> lock(mtx);
@@ -95,10 +103,10 @@ void Controller::TheControllerThread(const char *xmlPath)
 		ClearPlayers(players.tmssPlayers);
 
 		if (exiting)
-		{			
+		{
             break;
         }
-        
+
         if (!CreateEntities(xmlPath, globalCfg, tses))
         {
             errstrm << "CreateEntities() failed, TheControllerThread() stopped.";
@@ -107,7 +115,7 @@ void Controller::TheControllerThread(const char *xmlPath)
         }
 
         if (!CreatePlayers(globalCfg, tses, players))
-		{ 
+		{
 			errstrm << "CreatePlayers() failed, TheControllerThread() stopped.";
 			isOnGoing = false;
             break;
@@ -169,7 +177,7 @@ bool Controller::CreateEntities(const char *xmlPath, shared_ptr<GlobalCfgEntity>
 bool Controller::CreatePlayers(shared_ptr<GlobalCfgEntity> globalCfg, list<shared_ptr<TsEntity>> tses, Players& players)
 {
 	uint32_t fileNumber = 0, finishedFileNumber = 0;
-	DownloaderInterface::Handler handler = [&finishedFileNumber](std::shared_ptr<FtpResource> ftpResource, bool finished) ->void
+	DownloaderInterface::Handler handler = [&finishedFileNumber](shared_ptr<FtpResource> ftpResource, bool finished) ->void
     {
 		if (finished)
 		{
@@ -188,13 +196,13 @@ bool Controller::CreatePlayers(shared_ptr<GlobalCfgEntity> globalCfg, list<share
         {
             list<shared_ptr<RefsEventEntity>>& refsEvents = (*refs)->GetRefsEvents();
             for (auto refsEvent = refsEvents.begin(); refsEvent != refsEvents.end(); ++refsEvent)
-            {                
+            {
                 list<shared_ptr<PosterEntity>>& posters = (*refsEvent)->GetPosters();
                 for_each(posters.begin(), posters.end(), downloaderP);
 
                 list<shared_ptr<MovieEntity>>& movies = (*refsEvent)->GetMovies();
                 for_each(movies.begin(), movies.end(), downloaderM);
-            }            
+            }
         }
     }
 
@@ -215,7 +223,7 @@ bool Controller::CreatePlayers(shared_ptr<GlobalCfgEntity> globalCfg, list<share
         shared_ptr<PlayerInterface> patPlayer(CreatePlayerInterface("PatPlayer", globalCfg, *ts));
         players.patPlayers.push_back(patPlayer);
         patPlayer->Start();
-        
+
         list<shared_ptr<RefsEntity>>& refses = (*ts)->GetRefses();
         for (auto refs = refses.begin(); refs != refses.end(); ++refs)
         {
